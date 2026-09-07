@@ -5,6 +5,7 @@ use App\Livewire\Storefront\CollectionPage;
 use App\Livewire\Storefront\ProductPage;
 use App\Livewire\Storefront\CartPage;
 use App\Livewire\Storefront\CheckoutPage;
+use App\Livewire\Storefront\OrderStatusPage;
 use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,9 @@ Route::get('/koleksiyon/{slug}', CollectionPage::class)->name('collection.show')
 Route::get('/urun/{slug}', ProductPage::class)->name('product.show');
 Route::get('/sepet', CartPage::class)->name('cart');
 Route::get('/checkout', CheckoutPage::class)->name('checkout');
+Route::get('/siparis/{reference}', OrderStatusPage::class)
+    ->name('order.show')
+    ->where('reference', '[A-Za-z0-9]+');
 Route::post('/stripe/webhook', StripeWebhookController::class)
 	->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])
 	->name('stripe.webhook');

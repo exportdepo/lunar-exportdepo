@@ -6,7 +6,11 @@
                 <h1 class="mt-4 text-3xl font-extrabold text-emerald-900">Siparişiniz alındı</h1>
                 <p class="mt-3 text-emerald-800">Sipariş numaranız: <strong>{{ $orderReference }}</strong></p>
                 <p class="mt-2 text-sm text-emerald-700">Ödeme yöntemi: Manuel ödeme</p>
-                <a href="{{ url('/') }}" class="mt-8 inline-flex rounded-lg bg-emerald-700 px-5 py-3 font-semibold text-white hover:bg-emerald-800">Alışverişe dön</a>
+                <p class="mt-4 text-sm text-emerald-700">Sipariş onayını e-posta adresinize gönderdik.</p>
+                <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+                    <a href="{{ url('/siparis/' . $orderReference) }}" class="inline-flex rounded-lg bg-emerald-700 px-5 py-3 font-semibold text-white hover:bg-emerald-800">Siparişinizi takip edin</a>
+                    <a href="{{ url('/') }}" class="inline-flex rounded-lg border border-emerald-300 bg-white px-5 py-3 font-semibold text-emerald-800 hover:bg-emerald-50">Alışverişe dön</a>
+                </div>
             </div>
         @elseif (empty($summary))
             <div class="mx-auto max-w-2xl rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">

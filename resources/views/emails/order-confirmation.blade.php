@@ -141,6 +141,13 @@
                         </td>
                     </tr>
 
+                    {{-- CTA: Sipariş Takip --}}
+                    <tr>
+                        <td align="center" style="padding:0 32px 24px 32px;">
+                            <a href="{{ url('/siparis/' . $order->reference) }}" style="display:inline-block;background-color:#4f46e5;color:#ffffff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">Siparişinizi Takip Edin</a>
+                        </td>
+                    </tr>
+
                     {{-- Bilgi notu --}}
                     <tr>
                         <td style="padding:0 32px 32px 32px;">
