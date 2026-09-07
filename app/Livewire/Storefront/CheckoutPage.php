@@ -2,9 +2,12 @@
 
 namespace App\Livewire\Storefront;
 
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use App\Mail\OrderConfirmation;
 use Lunar\DataTypes\Price;
 use Lunar\DataTypes\ShippingOption;
 use Lunar\Facades\CartSession;
@@ -113,7 +116,9 @@ class CheckoutPage extends Component
         $this->orderReference = $order->reference;
         $this->summary = [];
         CartSession::forget();
-            $this->dispatch('cart-updated');
+        $this->dispatch('cart-updated');
+
+        $this->sendOrderConfirmation($order);
     }
 
     protected function refreshSummary(): void
@@ -143,6 +148,30 @@ class CheckoutPage extends Component
 
         ShippingManifest::addOption($shippingOption);
         $cart->setShippingOption($shippingOption);
+    }
+
+    protected function sendOrderConfirmation(Order $order): void
+    {
+        $email = $order->billingAddress?->contact_email
+            ?? $order->shippingAddress?->contact_email;
+
+        if (! $email) {
+            Log::warning('Sipariş onay maili gönderilemedi: e-posta adresi bulunamadı.', [
+                'order_id' => $order->id,
+                'reference' => $order->reference,
+            ]);
+            return;
+        }
+
+        try {
+            Mail::to($email)->send(new OrderConfirmation($order));
+        } catch (\Throwable $e) {
+            Log::error('Sipariş onay maili gönderilemedi.', [
+                'order_id' => $order->id,
+                'reference' => $order->reference,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function render()

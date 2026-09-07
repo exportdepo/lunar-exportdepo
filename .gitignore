@@ -27,6 +27,9 @@ yarn-error.log
 /_*.php
 /toArray()
 
+# Tek kullanımlık scriptler
+/scripts/
+
 # SQLite yerel veritabanı
 *.sqlite
 /database/database.sqlite
