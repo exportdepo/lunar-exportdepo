@@ -113,12 +113,30 @@ class CheckoutPage extends Component
         }
 
         $order = Order::findOrFail($response->orderId);
+
+        $this->linkOrderToUser($order);
+
         $this->orderReference = $order->reference;
         $this->summary = [];
         CartSession::forget();
         $this->dispatch('cart-updated');
 
         $this->sendOrderConfirmation($order);
+    }
+
+    protected function linkOrderToUser(Order $order): void
+    {
+        $user = auth()->user();
+        if (! $user) {
+            return;
+        }
+
+        $customer = $user->customers->first();
+        if (! $customer) {
+            return;
+        }
+
+        $order->update(['customer_id' => $customer->id]);
     }
 
     protected function refreshSummary(): void
