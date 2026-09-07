@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#16a34a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:rgba(0,0,0,0.4);stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#bg)"/>
+  <circle cx="300" cy="240" r="110" fill="rgba(255,255,255,0.15)"/>
+  <text x="300" y="290" font-size="120" text-anchor="middle" fill="white">🛏️</text>
+  <text x="300" y="430" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="white">Bel Yastığı</text>
+  <text x="300" y="475" font-family="Arial, sans-serif" font-size="20" text-anchor="middle" fill="rgba(255,255,255,0.85)">Lunar Shop</text>
+</svg>
