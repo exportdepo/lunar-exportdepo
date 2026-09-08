@@ -14,6 +14,10 @@ class ProductPage extends Component
 {
     public array $product = [];
 
+    public array $variants = [];
+
+    public ?int $selectedVariantId = null;
+
     public string $slug = '';
 
     public int $quantity = 1;
@@ -25,6 +29,7 @@ class ProductPage extends Component
         $this->slug = $slug;
         $product = Product::with([
             'media',
+            'variants.values',
             'variants.prices.currency',
             'urls',
             'collections.urls',
@@ -37,8 +42,6 @@ class ProductPage extends Component
             throw (new ModelNotFoundException)->setModel(Product::class, [$slug]);
         }
 
-        $variant = $product->variants->first();
-        $price = $variant?->prices->first();
         $image = $product->media->first();
 
         $this->product = [
@@ -46,12 +49,38 @@ class ProductPage extends Component
             'name' => (string) ($product->translateAttribute('name') ?? ''),
             'description' => (string) ($product->translateAttribute('description') ?? ''),
             'image_url' => $image?->getUrl(),
-            'price' => $price?->price?->value,
-            'stock' => $variant?->stock,
-            'variant_id' => $variant?->id,
+            'price' => null,
+            'stock' => null,
+            'variant_id' => null,
             'collection' => $product->collections->first()?->translateAttribute('name'),
             'collection_url' => $product->collections->first()?->urls->first()?->slug,
         ];
+
+        $this->variants = $this->getProductVariants($product);
+
+        $this->selectedVariantId = $product->variants->first()?->id;
+        $this->updateSelectedVariant($product->variants->first());
+    }
+
+    protected function getProductVariants(Product $product): array
+    {
+        return $product->variants->map(fn (ProductVariant $variant): array => [
+            'id' => $variant->id,
+            'label' => $variant->getOption() ?: $variant->sku ?: 'Varyant ' . $variant->id,
+        ])->values()->all();
+    }
+
+    public function updatedSelectedVariantId(?int $variantId): void
+    {
+        $variant = collect($this->variants)->firstWhere('id', $variantId);
+
+        if (! $variant) {
+            return;
+        }
+
+        $this->product['variant_id'] = $variantId;
+        $this->updateSelectedVariant($this->productVariant());
+        $this->added = false;
     }
 
     public function addToCart(): void
@@ -91,6 +120,18 @@ class ProductPage extends Component
                     ->whereHas('urls', fn ($urlQuery) => $urlQuery->where('slug', $this->slug));
             })
             ->firstOrFail();
+    }
+
+    protected function updateSelectedVariant(?ProductVariant $variant): void
+    {
+        if (! $variant) {
+            return;
+        }
+
+        $price = $variant->prices->first();
+        $this->product['price'] = $price?->price?->value;
+        $this->product['stock'] = $variant->stock;
+        $this->product['variant_id'] = $variant->id;
     }
 
     public function render()

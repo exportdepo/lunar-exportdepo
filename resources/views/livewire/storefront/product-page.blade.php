@@ -29,6 +29,16 @@
                 <p class="mt-6 text-lg leading-8 text-slate-600">{{ $product['description'] }}</p>
 
                 <div class="mt-8 border-t border-slate-200 pt-6">
+                    @if (count($variants) > 1)
+                        <div class="mb-5">
+                            <label for="variant" class="mb-2 block text-sm font-medium text-slate-700">Varyant</label>
+                            <select id="variant" wire:model.live="selectedVariantId" class="w-full max-w-sm rounded-lg border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                @foreach ($variants as $variant)
+                                    <option value="{{ $variant['id'] }}">{{ $variant['label'] }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
                     @if ($product['stock'] !== null && $product['stock'] > 0)
                         <div class="mb-4 text-sm font-medium text-emerald-700">Stokta: {{ $product['stock'] }} adet</div>
                         <form wire:submit="addToCart" class="flex flex-wrap items-end gap-3">

@@ -11,12 +11,11 @@ use Lunar\Models\Product;
 #[Layout('layouts.storefront')]
 class CollectionPage extends Component
 {
-    public array $collection = [];
-
-    public array $products = [];
+    public string $slug;
 
     public function mount(string $slug): void
     {
+        $this->slug = $slug;
         $collection = Collection::with([
             'media',
             'urls',
@@ -39,8 +38,26 @@ class CollectionPage extends Component
             'image_url' => $image?->getUrl(),
         ];
 
-        $this->products = $collection->products
-            ->where('status', 'published')
+        $this->loadProducts($collection);
+    }
+
+    protected function loadProducts(?Collection $collection = null): void
+    {
+        if (! $collection) {
+            $collection = Collection::whereHas('urls', fn ($query) => $query->where('slug', $this->slug))->first();
+        }
+
+        $query = $collection->products()
+            ->where('status', 'published');
+
+        if ($this->searchTerm) {
+            $query->where(function ($q) {
+                $q->where('attribute_data->name->en', 'like', '%' . $this->searchTerm . '%')
+                  ->orWhere('attribute_data->name->tr', 'like', '%' . $this->searchTerm . '%');
+            });
+        }
+
+        $this->products = $query->with(['media', 'variants.prices', 'urls'])->get()
             ->map(function (Product $product): array {
                 $variant = $product->variants->first();
                 $price = $variant?->prices->first();
@@ -59,6 +76,12 @@ class CollectionPage extends Component
             ->values()
             ->all();
     }
+
+    public function updatedSearchTerm(): void
+    {
+        $this->loadProducts();
+    }
+
 
     public function render()
     {

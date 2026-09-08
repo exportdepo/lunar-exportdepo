@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\OrderConfirmationService;
+use App\Services\OrderStockService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Lunar\Models\Order;
@@ -41,6 +43,8 @@ class StripeWebhookController extends Controller
                     'status' => 'payment-received',
                     'placed_at' => now(),
                 ]);
+                app(OrderStockService::class)->decrementFor($order->fresh('productLines'));
+                app(OrderConfirmationService::class)->send($order->fresh());
             }
         }
 
