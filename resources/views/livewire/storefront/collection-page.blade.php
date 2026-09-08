@@ -21,12 +21,57 @@
     </section>
 
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
             <h2 class="text-2xl font-bold text-slate-900">{{ $collection['name'] }} ürünleri</h2>
-            <div class="relative">
-                <input wire:model.live.debounce.300ms="searchTerm" type="text" placeholder="Ürün ara..." class="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            
+            <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                <div class="relative w-full sm:w-64">
+                    <input wire:model.live.debounce.300ms="searchTerm" type="text" placeholder="Ürün ara..." class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                @if (!empty($categories))
+                    <div class="w-full sm:w-48">
+                        <select wire:model="selectedCategoryId" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">Tüm Kategoriler</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category['id'] }}">{{ $category['name'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
+
+                @if (!empty($variantAttributes))
+                    <div class="w-full sm:w-48">
+                        <select wire:model="selectedVariantAttributeId" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">Tüm Özellikler</option>
+                            @foreach ($variantAttributes as $attribute)
+                                <option value="{{ $attribute['attribute_id'] }}">{{ $attribute['attribute_name'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="w-full sm:w-48">
+                        <select wire:model="selectedVariantValue" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" {{ $selectedVariantAttributeId ? '' : 'disabled' }}>
+                            <option value="">Değer Seçin</option>
+                            @foreach ($variantAttributes as $attribute)
+                                @if ($attribute['attribute_id'] == $selectedVariantAttributeId)
+                                    @foreach ($attribute['values'] as $value)
+                                        <option value="{{ $value['value'] }}">{{ $value['label'] }}</option>
+                                    @endforeach
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
+
+                @if ($searchTerm || $selectedCategoryId || $selectedVariantValue)
+                    <button wire:click="clearFilters" class="px-4 py-2 text-sm text-indigo-600 hover:text-indigo-800 underline transition-colors">
+                        Filtreleri Temizle
+                    </button>
+                @endif
+
+                <span class="text-sm text-slate-500">{{ count($products) }} ürün</span>
             </div>
-            <span class="text-sm text-slate-500">{{ count($products) }} ürün</span>
         </div>
 
         @if (empty($products))
