@@ -3,7 +3,7 @@
 ## Proje
 - **Yol:** `c:\Users\musta\Desktop\exportdepo`
 - **URL:** http://lunar.test
-- **Stack:** Laravel 11 + Lunar 1.5 + Livewire 3 + Tailwind (CDN) + Stripe SDK 16
+- **Stack:** Laravel 12 + Lunar 1.5 + Livewire 3 + Tailwind (CDN) + Stripe SDK 21
 
 ## Tamamlanan Teslimat
 
@@ -86,5 +86,8 @@ tests/Feature/StorefrontRoutesTest.php
 
 ## Notlar
 - `.env` repoya **gönderilmez** (Stripe anahtarları vb.)
-- Kök dizindeki geçici hata ayıklama dosyaları (`_*.php`, `toArray()`) `.gitignore`'a alındı
+- Kök dizindeki geçici hata ayıklama dosyaları (`_*.php`, `toArray())`) silindi; `.gitignore` deseni `/toArray()*` olarak sağlamlaştırıldı
 - SQLite veritabanı ve storage logları `.gitignore`'da
+- Stripe SDK 16 → ^21.3 yükseltildi (21.3.2); tüm feature testleri geçti (45 test / 164 assertion)
+- `.env`'de `PAYMENTS_TYPE` + `STRIPE_*` placeholder'ları mevcut; canlıya alırken `STRIPE_SECRET` ve `STRIPE_WEBHOOK_SECRET` doldurulmalı (boşsa manuel ödeme fallback'i)
+- Vendor sağlığı: composer.json ↔ composer.lock senkron, platform gereksinimleri eksiksiz, bilinen güvenlik açığı bulunmuyor
