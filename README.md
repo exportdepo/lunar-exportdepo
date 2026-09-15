@@ -1,66 +1,111 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ExportDepo
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**ExportDepo**, [Laravel](https://laravel.com) 12 ve [Lunar PHP](https://lunarphp.io) ^1.5 üzerinde çalışan, [Livewire](https://livewire.laravel.com) tabanlı tam yığın bir e-ticaret vitrinidir. Stripe ödemeleri ve Lunar yönetim panelini içerir.
 
-## About Laravel
+![CI](https://github.com/exportdepo/lunar-exportdepo/actions/workflows/tests.yml/badge.svg)
+![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+> ℹ️ Repo private olduğu için CI badge'i yalnızca repo üyelerine görünür.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Özellikler
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- 🏪 **Storefront** — Livewire tam sayfa bileşenleriyle: ana sayfa, koleksiyon, ürün detayı, sepet, checkout, sipariş durumu
+- 👤 **Hesap** — kayıt/giriş/şifre sıfırlama, "Hesabım" ve sipariş geçmişi sayfaları
+- 💳 **Ödeme** — Stripe entegrasyonu (webhook desteğiyle); `STRIPE_*` boşsa manuel ödeme (cash-in-hand) fallback'i
+- 🎛️ **Yönetim paneli** — Lunar Hub (`/lunar`) + özel Filament kaynakları: CollectionGroup, ProductType, TaxClass, Language
+- 🇹🇷 **Türkiye odaklı** — TRY para birimi, Türkçe rotalar ve demo veriler
 
-## Learning Laravel
+## Teknolojiler
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Katman | Teknoloji |
+|---|---|
+| Backend | Laravel 12, PHP 8.4 |
+| E-ticaret çekirdeği | Lunar PHP ^1.5 (ürün, varyant, fiyat, sipariş, sepet) |
+| Frontend | Livewire 3, Tailwind CSS 4 (Vite), Alpine.js |
+| Yönetim paneli | Filament 4 (Lunar Hub) |
+| Ödeme | Stripe PHP SDK ^21.3 |
+| Veritabanı | SQLite (geliştirme/test) — MySQL/PostgreSQL uyumlu |
+| Test | PHPUnit 11 — 46 test / 165 assertion |
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Gereksinimler
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP **8.4+** (`pdo_sqlite`, `mbstring`, `intl`, `bcmath`, `zip` uzantılarıyla)
+- Composer
+- Node.js 22+
 
-## Laravel Sponsors
+## Kurulum
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+# 1. Bağımlılıklar
+composer install
+npm ci
 
-### Premium Partners
+# 2. Ortam
+cp .env.example .env
+php artisan key:generate
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+# 3. Veritabanı (varsayılan: SQLite)
+touch database/database.sqlite
+php artisan migrate
+php artisan db:seed --class=DemoDataSeeder
 
-## Contributing
+# 4. Frontend
+npm run build        # veya geliştirme için: npm run dev
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# 5. Çalıştır
+php artisan serve
+# → http://127.0.0.1:8000
+```
 
-## Code of Conduct
+Demo seeder; elektronik ve giyim koleksiyonlarında 15+ Türkçe ürün, yönetim paneli için admin staff hesabı oluşturur. Admin şifresi `.env` içindeki `EXPORTDEPO_ADMIN_PASSWORD` ile belirlenir.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Ortam Değişkenleri
 
-## Security Vulnerabilities
+| Değişken | Açıklama |
+|---|---|
+| `PAYMENTS_TYPE` | `cash-in-hand` (varsayılan, manuel ödeme) veya `stripe` |
+| `STRIPE_SECRET` | Stripe gizli anahtarı — boşsa manuel ödeme fallback'i devreye girer |
+| `STRIPE_WEBHOOK_SECRET` | Webhook imza doğrulama anahtarı |
+| `EXPORTDEPO_ADMIN_PASSWORD` | Seeder'ın oluşturduğu admin staff şifresi |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Stripe webhook endpoint'i: `POST /stripe/webhook` (CSRF koruması muaf).
 
-## License
+## Storefront Rotaları
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Rota | Açıklama |
+|---|---|
+| `/` | Ana sayfa |
+| `/koleksiyon/{slug}` | Koleksiyon sayfası (arama/filtre dahil) |
+| `/urun/{slug}` | Ürün detayı |
+| `/sepet` | Sepet |
+| `/checkout` | Checkout |
+| `/siparis/{reference}` | Sipariş durumu takibi |
+| `/giris`, `/kayit`, `/sifremi-unuttum`, `/sifre-sifirlama/{token}` | Kimlik doğrulama |
+| `/hesabim`, `/hesabim/siparislerim` | Hesap (giriş gerektirir) |
+| `/lunar` | Yönetim paneli (Lunar Hub / Filament) |
+
+## Testler ve CI
+
+```bash
+php artisan test
+```
+
+Testler bellek içi SQLite (`:memory:`) üzerinde, `RefreshDatabase` ile koşar. Her push'ta GitHub Actions (`.github/workflows/tests.yml`) tüm test paketini PHP 8.4 ile otomatik çalıştırır.
+
+## Proje Yapısı
+
+```
+app/
+├── Filament/Resources/     # Özel Lunar admin kaynakları
+├── Http/Controllers/       # StripeWebhookController
+├── Livewire/Storefront/    # Vitrin sayfa bileşenleri
+├── Services/               # Silme servisleri (ProductType, TaxClass, CollectionGroup)
+└── Support/                # StorefrontPricing gibi yardımcılar
+```
+
+> 📌 Dahili notlar için: proje devir-teslim özetine `handoff.md`, veritabanı denetim raporuna `DB_AUDIT.md` dosyalarından ulaşabilirsiniz.
+
+## Lisans
+
+[MIT](https://opensource.org/licenses/MIT)
