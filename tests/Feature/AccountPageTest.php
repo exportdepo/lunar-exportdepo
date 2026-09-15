@@ -10,12 +10,22 @@ use Lunar\Models\Channel;
 use Lunar\Models\Customer;
 use Lunar\Models\CustomerGroup;
 use Lunar\Models\Order;
+use Tests\Concerns\SeedsLunarDefaults;
 use Tests\TestCase;
 
 class AccountPageTest extends TestCase
 {
+    use SeedsLunarDefaults;
+
     protected ?User $testUser = null;
     protected ?Customer $testCustomer = null;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seedLunarDefaults();
+    }
 
     protected function tearDown(): void
     {

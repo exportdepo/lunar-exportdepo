@@ -148,8 +148,14 @@ class CheckoutPage extends Component
             return;
         }
 
+        $cart->refresh();
+        $cart->recalculate();
+
         $this->summary = [
             'count' => $cart->lines->sum('quantity'),
+            'sub_total' => $cart->subTotal?->value ?? 0,
+            'tax_total' => $cart->taxTotal?->value ?? 0,
+            'shipping_total' => $cart->shippingTotal?->value ?? 0,
             'total' => $cart->total?->value ?? 0,
         ];
     }

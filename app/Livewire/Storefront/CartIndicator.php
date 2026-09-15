@@ -14,6 +14,10 @@ class CartIndicator extends Component
 
     public int $total = 0;
 
+    public int $subTotal = 0;
+
+    public int $taxTotal = 0;
+
     public function mount(): void
     {
         $this->refreshCart();
@@ -28,8 +32,13 @@ class CartIndicator extends Component
             $this->lines = [];
             $this->count = 0;
             $this->total = 0;
+            $this->subTotal = 0;
+            $this->taxTotal = 0;
             return;
         }
+
+        $cart->refresh();
+        $cart->recalculate();
 
         $this->lines = $cart->lines->map(function ($line): array {
             $product = $line->purchasable?->product;
@@ -38,10 +47,12 @@ class CartIndicator extends Component
                 'id' => $line->id,
                 'name' => (string) ($product?->translateAttribute('name') ?? 'Ürün'),
                 'quantity' => (int) $line->quantity,
-                'total' => $line->total?->value ?? 0,
+                'total' => (int) (($line->unitPriceInclTax?->value ?? ($line->unitPrice?->value ?? 0)) * $line->quantity),
             ];
         })->all();
         $this->count = array_sum(array_column($this->lines, 'quantity'));
+        $this->subTotal = $cart->subTotal?->value ?? 0;
+        $this->taxTotal = $cart->taxTotal?->value ?? 0;
         $this->total = $cart->total?->value ?? 0;
     }
 

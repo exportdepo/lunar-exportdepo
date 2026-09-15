@@ -7,11 +7,21 @@ use Livewire\Livewire;
 use Lunar\Base\ValueObjects\Cart\TaxBreakdown;
 use Lunar\Models\Channel;
 use Lunar\Models\Order;
+use Tests\Concerns\SeedsLunarDefaults;
 use Tests\TestCase;
 
 class OrderStatusPageTest extends TestCase
 {
+    use SeedsLunarDefaults;
+
     protected ?Order $testOrder = null;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seedLunarDefaults();
+    }
 
     protected function tearDown(): void
     {

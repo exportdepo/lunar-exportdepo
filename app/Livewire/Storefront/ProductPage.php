@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Lunar\Facades\CartSession;
+use Lunar\Models\Channel;
 use Lunar\Models\Product;
 use Lunar\Models\ProductVariant;
 
@@ -101,13 +102,21 @@ class ProductPage extends Component
             return;
         }
 
+        $channel = $variant->product->channels()
+            ->where('handle', 'web')
+            ->first();
+
+        if ($channel instanceof Channel) {
+            CartSession::setChannel($channel);
+        }
+
         CartSession::manager()->add(
             $variant,
             $this->quantity,
         );
 
         $this->added = true;
-        $this->dispatch('cart-updated');
+        $this->dispatch('cart-updated')->to(CartIndicator::class);
     }
 
     protected function productVariant()
@@ -122,14 +131,23 @@ class ProductPage extends Component
             ->firstOrFail();
     }
 
+    public function updatedQuantity(): void
+    {
+        if (! $this->product['variant_id'] || $this->quantity < 1) {
+            return;
+        }
+
+        // Adet değişince birim fiyatı yeniden çözümle (miktar kademesi olabilir).
+        $this->updateSelectedVariant($this->productVariant());
+    }
+
     protected function updateSelectedVariant(?ProductVariant $variant): void
     {
         if (! $variant) {
             return;
         }
 
-        $price = $variant->prices->first();
-        $this->product['price'] = $price?->price?->value;
+        $this->product['price'] = \App\Support\StorefrontPricing::forVariantInclTax($variant, $this->quantity);
         $this->product['stock'] = $variant->stock;
         $this->product['variant_id'] = $variant->id;
     }

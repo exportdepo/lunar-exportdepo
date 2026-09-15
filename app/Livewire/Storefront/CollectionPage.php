@@ -14,6 +14,9 @@ class CollectionPage extends Component
 {
     public string $slug;
 
+    public array $collection = [];
+    public array $products = [];
+
     public string $searchTerm = '';
 
     public ?int $selectedCategoryId = null;
@@ -109,13 +112,6 @@ class CollectionPage extends Component
             ->where('status', 'published')
             ->with(['media', 'variants.prices', 'variants.values', 'urls']);
 
-        if ($this->searchTerm) {
-            $query->where(function ($q) {
-                $q->where('attribute_data->name->en', 'like', '%' . $this->searchTerm . '%')
-                  ->orWhere('attribute_data->name->tr', 'like', '%' . $this->searchTerm . '%');
-            });
-        }
-
         if ($this->selectedCategoryId) {
             $query->whereHas('collections', fn ($q) => $q->where('lunar_collections.id', $this->selectedCategoryId));
         }
@@ -127,10 +123,28 @@ class CollectionPage extends Component
             });
         }
 
-        $this->products = $query->get()
+        $products = $query->get();
+
+        // Not: attribute_data Lunar FieldType'ları JSON olarak saklar; SQLite'ta
+        // Türkçe karakterler \uXXXX kaçışıyla tutulduğu için SQL LIKE güvenilir
+        // eşleşme sağlamaz. Bu yüzden arama PHP tarafında yapılır.
+        if ($this->searchTerm !== '') {
+            $needle = $this->normalizeSearch($this->searchTerm);
+
+            $products = $products->filter(function (Product $product) use ($needle): bool {
+                $haystack = $this->normalizeSearch(
+                    (string) ($product->translateAttribute('name') ?? '').' '.
+                    (string) ($product->translateAttribute('description') ?? '')
+                );
+
+                return str_contains($haystack, $needle);
+            });
+        }
+
+        $this->products = $products
             ->map(function (Product $product): array {
                 $variant = $product->variants->first();
-                $price = $variant?->prices->first();
+                $price = $variant ? \App\Support\StorefrontPricing::forVariantInclTax($variant) : null;
                 $image = $product->media->first();
                 $url = $product->urls->first();
 
@@ -140,11 +154,21 @@ class CollectionPage extends Component
                     'url' => $url?->slug,
                     'image_url' => $image?->getUrl(),
                     'stock' => $variant?->stock,
-                    'price' => $price?->price?->value,
+                    'price' => $price,
                 ];
             })
             ->values()
             ->all();
+    }
+
+    /**
+     * Türkçe-duyarlı küçük harf normalizasyonu.
+     * PHP'nin mb_strtolower'ı 'I' -> 'i' ve 'İ' -> 'i̇' dönüşümü yaptığı için
+     * önce Türkçe eşleme uygulanır: 'I' -> 'ı', 'İ' -> 'i'.
+     */
+    protected function normalizeSearch(string $value): string
+    {
+        return mb_strtolower(str_replace(['İ', 'I'], ['i', 'ı'], $value), 'UTF-8');
     }
 
     public function updatedSearchTerm(): void

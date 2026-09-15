@@ -12,10 +12,20 @@ use Lunar\Models\Product;
 use Lunar\Models\ProductVariant;
 use Lunar\Models\TaxClass;
 use Lunar\Models\OrderAddress;
+use Tests\Concerns\SeedsLunarDefaults;
 use Tests\TestCase;
 
 class OrderConfirmationMailTest extends TestCase
 {
+    use SeedsLunarDefaults;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seedLunarDefaults();
+    }
+
     public function test_mailable_uses_correct_subject_and_view(): void
     {
         $order = new \Lunar\Models\Order(['reference' => 'ORD-TEST-1234']);

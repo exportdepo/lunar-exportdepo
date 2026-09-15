@@ -27,7 +27,7 @@
                             </div>
                             <div class="min-w-0 flex-1">
                                 <h2 class="font-semibold text-slate-900">{{ $line['name'] }}</h2>
-                                <p class="mt-1 text-sm text-slate-500">{{ number_format($line['unit_price'] / 100, 2, ',', '.') }} ₺ / adet</p>
+                                <p class="mt-1 text-sm text-slate-500">{{ number_format($line['unit_price'] / 100, 2, ',', '.') }} ₺ / adet <span class="text-xs text-slate-400">(KDV dahil)</span></p>
                                 <div class="mt-3 flex flex-wrap items-center gap-3">
                                     <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600">
                                         <span>Adet</span>
@@ -49,9 +49,23 @@
 
                 <aside class="p-6">
                     <h2 class="text-lg font-bold text-slate-900">Sipariş özeti</h2>
-                    <div class="mt-5 flex items-center justify-between px-4 py-3">
-                        <span class="font-semibold text-slate-700">Toplam</span>
-                        <span class="text-2xl font-extrabold text-slate-900">{{ number_format($total / 100, 2, ',', '.') }} ₺</span>
+                    <div class="mt-5 space-y-2 px-4 py-3 text-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-600">Ürünler (KDV hariç)</span>
+                            <span class="font-semibold text-slate-900">{{ number_format($subTotal / 100, 2, ',', '.') }} ₺</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-600">KDV</span>
+                            <span class="font-semibold text-slate-900">{{ number_format($taxTotal / 100, 2, ',', '.') }} ₺</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-600">Kargo</span>
+                            <span class="font-semibold text-slate-900">{{ $shippingTotal > 0 ? number_format($shippingTotal / 100, 2, ',', '.') . ' ₺' : 'Ücretsiz' }}</span>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-slate-200 pt-3 mt-3">
+                            <span class="font-semibold text-slate-700">Toplam</span>
+                            <span class="text-2xl font-extrabold text-slate-900">{{ number_format($total / 100, 2, ',', '.') }} ₺</span>
+                        </div>
                     </div>
                     <a href="{{ url('/checkout') }}" class="mt-6 inline-flex w-full justify-center rounded-lg bg-indigo-600 px-5 py-3 font-semibold text-white hover:bg-indigo-700">Ödemeye geç</a>
                 </aside>

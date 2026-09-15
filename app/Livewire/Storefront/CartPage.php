@@ -13,6 +13,12 @@ class CartPage extends Component
 
     public int $total = 0;
 
+    public int $subTotal = 0;
+
+    public int $taxTotal = 0;
+
+    public int $shippingTotal = 0;
+
     public function mount(): void
     {
         $this->refreshCart();
@@ -31,6 +37,8 @@ class CartPage extends Component
         }
 
         $cart->updateLine($lineId, $quantity);
+        $cart->refresh();
+        $cart->recalculate();
         $this->refreshCart();
         $this->dispatch('cart-updated');
     }
@@ -43,6 +51,8 @@ class CartPage extends Component
         }
 
         $cart->remove($lineId);
+        $cart->refresh();
+        $cart->recalculate();
         $this->refreshCart();
         $this->dispatch('cart-updated');
     }
@@ -54,8 +64,14 @@ class CartPage extends Component
         if (! $cart) {
             $this->lines = [];
             $this->total = 0;
+            $this->subTotal = 0;
+            $this->taxTotal = 0;
+            $this->shippingTotal = 0;
             return;
         }
+
+        $cart->refresh();
+        $cart->recalculate();
 
         $this->lines = $cart->lines->map(function ($line): array {
             $variant = $line->purchasable;
@@ -67,11 +83,14 @@ class CartPage extends Component
                 'name' => (string) ($product?->translateAttribute('name') ?? 'Ürün'),
                 'image_url' => $image?->getUrl(),
                 'quantity' => (int) $line->quantity,
-                'unit_price' => $line->unitPrice?->value ?? 0,
-                'total' => $line->total?->value ?? 0,
+                'unit_price' => $line->unitPriceInclTax?->value ?? ($line->unitPrice?->value ?? 0),
+                'total' => (int) (($line->unitPriceInclTax?->value ?? ($line->unitPrice?->value ?? 0)) * $line->quantity),
             ];
         })->all();
 
+        $this->subTotal = $cart->subTotal?->value ?? 0;
+        $this->taxTotal = $cart->taxTotal?->value ?? 0;
+        $this->shippingTotal = $cart->shippingTotal?->value ?? 0;
         $this->total = $cart->total?->value ?? 0;
     }
 

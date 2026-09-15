@@ -36,4 +36,19 @@ class CleanLunarPanelManager extends BaseLunarPanelManager
             \Lunar\Admin\Filament\Widgets\Dashboard\Orders\PopularProductsTable::class,
         ];
     }
+
+    public static function getResources(): array
+    {
+        $overrides = [
+            \Lunar\Admin\Filament\Resources\CollectionGroupResource::class => \App\Filament\Resources\CollectionGroupResource::class,
+            \Lunar\Admin\Filament\Resources\TaxClassResource::class => \App\Filament\Resources\TaxClassResource::class,
+            \Lunar\Admin\Filament\Resources\ProductTypeResource::class => \App\Filament\Resources\ProductTypeResource::class,
+            \Lunar\Admin\Filament\Resources\LanguageResource::class => \App\Filament\Resources\LanguageResource::class,
+        ];
+
+        return array_map(
+            fn (string $resource): string => $overrides[$resource] ?? $resource,
+            parent::getResources(),
+        );
+    }
 }

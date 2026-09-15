@@ -144,6 +144,11 @@ class DemoDataSeeder extends Seeder
             $channel->update(['url' => config('app.url')]);
         }
 
+        Channel::whereKeyNot($channel->id)->where('default', true)->update(['default' => false]);
+        if (! $channel->default) {
+            $channel->update(['default' => true]);
+        }
+
         return $channel;
     }
 
@@ -281,8 +286,11 @@ class DemoDataSeeder extends Seeder
 
         foreach ($this->products as $p) {
             // Slug ile bak, varsa geç (idempotent)
+            // Not: DB'de morph alias saklanır ('product'), FQCN (Product::class) değil!
+            // FQCN ile sorgulamak kontrolü her zaman başarısız yapar ve tekrar seed'de
+            // ürün kopyaları + slug çakışmaları üretir.
             $exists = Url::where('slug', $p['slug'])
-                ->where('element_type', Product::class)
+                ->where('element_type', (new Product)->getMorphClass())
                 ->first();
             if ($exists) {
                 continue;
@@ -330,14 +338,16 @@ class DemoDataSeeder extends Seeder
                 'min_quantity' => 1,
             ]);
 
-            // 4) URL
-            Url::create([
-                'element_type' => 'product',
-                'element_id' => $product->id,
-                'language_id' => $language->id,
-                'slug' => $p['slug'],
-                'default' => true,
-            ]);
+            // 4) URL — dil bazlı benzersiz slug + firstOrCreate (tekrar seed'e dayanıklı)
+            $slug = $this->uniqueProductSlug($p['slug'], $language->id, $product->id);
+            Url::firstOrCreate(
+                [
+                    'element_type' => (new Product)->getMorphClass(),
+                    'element_id' => $product->id,
+                    'language_id' => $language->id,
+                ],
+                ['slug' => $slug, 'default' => true]
+            );
 
             // 5) Channels + CustomerGroups
             $product->channels()->syncWithoutDetaching([$channel->id]);
@@ -364,6 +374,30 @@ class DemoDataSeeder extends Seeder
         }
 
         return $count;
+    }
+
+    /**
+     * Dil bazlı benzersiz ürün slug'ı üretir; çakışırsa -2, -3... sonekleri dener.
+     * (Aynı ürünün kendi mevcut URL kayıtları hariç tutulur.)
+     */
+    protected function uniqueProductSlug(string $base, int $languageId, ?int $ignoreProductId = null): string
+    {
+        $morph = (new Product)->getMorphClass();
+        $slug = $base;
+        $i = 1;
+
+        while (Url::where('slug', $slug)
+            ->where('language_id', $languageId)
+            ->where(function ($query) use ($morph, $ignoreProductId) {
+                $query->where('element_type', '!=', $morph)
+                      ->orWhere('element_id', '!=', $ignoreProductId);
+            })
+            ->exists()) {
+            $i++;
+            $slug = $base.'-'.$i;
+        }
+
+        return $slug;
     }
 
     // ────────────────────────────────────────────────────────────

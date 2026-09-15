@@ -52,6 +52,20 @@
                 <aside class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <h2 class="text-lg font-bold text-slate-900">Sipariş özeti</h2>
                     <div class="mt-5 flex items-center justify-between text-sm text-slate-600"><span>{{ $summary['count'] }} ürün</span><span>TRY</span></div>
+                    <div class="mt-4 space-y-2 text-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-600">Ürünler (KDV hariç)</span>
+                            <span class="font-semibold text-slate-900">{{ number_format($summary['sub_total'] / 100, 2, ',', '.') }} ₺</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-600">KDV</span>
+                            <span class="font-semibold text-slate-900">{{ number_format($summary['tax_total'] / 100, 2, ',', '.') }} ₺</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-600">Kargo</span>
+                            <span class="font-semibold text-slate-900">{{ ($summary['shipping_total'] ?? 0) > 0 ? number_format($summary['shipping_total'] / 100, 2, ',', '.') . ' ₺' : 'Ücretsiz' }}</span>
+                        </div>
+                    </div>
                     <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-4"><span class="font-semibold text-slate-700">Toplam</span><span class="text-2xl font-extrabold text-slate-900">{{ number_format($summary['total'] / 100, 2, ',', '.') }} ₺</span></div>
                     <button type="submit" class="mt-6 inline-flex w-full justify-center rounded-lg bg-indigo-600 px-5 py-3 font-semibold text-white hover:bg-indigo-700">Siparişi tamamla</button>
                 </aside>

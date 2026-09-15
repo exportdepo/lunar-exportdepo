@@ -28,7 +28,7 @@ class HomePage extends Component
 
         $this->products = $products->map(function (Product $product): array {
             $variant = $product->variants->first();
-            $price = $variant?->prices->first();
+            $price = $variant ? \App\Support\StorefrontPricing::forVariantInclTax($variant) : null;
             $image = $product->media->first();
             $url = $product->urls->first();
 
@@ -38,7 +38,7 @@ class HomePage extends Component
                 'url' => $url?->slug,
                 'image_url' => $image?->getUrl(),
                 'stock' => $variant?->stock,
-                'price' => $price?->price?->value,
+                'price' => $price,
             ];
         })->all();
 

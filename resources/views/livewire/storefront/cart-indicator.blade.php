@@ -5,6 +5,9 @@
         </svg>
         <span class="hidden sm:inline">Sepet</span>
         <span id="cart-badge" class="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-5 h-5 px-1 text-xs font-bold text-white bg-indigo-600 rounded-full">{{ $count }}</span>
+        @if ($count > 0)
+            <span class="hidden md:inline text-sm font-bold text-slate-900">{{ number_format($total / 100, 2, ',', '.') }} ₺</span>
+        @endif
     </button>
     <div id="cart-dropdown" hidden class="absolute right-0 mt-3 w-80 max-w-[calc(100vw-2rem)] rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -32,9 +35,19 @@
                     </div>
                 @endforeach
             </div>
-            <div class="flex items-center justify-between border-t border-slate-100 pt-3">
-                <span class="font-semibold text-slate-700">Toplam</span>
-                <span class="font-bold text-slate-900">{{ number_format($total / 100, 2, ',', '.') }} ₺</span>
+            <div class="border-t border-slate-100 pt-3 text-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-600">Ara toplam (KDV hariç)</span>
+                    <span class="font-semibold text-slate-900">{{ number_format($subTotal / 100, 2, ',', '.') }} ₺</span>
+                </div>
+                <div class="mt-1 flex items-center justify-between">
+                    <span class="text-slate-600">KDV</span>
+                    <span class="font-semibold text-slate-900">{{ number_format($taxTotal / 100, 2, ',', '.') }} ₺</span>
+                </div>
+                <div class="mt-2 flex items-center justify-between">
+                    <span class="font-semibold text-slate-700">Toplam</span>
+                    <span class="font-bold text-slate-900">{{ number_format($total / 100, 2, ',', '.') }} ₺</span>
+                </div>
             </div>
             <div class="mt-4 grid grid-cols-2 gap-2">
                 <a href="{{ url('/sepet') }}" class="rounded-lg border border-slate-300 px-3 py-2 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50">Sepeti gör</a>

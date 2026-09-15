@@ -8,7 +8,7 @@
     <title>{{ $title ?? 'ExportDepo' }} — ExportDepo</title>
 
     {{-- Tailwind CSS (Play CDN - build gerektirmez) --}}
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <script>
         // Türkçe font + bazı Tailwind config
         tailwind.config = {
@@ -21,6 +21,114 @@
             }
         }
     </script>
+
+    <style>
+        /* Ön yüzde form elemanlarının (Checkbox, Radio, Input, Select) uyumlu, belirgin ve yumuşak gölgeli stilleri */
+
+        /* Checkbox Stilleri */
+        input[type="checkbox"] {
+            opacity: 1 !important;
+            visibility: visible !important;
+            border: 1px solid #cbd5e1 !important; /* Slate-300 hafif gri kenarlık */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08) !important; /* Yumuşak alt gölge */
+            border-radius: 0.25rem !important;
+            accent-color: #4f46e5 !important; /* Indigo-600 seçim rengi */
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+        }
+        input[type="checkbox"]:hover {
+            border-color: #94a3b8 !important; /* Hover'da hafifçe daha belirgin Slate-400 */
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12) !important;
+        }
+
+        /* 1. Radyo Butonları (Kusursuz Yuvarlak) */
+        input[type="radio"] {
+            opacity: 1 !important;
+            visibility: visible !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 9999px !important; /* Tam dairesellik garantisi */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08) !important;
+            accent-color: #4f46e5 !important;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+        }
+        input[type="radio"]:hover {
+            border-color: #94a3b8 !important;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12) !important;
+        }
+
+        /* 2. Metin ve Girdi Alanları */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"],
+        input[type="number"],
+        textarea {
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="tel"]:focus,
+        input[type="number"]:focus,
+        textarea:focus {
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            outline: none !important;
+        }
+
+        /* 3. Seçim Kutuları (Select) */
+        select {
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+            cursor: pointer;
+        }
+        select:focus {
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            outline: none !important;
+        }
+
+        /* 4. Buton Etkileşimleri (Modern Hover, Active & Shadow) */
+        button[type="submit"],
+        button:not([disabled]),
+        .btn-interactive {
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease !important;
+        }
+        button[type="submit"]:hover,
+        .bg-indigo-600:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
+        }
+        button[type="submit"]:active,
+        .bg-indigo-600:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2) !important;
+        }
+
+        /* 5. Form Hata ve Doğrulama Mesajları */
+        p.text-rose-600,
+        .error-message {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.5rem;
+            background-color: #fef2f2; /* Rose-50 */
+            border-left: 3px solid #f43f5e; /* Rose-500 */
+            border-radius: 0.375rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+        }
+
+        /* 6. Kart & Konteyner Çerçeve Gölge Dokunuşu */
+        .rounded-2xl.bg-white {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03) !important;
+            border-color: #e2e8f0 !important;
+        }
+    </style>
 
     {{-- Livewire styles --}}
     @livewireStyles
