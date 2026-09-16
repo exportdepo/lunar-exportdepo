@@ -13,8 +13,11 @@
 - 🏪 **Storefront** — Livewire tam sayfa bileşenleriyle: ana sayfa, koleksiyon, ürün detayı, sepet, checkout, sipariş durumu
 - 👤 **Hesap** — kayıt/giriş/şifre sıfırlama, "Hesabım" ve sipariş geçmişi sayfaları
 - 💳 **Ödeme** — Stripe entegrasyonu (webhook desteğiyle); `STRIPE_*` boşsa manuel ödeme (cash-in-hand) fallback'i
-- 🎛️ **Yönetim paneli** — Lunar Hub (`/lunar`) + özel Filament kaynakları: CollectionGroup, ProductType, TaxClass, Language
+- 🎛️ **Yönetim paneli** — Lunar Hub (`/exportdepo`) + özel Filament kaynakları: CollectionGroup, ProductType, TaxClass, Language, ProductReview
 - 🇹🇷 **Türkiye odaklı** — TRY para birimi, Türkçe rotalar ve demo veriler
+
+- ⭐ **Ürün yorumları** — onaylanan yorumlar vitrinde görünür; onay akışı panelden yönetilir.
+- ❤️ **İstek listesi** — misafirler için oturumda, üyeler için veritabanında saklanır; girişte birleştirilir.
 
 ## Teknolojiler
 
@@ -26,7 +29,7 @@
 | Yönetim paneli | Filament 4 (Lunar Hub) |
 | Ödeme | Stripe PHP SDK ^21.3 |
 | Veritabanı | SQLite (geliştirme/test) — MySQL/PostgreSQL uyumlu |
-| Test | PHPUnit 11 — 46 test / 165 assertion |
+| Test | PHPUnit 11 — 68 test / 233 assertion |
 
 ## Gereksinimler
 
@@ -83,7 +86,8 @@ Stripe webhook endpoint'i: `POST /stripe/webhook` (CSRF koruması muaf).
 | `/siparis/{reference}` | Sipariş durumu takibi |
 | `/giris`, `/kayit`, `/sifremi-unuttum`, `/sifre-sifirlama/{token}` | Kimlik doğrulama |
 | `/hesabim`, `/hesabim/siparislerim` | Hesap (giriş gerektirir) |
-| `/lunar` | Yönetim paneli (Lunar Hub / Filament) |
+| `/exportdepo` | Yönetim paneli (Lunar Hub / Filament, staff guard) |
+| `/istek-listesi` | İstek listesi (wishlist) |
 
 ## Testler ve CI
 

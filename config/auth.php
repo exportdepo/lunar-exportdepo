@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\User;
+use Lunar\Admin\Models\Staff;
+
 return [
 
     /*
@@ -40,6 +43,15 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Lunar Hub (Filament paneli) staff kimlik dogrulamasi.
+        // LunarPanelProvider bunu runtime'da da kaydeder; ancak config'te
+        // kalici tanimli olmak config cache ve erken erisim durumlarinda
+        // kesin cozum saglar.
+        'staff' => [
+            'driver' => 'session',
+            'provider' => 'staff',
+        ],
     ],
 
     /*
@@ -62,7 +74,13 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => env('AUTH_MODEL', User::class),
+        ],
+
+        // Lunar Hub staff provider (Lunar\Admin\Models\Staff)
+        'staff' => [
+            'driver' => 'eloquent',
+            'model' => Staff::class,
         ],
 
         // 'users' => [

@@ -2,10 +2,14 @@
 
 namespace App\Providers;
 
+use App\PaymentTypes\StripePayment;
+use App\Support\WishlistManager;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use Lunar\Admin\LunarPanelManager;
-use App\PaymentTypes\StripePayment;
 use Lunar\Facades\Payments;
 
 class AppServiceProvider extends ServiceProvider
@@ -59,6 +63,22 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Payments::extend('stripe', fn ($app) => $app->make(StripePayment::class));
+
+        // Misafirken oturumda oluşturulan istek listesini, kullanıcı giriş
+        // yaptığında hesabına taşı; çıkışta oturum listesini temizle.
+        // Yalnızca vitrin (web) guard'ı için geçerlidir, personel panelini etkilemez.
+        Event::listen(Login::class, function (Login $event): void {
+            if ($event->guard === 'web' && $event->user) {
+                WishlistManager::mergeSessionIntoUser((int) $event->user->getAuthIdentifier());
+            }
+        });
+
+        Event::listen(Logout::class, function (Logout $event): void {
+            if ($event->guard === 'web') {
+                WishlistManager::clearSession();
+            }
+        });
+
         // Last-ditch attempt to register the panel after every provider
         // has booted, in case the early registration failed silently.
         if (class_exists(LunarPanelManager::class)) {

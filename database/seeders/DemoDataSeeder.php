@@ -2,16 +2,23 @@
 
 namespace Database\Seeders;
 
+use App\Models\ProductReview;
 use App\Models\User;
+use App\Models\WishlistItem;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Lunar\Admin\Models\Staff;
 use Lunar\FieldTypes\Text;
+use Lunar\Models\Attribute;
+use Lunar\Models\AttributeGroup;
 use Lunar\Models\Brand;
 use Lunar\Models\Channel;
 use Lunar\Models\Collection as ProductCollection;
 use Lunar\Models\CollectionGroup;
+use Lunar\Models\Country;
 use Lunar\Models\Currency;
 use Lunar\Models\Customer;
 use Lunar\Models\CustomerGroup;
@@ -21,8 +28,11 @@ use Lunar\Models\Product;
 use Lunar\Models\ProductType;
 use Lunar\Models\ProductVariant;
 use Lunar\Models\TaxClass;
+use Lunar\Models\TaxRate;
+use Lunar\Models\TaxRateAmount;
+use Lunar\Models\TaxZone;
+use Lunar\Models\TaxZoneCountry;
 use Lunar\Models\Url;
-use Lunar\Admin\Models\Staff;
 use Spatie\Permission\Models\Role;
 
 class DemoDataSeeder extends Seeder
@@ -53,6 +63,63 @@ class DemoDataSeeder extends Seeder
         ['handle' => 'ev-yasam', 'name' => 'Ev & Yaşam', 'desc' => 'Ev dekorasyonu, mutfak ve yaşam alanlarınız için ürünler.'],
     ];
 
+    /** @var array<string, array<int, string>> */
+    protected array $productFeatures = [
+        'lunarbook-pro-14' => ['14 inç Retina ekran (2560×1600)', 'M-serisi işlemci', '16GB DDR5 RAM', '512GB NVMe SSD', '1,4 kg ağırlık', 'Tam gün batarya ömrü'],
+        'kablosuz-mouse' => ['Sessiz tıklama teknolojisi', '2.4GHz + Bluetooth çift mod', 'USB-C hızlı şarj', '6 aya kadar pil ömrü', 'Ergonomik simetrik tasarım'],
+        'mekanik-klavye' => ['Türkçe Q tuş dizilimi', 'RGB aydınlatma (16.8M renk)', 'Hot-swap switch desteği', 'Alüminyum kasa', 'N-key rollover', 'Çıkarılabilir USB-C kablo'],
+        'bluetooth-kulaklik' => ['Aktif gürültü engelleme (ANC)', '40 saat pil ömrü', 'Hi-Res Audio sertifikalı', 'Çok noktalı bağlantı', 'Katlanır taşıma tasarımı'],
+        'akilli-saat' => ['1.4 inç AMOLED ekran', 'Dahili GPS', 'Kalp ritmi ve SpO2 takibi', '7 gün pil ömrü', '5ATM su geçirmezlik', '100+ spor modu'],
+        'premium-pamuk-tisort' => ['%100 organik pamuk', '200 gr/m² kumaş', 'Slim fit kalıp', 'Çift iğne dikiş yaka ve kol', '30°C makinede yıkama'],
+        'yaz-elbisesi' => ['Hafif viskon kumaş', 'Çiçekli desen', 'Midi boy', 'Volanlı kol detayı', 'Kemerli ve kemersiz kullanım'],
+        'slim-fit-kot' => ['Esnek denim (2% elastan)', 'Slim fit kalıp', 'Koyu yıkama rengi', 'Klasik 5 cep tasarım', 'Ayarlanabilir paça'],
+        'spor-ayakkabi' => ['Nefes alan file üst yüzey', 'Hafif EVA ara taban', 'Kauçuk dış taban', 'Çıkarılabilir iç taban', 'Yaklaşık 280 gram (42 no)'],
+        'yun-kazak' => ['%100 merinos yünü', 'Kazak yaka', 'Klasik kesim', 'Kaşıntı yapmayan lif yapısı', 'Elde yıkama önerilir'],
+        'otomatik-kahve-makinesi' => ['15 bar pompa basıncı', 'Otomatik süt köpürtücü', 'Çift fincan aynı anda', 'Dokunmatik kontrol paneli', 'Yıkanabilir demlik grubu', '1.8 L su deposu'],
+        'seramik-tava-seti' => ['3 parça: 20, 26 ve 28 cm', 'Yapışmaz seramik kaplama', 'İndüksiyon dahil tüm ocaklar', 'Isı iletmez kulplar', 'Bulaşık makinesinde yıkanabilir'],
+        'bel-yastigi' => ['Visko elastik sünger', 'Ergonomik bel kavisi', 'Fermuarlı yıkanabilir kılıf', 'Ofis ve araç uyumlu', '40×40 cm ölçü'],
+        'led-masa-lambasi' => ['5 renk sıcaklığı (2700K-6500K)', '10 parlaklık kademesi', 'USB-C şarj, kablosuz kullanım', 'Dokunmatik kontrol', 'Titreşimsiz göz koruyucu ışık'],
+        'seramik-saksi' => ['3 farklı boy (15, 20, 25 cm)', 'Beyaz mat sırlı yüzey', 'Drenaj deliği + alt tabak', 'Elde üretilmiş kil seramik', 'İç mekân ve balkon uyumlu'],
+    ];
+
+    /** @var array<string, string> */
+    protected array $productDescriptions = [
+        'lunarbook-pro-14' => 'LunarBook Pro 14, 14 inç Retina kalitesinde ekranı ve M-serisi işlemcisiyle günlük işlerden profesyonel projelere kadar her yükü kolayca kaldırır. 16GB RAM ve 512GB SSD sayesinde çoklu sekme, video düzenleme ve büyük dosyalar arasındaki geçişler anlık olur. 1,4 kg\'lık alüminyum gövde çantada fark ettirmeden taşınır; tam gün süren batarya ile priz aramaya son.',
+        'kablosuz-mouse' => 'Kablosuz Mouse, sessiz tıklama yapısıyla gece çalışmaları ve paylaşılan ofisler için ideal bir seçim. 2.4GHz alıcı veya Bluetooth arasında tek tuşla geçiş yapabilir, USB-C ile 10 dakikalık şarjla gün boyu kullanabilirsiniz. Simetrik gövdesi sağ ve sol el kullanıcılarına aynı konforu sunar.',
+        'mekanik-klavye' => 'Mekanik Klavye, Türkçe Q dizilimi ve hot-swap anahtar yuvalarıyla hem günlük kullanıcılara hem de modifiye meraklılarına hitap eder. Alüminyum kasa ve N-key rollover sayesinde en hızlı anlarda bile tuş kaybı yaşanmaz. RGB aydınlatmayı yazılımla senkronize edip kendi ışık profillerinizi oluşturabilirsiniz.',
+        'bluetooth-kulaklik' => 'Bluetooth Kulaklık, aktif gürültü engelleme ile uçuşta, metroda ve açık ofiste sessiz bir alan yaratır. Hi-Res Audio sertifikalı sürücüler detayları kaybetmeden aktarır; tek şarjla 40 saate kadar dinleme süresi sunar. Katlanır gövdesi ve taşıma kılıfıyla ideal bir yol arkadaşıdır.',
+        'akilli-saat' => 'Akıllı Saat, parlak AMOLED ekranı ve dahili GPS\'i ile koşudan yüzmeye kadar tüm antrenmanlarınızı kaydeder. Kalp ritmi, SpO2 ve uyku analizleriyle sağlığınızı 7/24 takip eder; tek şarj 7 gün yeter. 5ATM sertifikası sayesinde yüzme seanslarında gönül rahatlığıyla kullanabilirsiniz.',
+        'premium-pamuk-tisort' => 'Premium Pamuk Tişört, %100 organik pamuktan üretilen 200 gr/m² kalın dokusuyla hem yumuşak hem de formunu koruyan bir yapıya sahiptir. Slim fit kalıbı bedeninizi gösterirken rahat hareket alanı bırakır. Kol ve yaka biyeleri, yıkamalarda esnemeyen çift iğne dikişle güçlendirilmiştir.',
+        'yaz-elbisesi' => 'Yaz Elbisesi, nefes alan viskon dokusuyla sıcak günlerde serin ve şık kalmanızı sağlar. Midi boy ve volanlı kol detayı hem ofiste hem plajda uyum sağlar. Kemerle bel vurgusu yapabilir, kemersiz daha rahat bir siluet tercih edebilirsiniz.',
+        'slim-fit-kot' => 'Slim Fit Kot Pantolon, esnek denim dokusuyla gün boyu konfor sunar; klasik beş cep yapısıyla zamansızdır. Koyu yıkama rengi hem ofis hem hafta sonu kombinlerine kolayca uyum sağlar. Paça, ütüyle istediğiniz boya getirilebilir.',
+        'spor-ayakkabi' => 'Spor Ayakkabı, file üst yüzeyi ve EVA ara tabanıyla adım başı enerji tasarrufu sağlar. Kauçuk dış taban, ıslak zeminlerde güvenli tutuş sunar. Çıkarılabilir iç taban sayesinde kişisel taban desteğiyle kullanılabilir; 280 gram ağırlığıyla koşu ve günlük kullanım için idealdir.',
+        'yun-kazak' => 'Yün Kazak, merinos yününün doğal ısı düzenleyici özelliğiyle soğuk günlerde terletmeden sıcak tutar. Kazak yaka ve klasik kesim, gömlek üstüne veya tek başına rahatlıkla kombinlenir. Merinos lifleri, çapraz lif yapısı sayesinde kaşıntı yapmaz.',
+        'otomatik-kahve-makinesi' => 'Otomatik Kahve Makinesi, 15 bar basınçlı pompasıyla espresso keyfini evinize taşır. Otomatik süt köpürtücü tek tuşla cappuccino ve latte hazırlar; çift fincan fonksiyonu misafirlerinizi bekletmez. Yıkanabilir demlik grubu sayesinde bakım dakikalar içinde tamamlanır.',
+        'seramik-tava-seti' => 'Seramik Tava Seti, üç farklı boyutuyla her yemek için doğru tavayı sunar. Yapışmaz seramik kaplama az yağla pişirmenizi sağlar ve yanık kalıntısı bırakmaz. İndüksiyon dahil tüm ocaklarda çalışır; kulplar ısı iletmez, bulaşık makinesinde rahatça yıkanır.',
+        'bel-yastigi' => 'Bel Yastığı, visko elastik süngeriyle belinize şekil alır ve uzun oturmalarda yükü omurgadan alır. Fermuarlı kılıfı çıkarılıp makinede yıkanabilir; dikişsiz kumaş yüzeyi terletmez. Ofis koltuğu, araç koltuğu ve ergonomik sandalyelerle uyumludur.',
+        'led-masa-lambasi' => 'LED Masa Lambası, beş renk sıcaklığı ve on parlaklık kademesiyle okumadan videokonferansa her ortam için doğru ışığı verir. Titreşimsiz LED teknolojisi göz yorgunluğunu azaltır. Dahili bataryası USB-C ile şarj edildikten sonra kablosuz olarak da kullanılabilir.',
+        'seramik-saksi' => 'Seramik Saksı Seti, üç farklı boyutuyla sukulentten sarmaşığa kadar tüm bitki ihtiyaçlarını karşılar. Beyaz mat sırlı yüzey minimalist ev dekoruyla uyumludur. Alt tabaklı drenaj deliği kök çürümesini önler; her saksı elde ayrı ayrı sırlanır.',
+    ];
+
+    /** @var array<int, string> */
+    protected array $reviewTemplates = [
+        'Ürün beklentimin üzerinde çıktı; {name} için bu fiyata bu kalite gerçekten iyi. Kargo özenliydi, tavsiye ederim.',
+        '{name} tam anlatıldığı gibi geldi. Üç gün içinde teslim edildi, kutusu hasarsızdı. Teşekkürler!',
+        'İki haftadır kullanıyorum, oldukça memnunum. Küçük eksikleri olsa da kesinlikle alırım.',
+        'Kalitesi güzel ama rengi fotoğraftakinden biraz daha koyu görünüyor. Yine de beğendim.',
+        'Ailemden de alan oldu, herkes memnun. İade sürecini de test ettik, sorunsuz çalışıyor.',
+        'Fiyat/performans olarak harika. Hızlı teslimat ve detaylara gösterilen özen için ayrıca teşekkürler.',
+    ];
+
+    /** @var array<int, string> */
+    protected array $reviewerNames = ['Ayşe K.', 'Mehmet D.', 'Zeynep A.', 'Can Y.', 'Elif T.', 'Burak S.', 'Deniz Ö.', 'Selin M.'];
+
+    /** @var array<int, string> */
+    protected array $reviewTitles = ['Harika ürün', 'Beklentiyi karşıladı', 'Memnun kaldım', 'Kaliteli ürün', 'Tekrar alırım', 'Tavsiye ederim'];
+
+    /** @var array<int, int> */
+    protected array $reviewRatings = [5, 4, 5, 5, 4, 3];
+
     public function run(): void
     {
         $this->command->info('🌙 Lunar Demo Veri Tohumlama Başlıyor...');
@@ -65,10 +132,12 @@ class DemoDataSeeder extends Seeder
             $currency = $this->ensureDefaultCurrency();
             $language = $this->ensureDefaultLanguage();
             $taxClass = $this->ensureDefaultTaxClass();
+            $this->ensureDefaultTaxZone($taxClass);
             $customerGroup = $this->ensureDefaultCustomerGroup();
             $productType = $this->ensureDefaultProductType();
             $collectionGroup = $this->ensureDefaultCollectionGroup();
             $brand = $this->ensureBrand();
+            $this->ensureFeaturesAttribute();
 
             $this->command->info('  ✓ Kanal, para birimi, dil, KDV, marka hazır');
 
@@ -80,9 +149,18 @@ class DemoDataSeeder extends Seeder
 
             $this->createAdminUser();
             $this->command->info('  ✓ Admin kullanıcı oluşturuldu');
+            $this->ensureLegacyStaff();
+            $this->command->info('  ✓ Eski panel hesabı senkronize edildi');
 
             $this->createTestCustomer($customerGroup);
             $this->command->info('  ✓ Test müşteri oluşturuldu');
+            $this->ensureLegacyCustomer($customerGroup);
+            $this->command->info('  ✓ Eski müşteri hesabı senkronize edildi');
+
+            $this->pruneForeignProducts($this->products, $channel, $currency, $customerGroup);
+
+            $this->createDemoWishlist();
+            $this->command->info('  ✓ Demo istek listesi oluşturuldu');
         });
 
         $this->command->info('✅ Demo veri başarıyla yüklendi!');
@@ -111,21 +189,36 @@ class DemoDataSeeder extends Seeder
             'led-masa-lambasi' => '#eab308', 'seramik-saksi' => '#65a30d',
         ];
 
+        // Ana görsel + 2 galeri varyantı (farklı gradyan yönü ve köşe rozeti)
+        $views = [
+            ['suffix' => '', 'x1' => '0%', 'y1' => '0%', 'x2' => '100%', 'y2' => '100%', 'badge' => ''],
+            ['suffix' => '-gorsel-2', 'x1' => '100%', 'y1' => '0%', 'x2' => '0%', 'y2' => '100%', 'badge' => 'Görünüm 2'],
+            ['suffix' => '-gorsel-3', 'x1' => '0%', 'y1' => '100%', 'x2' => '100%', 'y2' => '0%', 'badge' => 'Görünüm 3'],
+        ];
+
         foreach ($this->products as $p) {
             $color = $colorMap[$p['slug']] ?? '#6b7280';
-            $path = $dir . DIRECTORY_SEPARATOR . $p['slug'] . '.svg';
-            $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">'
-                . '<defs><linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">'
-                . '<stop offset="0%" style="stop-color:' . $color . ';stop-opacity:1"/>'
-                . '<stop offset="100%" style="stop-color:rgba(0,0,0,0.4);stop-opacity:1"/>'
-                . '</linearGradient></defs>'
-                . '<rect width="600" height="600" fill="url(#bg)"/>'
-                . '<circle cx="300" cy="240" r="110" fill="rgba(255,255,255,0.15)"/>'
-                . '<text x="300" y="280" font-size="40" text-anchor="middle" fill="white" font-family="Arial">' . htmlspecialchars($p['name']) . '</text>'
-                . '<text x="300" y="340" font-size="100" text-anchor="middle" fill="rgba(255,255,255,0.5)">📦</text>'
-                . '<text x="300" y="450" font-family="Arial" font-size="22" text-anchor="middle" fill="rgba(255,255,255,0.85)">ExportDepo</text>'
-                . '</svg>';
-            file_put_contents($path, $svg);
+
+            foreach ($views as $view) {
+                $path = $dir.DIRECTORY_SEPARATOR.$p['slug'].$view['suffix'].'.svg';
+                $badge = $view['badge'] !== ''
+                    ? '<rect x="430" y="24" rx="12" width="150" height="36" fill="rgba(255,255,255,0.25)"/>'
+                        .'<text x="505" y="48" font-size="18" text-anchor="middle" fill="white" font-family="Arial">'.$view['badge'].'</text>'
+                    : '';
+                $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">'
+                    .'<defs><linearGradient id="bg" x1="'.$view['x1'].'" y1="'.$view['y1'].'" x2="'.$view['x2'].'" y2="'.$view['y2'].'">'
+                    .'<stop offset="0%" style="stop-color:'.$color.';stop-opacity:1"/>'
+                    .'<stop offset="100%" style="stop-color:rgba(0,0,0,0.4);stop-opacity:1"/>'
+                    .'</linearGradient></defs>'
+                    .'<rect width="600" height="600" fill="url(#bg)"/>'
+                    .'<circle cx="300" cy="240" r="110" fill="rgba(255,255,255,0.15)"/>'
+                    .'<text x="300" y="280" font-size="40" text-anchor="middle" fill="white" font-family="Arial">'.htmlspecialchars($p['name']).'</text>'
+                    .'<text x="300" y="340" font-size="100" text-anchor="middle" fill="rgba(255,255,255,0.5)">📦</text>'
+                    .'<text x="300" y="450" font-family="Arial" font-size="22" text-anchor="middle" fill="rgba(255,255,255,0.85)">ExportDepo</text>'
+                    .$badge
+                    .'</svg>';
+                file_put_contents($path, $svg);
+            }
         }
     }
 
@@ -159,12 +252,14 @@ class DemoDataSeeder extends Seeder
             if (! $try->default) {
                 $try->update(['default' => true]);
             }
+
             return $try;
         }
         $existingDefault = Currency::where('default', true)->first();
         if ($existingDefault) {
             $existingDefault->update(['default' => false]);
         }
+
         return Currency::create([
             'code' => 'TRY', 'name' => 'Türk Lirası',
             'exchange_rate' => 1, 'decimal_places' => 2, 'default' => true, 'enabled' => true,
@@ -175,13 +270,62 @@ class DemoDataSeeder extends Seeder
     {
         return Language::firstOrCreate(
             ['code' => 'tr'],
-            ['name' => 'Türkçe', 'default' => true, 'enabled' => true]
+            ['name' => 'Türkçe', 'default' => true]
         );
     }
 
     protected function ensureDefaultTaxClass(): TaxClass
     {
         return TaxClass::firstOrCreate(['name' => 'KDV'], ['default' => true]);
+    }
+
+    /**
+     * Varsayılan vergi bölgesi ve KDV oranı.
+     *
+     * Lunar cart pipeline'ı (SystemTaxDriver::getBreakdown) GetTaxZone
+     * fallback'iyle default bölgeyi arar; tanımsızsa "Attempt to read
+     * property \"id\" on null" hatasıyla vitrinin tüm sayfaları
+     * (sepette ürün olduğu sürece) 500 döndürür.
+     */
+    protected function ensureDefaultTaxZone(TaxClass $taxClass): void
+    {
+        $country = Country::firstOrCreate(
+            ['iso3' => 'TUR'],
+            [
+                'name' => 'Türkiye',
+                'iso2' => 'TR',
+                'phonecode' => '+90',
+                'currency' => 'TRY',
+                'native' => 'Türkiye',
+                'emoji' => '🇹🇷',
+                'emoji_u' => 'TR',
+            ]
+        );
+
+        $zone = TaxZone::firstOrCreate(
+            ['name' => 'Türkiye'],
+            [
+                'zone_type' => 'country',
+                'price_display' => 'tax_exclusive',
+                'active' => true,
+                'default' => true,
+            ]
+        );
+
+        TaxZoneCountry::firstOrCreate([
+            'tax_zone_id' => $zone->id,
+            'country_id' => $country->id,
+        ]);
+
+        $rate = TaxRate::firstOrCreate(
+            ['tax_zone_id' => $zone->id, 'name' => 'KDV %20'],
+            ['priority' => 1]
+        );
+
+        TaxRateAmount::firstOrCreate(
+            ['tax_rate_id' => $rate->id, 'tax_class_id' => $taxClass->id],
+            ['percentage' => 20]
+        );
     }
 
     protected function ensureDefaultCustomerGroup(): CustomerGroup
@@ -293,61 +437,117 @@ class DemoDataSeeder extends Seeder
                 ->where('element_type', (new Product)->getMorphClass())
                 ->first();
             if ($exists) {
+                // Zaten seed edilmiş ürünler için eksik görsel/attribute/yorum top-up'ı
+                $this->ensureProductExtras((int) $exists->element_id, $p);
+
                 continue;
             }
 
-            // 1) Product
-            $product = Product::create([
-                'product_type_id' => $productType->id,
-                'brand_id' => $brand->id,
-                'status' => 'published',
-                'attribute_data' => collect([
-                    'name' => new Text($p['name']),
-                    'description' => new Text($p['desc']),
-                ]),
-            ]);
+            // 1) Product — slug üzerinden deterministik eşleşme (duplicate üretmez).
+            $features = $this->productFeatures[$p['slug']] ?? [];
+            $description = $this->productDescriptions[$p['slug']] ?? $p['desc'];
 
-            // 2) Product Variant
-            $variant = ProductVariant::create([
-                'product_id' => $product->id,
-                'tax_class_id' => $taxClass->id,
-                'sku' => strtoupper('LUN-' . Str::random(8)),
-                'gtin' => (string) random_int(1000000000000, 9999999999999),
-                'mpn' => 'MPN-' . strtoupper(Str::random(6)),
-                'ean' => (string) random_int(1000000000000, 9999999999999),
-                'unit_quantity' => 1,
-                'min_quantity' => 1,
-                'quantity_increment' => 1,
-                'shippable' => true,
-                'stock' => $p['stock'],
-                'backorder' => 0,
-                'purchasable' => 'always',
-                'weight_value' => $p['weight'],
-                'weight_unit' => 'kg',
-            ]);
+            $existingId = Url::where('element_type', (new Product)->getMorphClass())
+                ->where('slug', $p['slug'])
+                ->value('element_id');
 
-            // 3) Price (TRY, standart müşteri grubu) — price kuruş cinsinden
+            $product = $existingId ? Product::find($existingId) : null;
+
+            if (! $product) {
+                $product = Product::create([
+                    'product_type_id' => $productType->id,
+                    'brand_id' => $brand->id,
+                    'status' => 'published',
+                    'attribute_data' => collect([
+                        'name' => new Text($p['name']),
+                        'description' => new Text($description),
+                        'features' => new Text(implode("\n", $features)),
+                    ]),
+                ]);
+            } else {
+                $product->update([
+                    'status' => 'published',
+                    'attribute_data' => collect([
+                        'name' => new Text($p['name']),
+                        'description' => new Text($description),
+                        'features' => new Text(implode("\n", $features)),
+                    ]),
+                ]);
+            }
+
+            // 2) Product Variant — ürün başına tek varyant (duplicate üretmez).
+            $variant = ProductVariant::where('product_id', $product->id)->first();
+
+            if (! $variant) {
+                $variant = ProductVariant::create([
+                    'product_id' => $product->id,
+                    'tax_class_id' => $taxClass->id,
+                    'sku' => strtoupper('LUN-'.Str::random(8)),
+                    'gtin' => (string) random_int(1000000000000, 9999999999999),
+                    'mpn' => 'MPN-'.strtoupper(Str::random(6)),
+                    'ean' => (string) random_int(1000000000000, 9999999999999),
+                    'unit_quantity' => 1,
+                    'min_quantity' => 1,
+                    'quantity_increment' => 1,
+                    'shippable' => true,
+                    'stock' => $p['stock'],
+                    'backorder' => 0,
+                    'purchasable' => 'always',
+                    'weight_value' => $p['weight'],
+                    'weight_unit' => 'kg',
+                ]);
+            } else {
+                $variant->update([
+                    'stock' => $p['stock'],
+                    'weight_value' => $p['weight'],
+                ]);
+            }
+
+            // 3) Price (TRY, standart müşteri grubu) — varyant başına tek fiyat.
             // Not: Lunar morphMap kullandığı için FQCN değil, alias ('product_variant') gerekli
-            Price::create([
-                'currency_id' => $currency->id,
-                'customer_group_id' => $customerGroup->id,
-                'priceable_type' => \Illuminate\Database\Eloquent\Relations\Relation::getMorphAlias(ProductVariant::class) ?: 'product_variant',
-                'priceable_id' => $variant->id,
-                'price' => $p['price'] * 100,
-                'compare_price' => null,
-                'min_quantity' => 1,
-            ]);
-
-            // 4) URL — dil bazlı benzersiz slug + firstOrCreate (tekrar seed'e dayanıklı)
-            $slug = $this->uniqueProductSlug($p['slug'], $language->id, $product->id);
-            Url::firstOrCreate(
+            Price::updateOrCreate(
                 [
-                    'element_type' => (new Product)->getMorphClass(),
-                    'element_id' => $product->id,
-                    'language_id' => $language->id,
+                    'currency_id' => $currency->id,
+                    'customer_group_id' => $customerGroup->id,
+                    'priceable_type' => Relation::getMorphAlias(ProductVariant::class) ?: 'product_variant',
+                    'priceable_id' => $variant->id,
+                    'min_quantity' => 1,
                 ],
-                ['slug' => $slug, 'default' => true]
+                [
+                    'price' => $p['price'] * 100,
+                    'compare_price' => null,
+                ]
             );
+
+            // 4) URL — ürün başına TEK canonical URL (duplicate üretmez):
+            // bu ürüne ait eski '-N' kayıtlarını canonical slug'a geri al, diğerlerini sil.
+            $canonical = Url::where('element_type', (new Product)->getMorphClass())
+                ->where('slug', $p['slug'])
+                ->where('element_id', $product->id)
+                ->first();
+
+            if (! $canonical) {
+                $adopted = Url::where('element_type', (new Product)->getMorphClass())
+                    ->where('element_id', $product->id)
+                    ->where('slug', 'like', $p['slug'].'-%')
+                    ->first();
+
+                if ($adopted) {
+                    $adopted->update(['slug' => $p['slug'], 'default' => true]);
+                } else {
+                    Url::create([
+                        'element_type' => (new Product)->getMorphClass(),
+                        'element_id' => $product->id,
+                        'slug' => $p['slug'],
+                        'language_id' => $language->id,
+                        'default' => true,
+                    ]);
+                }
+
+                Url::where('element_type', (new Product)->getMorphClass())
+                    ->where('slug', 'like', $p['slug'].'-%')
+                    ->delete();
+            }
 
             // 5) Channels + CustomerGroups
             $product->channels()->syncWithoutDetaching([$channel->id]);
@@ -361,19 +561,221 @@ class DemoDataSeeder extends Seeder
                 'position' => $count + 1,
             ]);
 
-            // 7) Görsel
-            $imgPath = public_path("images/demo/{$p['slug']}.svg");
-            if (file_exists($imgPath)) {
-                $product->addMedia($imgPath)
-                    ->preservingOriginal()
-                    ->usingName($p['name'])
-                    ->toMediaCollection('images');
-            }
+            // 7) Görsel (ana görsel + 2 galeri varyantı)
+            $this->attachProductMedia($product, $p);
+
+            // 8) Demo yorumlar
+            $this->createProductReviews($product);
 
             $count++;
         }
 
         return $count;
+    }
+
+    /**
+     * "features" ürün attribute'unu idempotent olarak kaydeder.
+     * Kayıtlı olması, Filament hub ürün formunda alanın düzenlenebilir olmasını sağlar.
+     */
+    /**
+     * Seeder listesinde olmayan yabancı/duplicate ürünleri budar.
+     * Böylece katalog her seed koşusu sonunda tam listedeki ürünlerden oluşur.
+     * Sepet/sipariş satırları canonical ürüne yönlendirilir, veri kaybolmaz.
+     */
+    protected function pruneForeignProducts(array $products, Channel $channel, Currency $currency, CustomerGroup $customerGroup): void
+    {
+        $validSlugs = collect($products)->pluck('slug')->all();
+
+        $validProductIds = Url::where('element_type', (new Product)->getMorphClass())
+            ->whereIn('slug', $validSlugs)
+            ->pluck('element_id')
+            ->unique()
+            ->values()
+            ->all();
+
+        $foreignIds = Product::whereNotIn('id', $validProductIds)->pluck('id')->all();
+
+        if (empty($foreignIds)) {
+            return;
+        }
+
+        // Canonical eşleşme: slug tabanına göre (örn. slim-fit-kot-pantolon-3 → slim-fit-kot-pantolon)
+        $canonicalBySlug = Url::where('element_type', (new Product)->getMorphClass())
+            ->whereIn('slug', $validSlugs)
+            ->get(['slug', 'element_id'])
+            ->keyBy('slug');
+
+        $dupCount = 0;
+
+        foreach ($foreignIds as $foreignId) {
+            $foreignUrl = Url::where('element_type', (new Product)->getMorphClass())
+                ->where('element_id', $foreignId)
+                ->first();
+
+            $canonicalId = null;
+
+            if ($foreignUrl) {
+                $base = preg_replace('/-\d+$/', '', $foreignUrl->slug);
+                $canonicalId = $canonicalBySlug->get($base)?->element_id;
+            }
+
+            $canonicalId ??= $validProductIds[0] ?? null;
+
+            if (! $canonicalId) {
+                continue;
+            }
+
+            $oldVariantIds = ProductVariant::where('product_id', $foreignId)->pluck('id')->all();
+            $newVariantId = ProductVariant::where('product_id', $canonicalId)->value('id');
+
+            if ($newVariantId && ! empty($oldVariantIds)) {
+                DB::table('lunar_cart_lines')->whereIn('purchasable_id', $oldVariantIds)->update(['purchasable_id' => $newVariantId]);
+                DB::table('lunar_order_lines')->whereIn('purchasable_id', $oldVariantIds)->update(['purchasable_id' => $newVariantId]);
+            }
+
+            Price::where('priceable_type', (new ProductVariant)->getMorphClass())
+                ->whereIn('priceable_id', $oldVariantIds)
+                ->delete();
+            Url::where('element_type', (new Product)->getMorphClass())
+                ->where('element_id', $foreignId)
+                ->delete();
+            DB::table('media')->where('model_type', 'product')->where('model_id', $foreignId)->delete();
+            ProductReview::where('product_id', $foreignId)->delete();
+            WishlistItem::where('product_id', $foreignId)->delete();
+            DB::table('lunar_collection_product')->where('product_id', $foreignId)->delete();
+            ProductVariant::where('product_id', $foreignId)->delete();
+            Product::where('id', $foreignId)->delete();
+
+            $dupCount++;
+        }
+
+        if ($dupCount > 0) {
+            $this->command->info("  ✓ {$dupCount} yabancı/duplicate ürün budandı");
+        }
+    }
+
+    protected function ensureFeaturesAttribute(): void
+    {
+        $group = AttributeGroup::firstOrCreate(
+            ['attributable_type' => 'product', 'handle' => 'product-details'],
+            ['name' => json_encode(['en' => 'Product Details']), 'position' => 1]
+        );
+
+        Attribute::firstOrCreate(
+            [
+                'attribute_type' => 'product',
+                'attribute_group_id' => $group->id,
+                'handle' => 'features',
+            ],
+            [
+                'position' => 3,
+                'name' => json_encode(['en' => 'Features']),
+                'type' => Text::class,
+                'required' => false,
+                'system' => false,
+                'searchable' => false,
+                'filterable' => false,
+                'configuration' => json_encode(['richtext' => false]),
+            ]
+        );
+    }
+
+    /**
+     * Ürüne tüm demo görsellerini (ana + 2 varyant) ekler; var olanları tekrar eklemez.
+     */
+    protected function attachProductMedia(Product $product, array $p): void
+    {
+        $variants = ['', '-gorsel-2', '-gorsel-3'];
+        $added = 0;
+
+        foreach ($variants as $suffix) {
+            $imgPath = public_path("images/demo/{$p['slug']}{$suffix}.svg");
+            if (! file_exists($imgPath)) {
+                continue;
+            }
+
+            // Aynı dosya adı zaten bağlıysa atla (idempotent)
+            $fileName = basename($imgPath);
+            $alreadyAttached = $product->media()
+                ->where('file_name', $fileName)
+                ->exists();
+
+            if ($alreadyAttached) {
+                continue;
+            }
+
+            $product->addMedia($imgPath)
+                ->preservingOriginal()
+                ->usingName($p['name'].($suffix !== '' ? ' '.trim(str_replace('-', ' ', $suffix)) : ''))
+                ->toMediaCollection('images');
+            $added++;
+        }
+    }
+
+    /**
+     * Ürüne idempotent demo yorumlar ekler (yalnızca hiç yorumu yoksa).
+     */
+    protected function createProductReviews(Product $product): void
+    {
+        if (ProductReview::where('product_id', $product->id)->exists()) {
+            return;
+        }
+
+        $name = (string) ($product->translateAttribute('name') ?? 'Ürün');
+        $reviewCount = 2 + ($product->id % 3); // ürün başına 2-4 yorum
+
+        for ($i = 0; $i < $reviewCount; $i++) {
+            $templateIndex = ($product->id + $i) % count($this->reviewTemplates);
+            $body = str_replace(
+                '{name}',
+                $name,
+                $this->reviewTemplates[$templateIndex]
+            );
+
+            ProductReview::create([
+                'product_id' => $product->id,
+                'user_id' => null,
+                'name' => $this->reviewerNames[($product->id + $i) % count($this->reviewerNames)],
+                'rating' => $this->reviewRatings[$templateIndex],
+                'title' => $this->reviewTitles[$templateIndex],
+                'body' => $body,
+                'is_approved' => true,
+            ]);
+        }
+    }
+
+    /**
+     * Önceden seed edilmiş ürünler için eksik galeri görseli, features/description
+     * verisi ve demo yorumları idempotent olarak tamamlar.
+     */
+    protected function ensureProductExtras(int $productId, array $p): void
+    {
+        $product = Product::find($productId);
+        if (! $product) {
+            return;
+        }
+
+        // 1) Medya top-up
+        $this->attachProductMedia($product, $p);
+
+        // 2) Attribute top-up (yalnızca seeder'ın kendi eski kısa metni varsa günceller;
+        //    elle düzenlenmiş açıklamalara dokunmaz)
+        $data = $product->attribute_data;
+        $currentDesc = (string) ($product->translateAttribute('description') ?? '');
+
+        if ($currentDesc === $p['desc']) {
+            $data['description'] = new Text($this->productDescriptions[$p['slug']] ?? $p['desc']);
+        }
+
+        if (! isset($data['features']) || blank($product->translateAttribute('features'))) {
+            $data['features'] = new Text(implode("\n", $this->productFeatures[$p['slug']] ?? []));
+        }
+
+        $product->attribute_data = $data;
+        $product->save();
+
+        // 3) Yorum top-up
+        $this->createProductReviews($product);
     }
 
     /**
@@ -390,7 +792,7 @@ class DemoDataSeeder extends Seeder
             ->where('language_id', $languageId)
             ->where(function ($query) use ($morph, $ignoreProductId) {
                 $query->where('element_type', '!=', $morph)
-                      ->orWhere('element_id', '!=', $ignoreProductId);
+                    ->orWhere('element_id', '!=', $ignoreProductId);
             })
             ->exists()) {
             $i++;
@@ -427,17 +829,23 @@ class DemoDataSeeder extends Seeder
             $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'staff']);
             $staff->assignRole($adminRole);
         } catch (\Throwable $e) {
-            $this->command->warn('  ! Rol atanamadı (Spatie Permission?): ' . $e->getMessage());
+            $this->command->warn('  ! Rol atanamadı (Spatie Permission?): '.$e->getMessage());
         }
     }
 
     protected function createTestCustomer(CustomerGroup $customerGroup): void
     {
-        $user = User::firstOrCreate(
+        $password = env('EXPORTDEPO_CUSTOMER_PASSWORD', 'password');
+
+        if (blank($password)) {
+            $password = 'password';
+        }
+
+        $user = User::updateOrCreate(
             ['email' => 'musteri@test.com'],
             [
                 'name' => 'Test Müşteri',
-                'password' => Hash::make('password'),
+                'password' => Hash::make($password),
                 'email_verified_at' => now(),
             ]
         );
@@ -456,6 +864,101 @@ class DemoDataSeeder extends Seeder
 
             $customer->customerGroups()->attach($customerGroup->id);
             $customer->users()->attach($user->id);
+        }
+    }
+
+    /**
+     * Eski vitrin hesabı (fresh --seed sonrası kaybolmaması için seeder'a sabitlendi).
+     * Şifre .env → EXPORTDEPO_CUSTOMER2_PASSWORD değerinden alınır.
+     */
+    protected function ensureLegacyCustomer(CustomerGroup $customerGroup): void
+    {
+        $password = env('EXPORTDEPO_CUSTOMER2_PASSWORD');
+
+        if (blank($password)) {
+            return;
+        }
+
+        $user = User::updateOrCreate(
+            ['email' => 'mustafaparlak2307@gmail.com'],
+            [
+                'name' => 'Mustafa Parlak',
+                'password' => Hash::make($password),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        $customer = Customer::where('account_ref', 'LEGACY-001')->first();
+        if (! $customer) {
+            $customer = Customer::create([
+                'title' => 'Mr',
+                'first_name' => 'Mustafa',
+                'last_name' => 'Parlak',
+                'account_ref' => 'LEGACY-001',
+                'attribute_data' => collect([
+                    'name' => new Text('Mustafa Parlak'),
+                ]),
+            ]);
+
+            $customer->customerGroups()->attach($customerGroup->id);
+            $customer->users()->attach($user->id);
+        }
+    }
+
+    /**
+     * Eski panel hesabı (fresh --seed sonrası kaybolmaması için seeder'a sabitlendi).
+     * Şifre .env → EXPORTDEPO_ADMIN2_PASSWORD değerinden alınır.
+     */
+    protected function ensureLegacyStaff(): void
+    {
+        $password = env('EXPORTDEPO_ADMIN2_PASSWORD');
+
+        if (blank($password)) {
+            return;
+        }
+
+        $staff = Staff::updateOrCreate(
+            ['email' => 'admin@lunar.shop'],
+            [
+                'first_name' => 'Legacy',
+                'last_name' => 'Admin',
+                'admin' => true,
+                'password' => $password,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        try {
+            $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'staff']);
+            $staff->assignRole($adminRole);
+        } catch (\Throwable $e) {
+            $this->command->warn('  ! Rol atanamadı (Spatie Permission?): '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Demo müşteri için örnek istek listesi kayıtları (idempotent).
+     */
+    protected function createDemoWishlist(): void
+    {
+        $user = User::where('email', 'musteri@test.com')->first();
+
+        if (! $user) {
+            return;
+        }
+
+        $productIds = Product::query()
+            ->where('status', 'published')
+            ->orderBy('id')
+            ->limit(4)
+            ->pluck('id')
+            ->all();
+
+        foreach ($productIds as $productId) {
+            WishlistItem::firstOrCreate([
+                'user_id' => $user->id,
+                'product_id' => $productId,
+            ]);
         }
     }
 }

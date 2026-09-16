@@ -61,6 +61,7 @@
         @else
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach ($products as $product)
+                    <div class="relative">
                     <a href="{{ $product['url'] ? url('/urun/' . $product['url']) : '#' }}"
                        class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all overflow-hidden border border-slate-100 flex flex-col">
                         <div class="relative aspect-square overflow-hidden bg-slate-100">
@@ -100,6 +101,16 @@
                             </div>
                         </div>
                     </a>
+                    <button type="button" wire:click="toggle({{ $product['id'] }})" wire:key="wishlist-{{ $product['id'] }}"
+                            title="{{ $this->inWishlist($product['id']) ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}"
+                            aria-label="{{ $this->inWishlist($product['id']) ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}"
+                            class="absolute top-2 left-2 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border shadow-sm backdrop-blur transition-colors
+                                   {{ $this->inWishlist($product['id']) ? 'border-rose-200 bg-white text-rose-500' : 'border-slate-200 bg-white/90 text-slate-500 hover:text-rose-500' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="{{ $this->inWishlist($product['id']) ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 10-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                    </button>
+                    </div>
                 @endforeach
             </div>
         @endif

@@ -2,19 +2,24 @@
 
 namespace App\Livewire\Storefront;
 
+use App\Livewire\Storefront\Concerns\InteractsWithWishlist;
+use App\Support\StorefrontPricing;
+use App\Support\WishlistManager;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Lunar\Models\Collection;
 use Lunar\Models\Product;
 
-
 #[Layout('layouts.storefront')]
 class CollectionPage extends Component
 {
+    use InteractsWithWishlist;
+
     public string $slug;
 
     public array $collection = [];
+
     public array $products = [];
 
     public string $searchTerm = '';
@@ -58,6 +63,8 @@ class CollectionPage extends Component
         $this->loadCategories($collection);
         $this->loadVariantAttributes($collection);
         $this->loadProducts($collection);
+
+        $this->wishlistIds = WishlistManager::ids();
     }
 
     protected function loadCategories(Collection $collection): void
@@ -87,6 +94,7 @@ class CollectionPage extends Component
             ->groupBy('attribute_id')
             ->map(function ($values) {
                 $first = $values->first();
+
                 return [
                     'attribute_id' => $first->attribute_id,
                     'attribute_name' => $first->attribute->name ?? 'Özellik',
@@ -119,7 +127,7 @@ class CollectionPage extends Component
         if ($this->selectedVariantAttributeId && $this->selectedVariantValue) {
             $query->whereHas('variants.values', function ($q) {
                 $q->where('attribute_id', $this->selectedVariantAttributeId)
-                  ->where('value', $this->selectedVariantValue);
+                    ->where('value', $this->selectedVariantValue);
             });
         }
 
@@ -144,11 +152,12 @@ class CollectionPage extends Component
         $this->products = $products
             ->map(function (Product $product): array {
                 $variant = $product->variants->first();
-                $price = $variant ? \App\Support\StorefrontPricing::forVariantInclTax($variant) : null;
+                $price = $variant ? StorefrontPricing::forVariantInclTax($variant) : null;
                 $image = $product->media->first();
                 $url = $product->urls->first();
 
                 return [
+                    'id' => $product->id,
                     'name' => (string) ($product->translateAttribute('name') ?? ''),
                     'description' => (string) ($product->translateAttribute('description') ?? ''),
                     'url' => $url?->slug,

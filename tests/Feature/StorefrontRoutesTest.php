@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Livewire\Storefront\ProductPage;
+use App\Models\ProductReview;
+use Livewire\Livewire;
 use Lunar\Models\Collection;
 use Lunar\Models\Language;
 use Lunar\Models\Product;
@@ -61,5 +64,55 @@ class StorefrontRoutesTest extends TestCase
             ->assertOk()
             ->assertSee('cart-dropdown')
             ->assertSee('cart-badge');
+    }
+
+    public function test_product_page_shows_enriched_sections(): void
+    {
+        $this->get('/urun/lunarbook-pro-14')
+            ->assertOk()
+            ->assertSee('Ürün Açıklaması')
+            ->assertSee('Yorumlar')
+            ->assertSee('İptal ve İade Koşulları');
+    }
+
+    public function test_approved_reviews_are_visible_and_new_ones_require_approval(): void
+    {
+        $productId = Product::whereHas('urls', fn ($query) => $query->where('slug', 'lunarbook-pro-14'))->value('id');
+
+        ProductReview::create([
+            'product_id' => $productId,
+            'name' => 'Test Yorumcu',
+            'rating' => 5,
+            'title' => 'Mükemmel',
+            'body' => 'Onay bekleyen yorumun içeriği.',
+            'is_approved' => false,
+        ]);
+
+        // Onaysız yorum vitrinde görünmez (Yorumlar sekmesi açılmış halde)
+        Livewire::test(ProductPage::class, ['slug' => 'lunarbook-pro-14'])
+            ->call('selectTab', 'reviews')
+            ->assertDontSee('Onay bekleyen yorumun içeriği');
+
+        // Yorum formu ile gönderim → onaysız kayıt oluşturur
+        Livewire::test(ProductPage::class, ['slug' => 'lunarbook-pro-14'])
+            ->set('reviewRating', 4)
+            ->set('reviewerName', 'Test Kullanıcı')
+            ->set('reviewTitle', 'Güzel')
+            ->set('reviewBody', 'Çok kaliteli bir ürün, memnun kaldım.')
+            ->call('submitReview')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('product_reviews', [
+            'product_id' => $productId,
+            'name' => 'Test Kullanıcı',
+            'rating' => 4,
+            'is_approved' => false,
+        ]);
+
+        // Yorum onaylanınca Yorumlar sekmesinde listelenir
+        ProductReview::where('name', 'Test Yorumcu')->update(['is_approved' => true]);
+        Livewire::test(ProductPage::class, ['slug' => 'lunarbook-pro-14'])
+            ->call('selectTab', 'reviews')
+            ->assertSee('Onay bekleyen yorumun içeriği');
     }
 }

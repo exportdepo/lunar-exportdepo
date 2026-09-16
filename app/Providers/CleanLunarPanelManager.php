@@ -2,6 +2,16 @@
 
 namespace App\Providers;
 
+use App\Filament\Resources\CollectionGroupResource;
+use App\Filament\Resources\LanguageResource;
+use App\Filament\Resources\ProductReviewResource;
+use App\Filament\Resources\ProductTypeResource;
+use App\Filament\Resources\TaxClassResource;
+use Filament\Panel;
+use Lunar\Admin\Filament\Pages\Dashboard;
+use Lunar\Admin\Filament\Widgets\Dashboard\Orders\LatestOrdersTable;
+use Lunar\Admin\Filament\Widgets\Dashboard\Orders\OrderStatsOverview;
+use Lunar\Admin\Filament\Widgets\Dashboard\Orders\PopularProductsTable;
 use Lunar\Admin\LunarPanelManager as BaseLunarPanelManager;
 
 /**
@@ -15,13 +25,13 @@ class CleanLunarPanelManager extends BaseLunarPanelManager
     public function register(): BaseLunarPanelManager
     {
         $this->extensions([
-            \Lunar\Admin\Filament\Pages\Dashboard::class => PanelDashboardExtension::class,
+            Dashboard::class => PanelDashboardExtension::class,
         ]);
 
         return parent::register();
     }
 
-    protected function defaultPanel(): \Filament\Panel
+    protected function defaultPanel(): Panel
     {
         return parent::defaultPanel()
             ->path('exportdepo')
@@ -31,24 +41,29 @@ class CleanLunarPanelManager extends BaseLunarPanelManager
     public static function getWidgets(): array
     {
         return [
-            \Lunar\Admin\Filament\Widgets\Dashboard\Orders\OrderStatsOverview::class,
-            \Lunar\Admin\Filament\Widgets\Dashboard\Orders\LatestOrdersTable::class,
-            \Lunar\Admin\Filament\Widgets\Dashboard\Orders\PopularProductsTable::class,
+            OrderStatsOverview::class,
+            LatestOrdersTable::class,
+            PopularProductsTable::class,
         ];
     }
 
     public static function getResources(): array
     {
         $overrides = [
-            \Lunar\Admin\Filament\Resources\CollectionGroupResource::class => \App\Filament\Resources\CollectionGroupResource::class,
-            \Lunar\Admin\Filament\Resources\TaxClassResource::class => \App\Filament\Resources\TaxClassResource::class,
-            \Lunar\Admin\Filament\Resources\ProductTypeResource::class => \App\Filament\Resources\ProductTypeResource::class,
-            \Lunar\Admin\Filament\Resources\LanguageResource::class => \App\Filament\Resources\LanguageResource::class,
+            \Lunar\Admin\Filament\Resources\CollectionGroupResource::class => CollectionGroupResource::class,
+            \Lunar\Admin\Filament\Resources\TaxClassResource::class => TaxClassResource::class,
+            \Lunar\Admin\Filament\Resources\ProductTypeResource::class => ProductTypeResource::class,
+            \Lunar\Admin\Filament\Resources\LanguageResource::class => LanguageResource::class,
         ];
 
-        return array_map(
+        $mapped = array_map(
             fn (string $resource): string => $overrides[$resource] ?? $resource,
             parent::getResources(),
         );
+
+        // Uygulamaya özel (Lunar olmayan) kaynaklar panel listesine eklenir.
+        return array_merge($mapped, [
+            ProductReviewResource::class,
+        ]);
     }
 }

@@ -22,9 +22,8 @@ class RegisterPage extends Component
 
     public function mount()
     {
-        if (Auth::check()) {
-            return redirect('/hesabim');
-        }
+        // Giriş yapılmış kullanıcıyı 'guest' middleware /hesabim'a yönlendirir.
+        // Mount'tan redirect dönmek page component'te 500 ürettiği için kaldırıldı.
     }
 
     public function register()
