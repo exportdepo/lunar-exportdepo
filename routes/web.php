@@ -33,6 +33,8 @@ Route::get('/siparis/{reference}', OrderStatusPage::class)
 // Misafir auth rotaları. Giriş yapılmışsa 'guest' middleware /hesabim'a
 // yönlendirir (Livewire page component'lerinde mount'tan redirect dönmek
 // MissingLayoutException -> 500 ürettiği için kontrol middleware'dadır).
+// Eski `/login` alışkanlığı için kalıcı yönlendirme (çift-slash hatalarını önler).
+Route::permanentRedirect('/login', '/giris');
 Route::middleware('guest')->group(function () {
     Route::get('/giris', LoginPage::class)->name('login');
     Route::get('/kayit', RegisterPage::class)->name('register');

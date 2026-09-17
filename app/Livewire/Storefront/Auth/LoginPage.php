@@ -23,6 +23,8 @@ class LoginPage extends Component
 
     public function login()
     {
+        $this->email = \App\Support\CustomerEmail::normalize($this->email);
+
         $this->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],

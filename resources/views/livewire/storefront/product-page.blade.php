@@ -105,7 +105,54 @@
                 </div>
 
                 <div class="mt-8 border-t border-slate-200 pt-6">
-                    @if (count($variants) > 1)
+                    @if (count($optionGroups) > 0)
+                        <div class="mb-6 space-y-5">
+                            @foreach ($optionGroups as $group)
+                                <div>
+                                    <div class="mb-2 text-sm font-medium text-slate-700">
+                                        {{ $group['name'] }}
+                                        @foreach ($group['values'] as $value)
+                                            @if ($this->isValueSelected($group['id'], $value['id']))
+                                                <span class="font-normal text-slate-400">: {{ $value['name'] }}</span>
+                                            @endif
+                                        @endforeach
+                                    </div>
+
+                                    <div class="flex flex-wrap gap-2">
+                                        @foreach ($group['values'] as $value)
+                                            @php
+                                                $selected = $this->isValueSelected($group['id'], $value['id']);
+                                                $available = $this->isValueAvailable($group['id'], $value['id']);
+                                            @endphp
+
+                                            @if ($group['is_colour'])
+                                                <button type="button"
+                                                        wire:click="selectOptionValue({{ $group['id'] }}, {{ $value['id'] }})"
+                                                        @disabled(! $available)
+                                                        title="{{ $value['name'] }}{{ $available ? '' : ' (stokta yok)' }}"
+                                                        aria-label="{{ $value['name'] }}"
+                                                        class="flex h-9 w-9 items-center justify-center rounded-full border-2 transition-colors
+                                                               {{ $selected ? 'border-indigo-600 ring-2 ring-indigo-200' : 'border-slate-200 hover:border-indigo-400' }}
+                                                               {{ $available ? '' : 'cursor-not-allowed opacity-40' }}">
+                                                    <span class="h-6 w-6 rounded-full border border-slate-300" style="background-color: {{ $value['hex'] ?: '#e2e8f0' }}"></span>
+                                                </button>
+                                            @else
+                                                <button type="button"
+                                                        wire:click="selectOptionValue({{ $group['id'] }}, {{ $value['id'] }})"
+                                                        @disabled(! $available)
+                                                        title="{{ $value['name'] }}{{ $available ? '' : ' (stokta yok)' }}"
+                                                        class="min-w-[3rem] rounded-lg border px-4 py-2 text-sm font-medium transition-colors
+                                                               {{ $selected ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-slate-300 bg-white text-slate-700 hover:border-indigo-400' }}
+                                                               {{ $available ? '' : 'cursor-not-allowed border-slate-200 text-slate-300 line-through' }}">
+                                                    {{ $value['name'] }}
+                                                </button>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @elseif (count($variants) > 1)
                         <div class="mb-5">
                             <label for="variant" class="mb-2 block text-sm font-medium text-slate-700">Varyant</label>
                             <select id="variant" wire:model.live="selectedVariantId" class="w-full max-w-sm rounded-lg border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">

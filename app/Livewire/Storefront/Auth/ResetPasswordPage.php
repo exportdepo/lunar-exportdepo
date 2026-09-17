@@ -26,6 +26,8 @@ class ResetPasswordPage extends Component
 
     public function resetPassword()
     {
+        $this->email = \App\Support\CustomerEmail::normalize($this->email);
+
         $this->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],

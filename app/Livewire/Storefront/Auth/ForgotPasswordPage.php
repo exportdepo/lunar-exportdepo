@@ -14,6 +14,8 @@ class ForgotPasswordPage extends Component
 
     public function sendResetLink()
     {
+        $this->email = \App\Support\CustomerEmail::normalize($this->email);
+
         $this->validate([
             'email' => ['required', 'email'],
         ]);

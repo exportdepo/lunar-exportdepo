@@ -51,6 +51,13 @@ class User extends Authenticatable
         ];
     }
 
+    protected function email(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            set: fn (string $value) => \App\Support\CustomerEmail::normalize($value),
+        );
+    }
+
     public function firstName(): string
     {
         return explode(' ', $this->name ?? '')[0] ?? '';

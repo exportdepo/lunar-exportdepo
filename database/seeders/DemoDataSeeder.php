@@ -25,6 +25,8 @@ use Lunar\Models\CustomerGroup;
 use Lunar\Models\Language;
 use Lunar\Models\Price;
 use Lunar\Models\Product;
+use Lunar\Models\ProductOption;
+use Lunar\Models\ProductOptionValue;
 use Lunar\Models\ProductType;
 use Lunar\Models\ProductVariant;
 use Lunar\Models\TaxClass;
@@ -54,6 +56,152 @@ class DemoDataSeeder extends Seeder
         ['slug' => 'bel-yastigi', 'name' => 'Bel Yastığı (Memory Foam)', 'desc' => 'Visko elastik sünger, ergonomik tasarım, ofis koltuğu için.', 'price' => 449, 'stock' => 80, 'collection' => 'ev-yasam', 'weight' => 0.4],
         ['slug' => 'led-masa-lambasi', 'name' => 'LED Masa Lambası', 'desc' => '5 renk sıcaklık, 10 parlaklık seviye, USB-C şarj.', 'price' => 699, 'stock' => 65, 'collection' => 'ev-yasam', 'weight' => 0.8],
         ['slug' => 'seramik-saksi', 'name' => 'Seramik Saksı Seti', 'desc' => '3 parça farklı boy, beyaz mat, drenaj delikli.', 'price' => 549, 'stock' => 55, 'collection' => 'ev-yasam', 'weight' => 1.8],
+    ];
+
+    /**
+     * Seçenek handle'larının panel ve vitrindeki görünen adları.
+     *
+     * @var array<string, string>
+     */
+    protected array $optionLabels = [
+        'renk' => 'Renk',
+        'beden' => 'Beden',
+        'numara' => 'Numara',
+        'paca-boyu' => 'Paça Boyu',
+        'switch-tipi' => 'Switch Tipi',
+        'klavye-dili' => 'Klavye Dili',
+        'kordon' => 'Kordon',
+        'model' => 'Model',
+    ];
+
+    /**
+     * Ürün bazlı varyasyon tanımları (renk, beden, model vb.).
+     *
+     * Burada listelenen ürünlerde seçenek kombinasyonları kadar varyant üretilir;
+     * listelenmeyen ürünler tek varyantlı kalır (geriye dönük uyum).
+     *
+     * Her değer şu anahtarları taşır:
+     *   - name        : görünen ad (vitrin + panel)
+     *   - hex         : yalnızca renk seçeneklerinde gösterilen renk kodu (swatch)
+     *   - price_delta : baz fiyata TL cinsinden eklenen fark
+     *   - stock       : sabit stok (verilmezse baz stoktan türetilir)
+     *
+     * @var array<string, array<string, array<int, array<string, mixed>>>>
+     */
+    protected array $variations = [
+        'premium-pamuk-tisort' => [
+            'renk' => [
+                ['name' => 'Siyah', 'hex' => '#111827', 'price_delta' => 0],
+                ['name' => 'Beyaz', 'hex' => '#f1f5f9', 'price_delta' => 0],
+                ['name' => 'Lacivert', 'hex' => '#1d4ed8', 'price_delta' => 20],
+                ['name' => 'Bordo', 'hex' => '#7f1d1d', 'price_delta' => 20],
+            ],
+            'beden' => [
+                ['name' => 'S', 'price_delta' => 0],
+                ['name' => 'M', 'price_delta' => 0],
+                ['name' => 'L', 'price_delta' => 0],
+                ['name' => 'XL', 'price_delta' => 10],
+                ['name' => '2XL', 'price_delta' => 30, 'stock' => 0],
+            ],
+        ],
+        'yaz-elbisesi' => [
+            'renk' => [
+                ['name' => 'Çiçekli Pembe', 'hex' => '#ec4899', 'price_delta' => 0],
+                ['name' => 'Çiçekli Mavi', 'hex' => '#3b82f6', 'price_delta' => 0],
+                ['name' => 'Zeytin Yeşili', 'hex' => '#4d7c0f', 'price_delta' => 50],
+            ],
+            'beden' => [
+                ['name' => 'XS', 'price_delta' => 0],
+                ['name' => 'S', 'price_delta' => 0],
+                ['name' => 'M', 'price_delta' => 0],
+                ['name' => 'L', 'price_delta' => 20],
+            ],
+        ],
+        'yun-kazak' => [
+            'renk' => [
+                ['name' => 'Antrasit', 'hex' => '#374151', 'price_delta' => 0],
+                ['name' => 'Camel', 'hex' => '#b45309', 'price_delta' => 40],
+                ['name' => 'Krem', 'hex' => '#fef3c7', 'price_delta' => 0],
+            ],
+            'beden' => [
+                ['name' => 'S', 'price_delta' => 0],
+                ['name' => 'M', 'price_delta' => 0],
+                ['name' => 'L', 'price_delta' => 0],
+                ['name' => 'XL', 'price_delta' => 30],
+            ],
+        ],
+        'slim-fit-kot' => [
+            'beden' => [
+                ['name' => '30/32', 'price_delta' => 0],
+                ['name' => '31/32', 'price_delta' => 0],
+                ['name' => '32/32', 'price_delta' => 0],
+                ['name' => '33/32', 'price_delta' => 0],
+                ['name' => '34/32', 'price_delta' => 30],
+                ['name' => '36/32', 'price_delta' => 60, 'stock' => 0],
+            ],
+            'paca-boyu' => [
+                ['name' => 'Standart Boy', 'price_delta' => 0],
+                ['name' => 'Uzun Boy', 'price_delta' => 40],
+                ['name' => 'Kısa Boy', 'price_delta' => 40],
+            ],
+        ],
+        'spor-ayakkabi' => [
+            'renk' => [
+                ['name' => 'Beyaz', 'hex' => '#f1f5f9', 'price_delta' => 0],
+                ['name' => 'Siyah', 'hex' => '#111827', 'price_delta' => 0],
+                ['name' => 'Gri', 'hex' => '#6b7280', 'price_delta' => 50],
+            ],
+            'numara' => [
+                ['name' => '38', 'price_delta' => 0],
+                ['name' => '39', 'price_delta' => 0],
+                ['name' => '40', 'price_delta' => 0],
+                ['name' => '41', 'price_delta' => 0],
+                ['name' => '42', 'price_delta' => 0],
+                ['name' => '44', 'price_delta' => 100, 'stock' => 0],
+            ],
+        ],
+        'mekanik-klavye' => [
+            'switch-tipi' => [
+                ['name' => 'Red (Linear)', 'price_delta' => 0],
+                ['name' => 'Brown (Tactile)', 'price_delta' => 150],
+                ['name' => 'Blue (Clicky)', 'price_delta' => 150],
+            ],
+            'klavye-dili' => [
+                ['name' => 'Türkçe Q', 'price_delta' => 0],
+                ['name' => 'İngilizce US', 'price_delta' => 0],
+            ],
+        ],
+        'bluetooth-kulaklik' => [
+            'renk' => [
+                ['name' => 'Siyah', 'hex' => '#111827', 'price_delta' => 0],
+                ['name' => 'Beyaz', 'hex' => '#f1f5f9', 'price_delta' => 0],
+                ['name' => 'Lila', 'hex' => '#a855f7', 'price_delta' => 100],
+            ],
+        ],
+        'akilli-saat' => [
+            'renk' => [
+                ['name' => 'Siyah', 'hex' => '#111827', 'price_delta' => 0],
+                ['name' => 'Gümüş', 'hex' => '#cbd5e1', 'price_delta' => 100],
+                ['name' => 'Altın', 'hex' => '#d4af37', 'price_delta' => 250],
+            ],
+            'kordon' => [
+                ['name' => 'Silikon', 'price_delta' => 0],
+                ['name' => 'Deri', 'price_delta' => 300],
+            ],
+        ],
+        'kablosuz-mouse' => [
+            'renk' => [
+                ['name' => 'Siyah', 'hex' => '#111827', 'price_delta' => 0],
+                ['name' => 'Beyaz', 'hex' => '#f1f5f9', 'price_delta' => 0],
+                ['name' => 'Turkuaz', 'hex' => '#06b6d4', 'price_delta' => 30],
+            ],
+        ],
+        'otomatik-kahve-makinesi' => [
+            'model' => [
+                ['name' => 'Mat Siyah', 'price_delta' => 0],
+                ['name' => 'Paslanmaz Çelik', 'price_delta' => 1500],
+            ],
+        ],
     ];
 
     /** @var array<int, array<string, string>> */
@@ -158,6 +306,7 @@ class DemoDataSeeder extends Seeder
             $this->command->info('  ✓ Eski müşteri hesabı senkronize edildi');
 
             $this->pruneForeignProducts($this->products, $channel, $currency, $customerGroup);
+            $this->pruneForeignCollections($collectionGroup, $language);
 
             $this->createDemoWishlist();
             $this->command->info('  ✓ Demo istek listesi oluşturuldu');
@@ -359,6 +508,13 @@ class DemoDataSeeder extends Seeder
     // ────────────────────────────────────────────────────────────
 
     /**
+     * Koleksiyonları ad çevirisi üzerinden idempotent eşleştirir.
+     *
+     * NOT: `lunar_collections` tablosunda `handle` kolonu YOKTUR (sadece
+     * attribute_data JSON içinde `name` + URL slug vardır). Eski kod
+     * `where('handle', ...)` ile sorguladığı için eşleşme hiç bulunamıyor
+     * ve her seed koşusunda 3 kopya üretiliyordu.
+     *
      * @return array<string, ProductCollection>
      */
     protected function createCollections(CollectionGroup $group, Language $language): array
@@ -366,11 +522,36 @@ class DemoDataSeeder extends Seeder
         $created = [];
         $channel = Channel::where('handle', 'web')->first();
         $cg = CustomerGroup::where('handle', 'default')->first();
+        $collectionMorph = (new ProductCollection)->getMorphClass();
 
         foreach ($this->collections as $col) {
-            $collection = ProductCollection::where('handle', $col['handle'])->first();
+            // 1) Öncelik: aynı grup içinde ad çevirisi eşleşmesi (kullanıcı seçimi).
+            $collection = $this->findCollectionByName($group->id, $col['name']);
+
+            // 2) Fallback: aynı slug'a sahip URL üzerinden eşleştirme
+            // (eski kopyalardan birini canonical olarak benimser, yenisini üretmez).
+            if (! $collection) {
+                $collectionId = Url::where('element_type', $collectionMorph)
+                    ->where('slug', $col['handle'])
+                    ->whereHasMorph('element', [ProductCollection::class], function ($query) use ($group) {
+                        $query->where('collection_group_id', $group->id);
+                    })
+                    ->value('element_id');
+
+                $collection = $collectionId ? ProductCollection::find($collectionId) : null;
+            }
+
             if (! $collection) {
                 $collection = ProductCollection::create([
+                    'collection_group_id' => $group->id,
+                    'attribute_data' => collect([
+                        'name' => new Text($col['name']),
+                        'description' => new Text($col['desc']),
+                    ]),
+                ]);
+            } else {
+                // Mevcut kaydı güncel tut (yeniden üretmeden).
+                $collection->update([
                     'collection_group_id' => $group->id,
                     'attribute_data' => collect([
                         'name' => new Text($col['name']),
@@ -384,7 +565,7 @@ class DemoDataSeeder extends Seeder
 
             Url::firstOrCreate(
                 [
-                    'element_type' => 'collection',
+                    'element_type' => $collectionMorph,
                     'element_id' => $collection->id,
                     'language_id' => $language->id,
                 ],
@@ -407,6 +588,119 @@ class DemoDataSeeder extends Seeder
         }
 
         return $created;
+    }
+
+    /**
+     * Ayni koleksiyon grubu icinde ad cevirisi eslesen koleksiyonu bulur.
+     *
+     * `attribute_data` JSON yapisi DB-motoruna gore farkli davrandigi icin
+     * ham JSON sorgusu yerine PHP tarafinda translateAttribute karsilastirmasi
+     * yapilir. Koleksiyon sayisi kucuk oldugundan bu guvenlidir.
+     */
+    protected function findCollectionByName(int $groupId, string $name): ?ProductCollection
+    {
+        $wanted = mb_strtolower(trim($name));
+
+        return ProductCollection::where('collection_group_id', $groupId)
+            ->get()
+            ->first(function (ProductCollection $collection) use ($wanted) {
+                $current = $collection->translateAttribute('name');
+
+                return $current !== null && mb_strtolower(trim((string) $current)) === $wanted;
+            });
+    }
+
+    /**
+     * Liste disi / kopya koleksiyonlari budar.
+     *
+     * Canonical: once ad eslesmesi, yoksa ilk slug kaydi. Kopyanin urun
+     * pivotlari, kanal/musteri-grubu pivotlari, medyasi canonical kayda
+     * tasinir; kopya hard-delete edilir. Panelden eklenen yabanci
+     * koleksiyonlara dokunulmaz.
+     */
+    protected function pruneForeignCollections(CollectionGroup $group, Language $language): void
+    {
+        $collectionMorph = (new ProductCollection)->getMorphClass();
+        $pruned = 0;
+
+        foreach ($this->collections as $col) {
+            $canonical = $this->findCollectionByName($group->id, $col['name']);
+
+            if (! $canonical) {
+                $canonicalId = Url::where('element_type', $collectionMorph)
+                    ->where('slug', $col['handle'])
+                    ->orderBy('element_id')
+                    ->value('element_id');
+
+                $canonical = $canonicalId ? ProductCollection::find($canonicalId) : null;
+            }
+
+            if (! $canonical) {
+                continue;
+            }
+
+            $candidates = ProductCollection::where('collection_group_id', $group->id)
+                ->whereKeyNot($canonical->id)
+                ->get();
+
+            foreach ($candidates as $duplicate) {
+                $dupName = mb_strtolower(trim((string) $duplicate->translateAttribute('name')));
+                $isNameCopy = $dupName === mb_strtolower(trim($col['name']));
+                $isSlugCopy = Url::where('element_type', $collectionMorph)
+                    ->where('element_id', $duplicate->id)
+                    ->where('slug', $col['handle'])
+                    ->exists();
+
+                if (! $isNameCopy && ! $isSlugCopy) {
+                    continue;
+                }
+
+                $productIds = DB::table('lunar_collection_product')
+                    ->where('collection_id', $duplicate->id)
+                    ->pluck('product_id')
+                    ->all();
+
+                foreach ($productIds as $productId) {
+                    DB::table('lunar_collection_product')->insertOrIgnore([
+                        'collection_id' => $canonical->id,
+                        'product_id' => $productId,
+                        'position' => 9999,
+                    ]);
+                }
+
+                DB::table('lunar_collection_product')->where('collection_id', $duplicate->id)->delete();
+
+                $canonical->channels()->syncWithoutDetaching($duplicate->channels()->pluck('lunar_channels.id')->all());
+                $canonical->customerGroups()->syncWithoutDetaching($duplicate->customerGroups()->pluck('lunar_customer_groups.id')->all());
+                $duplicate->channels()->detach();
+                $duplicate->customerGroups()->detach();
+                $duplicate->brands()->detach();
+                $duplicate->discounts()->detach();
+
+                foreach ($duplicate->getMedia('images') as $media) {
+                    $existsOnCanonical = $canonical->media()
+                        ->where('file_name', $media->file_name)
+                        ->exists();
+
+                    if ($existsOnCanonical) {
+                        $media->delete();
+                    } else {
+                        $media->update(['model_id' => $canonical->id]);
+                    }
+                }
+
+                Url::where('element_type', $collectionMorph)
+                    ->where('element_id', $duplicate->id)
+                    ->delete();
+
+                $duplicate->delete();
+                $pruned++;
+            }
+        }
+
+        if ($pruned > 0) {
+            $this->command->info("  ✓ {$pruned} kopya koleksiyon budandı");
+        }
     }
 
     // ────────────────────────────────────────────────────────────
@@ -439,6 +733,13 @@ class DemoDataSeeder extends Seeder
             if ($exists) {
                 // Zaten seed edilmiş ürünler için eksik görsel/attribute/yorum top-up'ı
                 $this->ensureProductExtras((int) $exists->element_id, $p);
+
+                // Mevcut ürünlere de varyasyonları (seçenek + kombinasyon varyantları) uygula.
+                $seeded = Product::find($exists->element_id);
+
+                if ($seeded) {
+                    $this->applyProductVariations($seeded, $p);
+                }
 
                 continue;
             }
@@ -566,6 +867,10 @@ class DemoDataSeeder extends Seeder
 
             // 8) Demo yorumlar
             $this->createProductReviews($product);
+
+            // 9) Varyasyonlar (renk / beden / model) — tanımlı ürünlerde
+            // kombinasyon başına bir varyant + fiyat + stok üretir.
+            $this->applyProductVariations($product, $p);
 
             $count++;
         }
@@ -782,6 +1087,254 @@ class DemoDataSeeder extends Seeder
      * Dil bazlı benzersiz ürün slug'ı üretir; çakışırsa -2, -3... sonekleri dener.
      * (Aynı ürünün kendi mevcut URL kayıtları hariç tutulur.)
      */
+    // ────────────────────────────────────────────────────────────
+    // Varyasyonlar (renk / beden / model ...)
+    // ────────────────────────────────────────────────────────────
+
+    /**
+     * Varyasyon tanımı olan ürüne seçenekleri, kombinasyon varyantlarını,
+     * fiyat ve stoklarını idempotent biçimde uygular.
+     *
+     * @param  array<string, mixed>  $p
+     */
+    protected function applyProductVariations(Product $product, array $p): void
+    {
+        $plan = $this->variations[$p['slug']] ?? null;
+
+        if (empty($plan)) {
+            return;
+        }
+
+        $taxClass = TaxClass::where('default', true)->first() ?? TaxClass::first();
+        $currency = Currency::where('default', true)->first();
+        $customerGroup = CustomerGroup::where('handle', 'default')->first();
+
+        if (! $taxClass || ! $currency || ! $customerGroup) {
+            return;
+        }
+
+        $options = [];
+        $optionPositions = [];
+        $position = 1;
+
+        foreach ($plan as $optionHandle => $values) {
+            $options[$optionHandle] = $this->ensureProductOption($p['slug'], $optionHandle, $values);
+            $optionPositions[$options[$optionHandle]->id] = ['position' => $position];
+            $position++;
+        }
+
+        $product->productOptions()->sync($optionPositions);
+
+        $combinations = $this->combineVariationValues($plan);
+        $perVariantStock = max(1, (int) floor(((int) $p['stock']) / max(1, count($combinations))));
+
+        foreach ($combinations as $index => $combination) {
+            $valueIds = [];
+            $priceDelta = 0;
+            $outOfStock = false;
+            $valid = true;
+
+            foreach ($combination as $optionHandle => $value) {
+                $matched = $options[$optionHandle]->values->first(
+                    fn (ProductOptionValue $optionValue) => $optionValue->translate('name') === $value['name']
+                );
+
+                if (! $matched) {
+                    $valid = false;
+
+                    break;
+                }
+
+                $valueIds[] = $matched->id;
+
+                if (array_key_exists('stock', $value) && (int) $value['stock'] === 0) {
+                    $outOfStock = true;
+                }
+
+                $priceDelta += (int) ($value['price_delta'] ?? 0);
+            }
+
+            if (! $valid) {
+                continue;
+            }
+
+            $this->upsertVariationVariant(
+                $product,
+                $p,
+                $index,
+                $combination,
+                $valueIds,
+                $priceDelta,
+                $outOfStock,
+                $perVariantStock,
+                $taxClass,
+                $currency,
+                $customerGroup
+            );
+        }
+    }
+
+    /**
+     * Kombinasyon varyantını SKU bazlı, idempotent biçimde oluşturur/günceller.
+     *
+     * @param  array<string, mixed>  $p
+     * @param  array<string, array<string, mixed>>  $combination
+     * @param  array<int, int>  $valueIds
+     */
+    protected function upsertVariationVariant(
+        Product $product,
+        array $p,
+        int $index,
+        array $combination,
+        array $valueIds,
+        int $priceDelta,
+        bool $outOfStock,
+        int $perVariantStock,
+        TaxClass $taxClass,
+        Currency $currency,
+        CustomerGroup $customerGroup
+    ): void {
+        $sku = $this->variationSku($p['slug'], $combination);
+
+        $variant = ProductVariant::where('product_id', $product->id)
+            ->where('sku', $sku)
+            ->first();
+
+        // Ürün daha önce tek varyantlı seed edildiyse ilk kombinasyonda o varyantı
+        // benimse; böylece sepet/sipariş satırlarındaki varyant referansı korunur.
+        if (! $variant && $index === 0) {
+            $existing = ProductVariant::where('product_id', $product->id)->orderBy('id')->get();
+
+            if ($existing->count() === 1 && $existing->first()->values()->count() === 0) {
+                $variant = $existing->first();
+                $variant->update(['sku' => $sku]);
+            }
+        }
+
+        $stock = $outOfStock ? 0 : $perVariantStock;
+
+        if (! $variant) {
+            $variant = ProductVariant::create([
+                'product_id' => $product->id,
+                'tax_class_id' => $taxClass->id,
+                'sku' => $sku,
+                'gtin' => (string) random_int(1000000000000, 9999999999999),
+                'mpn' => 'MPN-'.strtoupper(Str::random(6)),
+                'ean' => (string) random_int(1000000000000, 9999999999999),
+                'unit_quantity' => 1,
+                'min_quantity' => 1,
+                'quantity_increment' => 1,
+                'shippable' => true,
+                'stock' => $stock,
+                'backorder' => 0,
+                'purchasable' => 'always',
+                'weight_value' => $p['weight'],
+                'weight_unit' => 'kg',
+            ]);
+        } else {
+            $variant->update([
+                'stock' => $stock,
+                'weight_value' => $p['weight'],
+            ]);
+        }
+
+        // Seçenek değerleri ile varyantı bağla (vitrindeki filtreleme bunu kullanır).
+        $variant->values()->sync($valueIds);
+
+        // Varyant fiyatı = baz fiyat + kombinasyon farkı.
+        Price::updateOrCreate(
+            [
+                'currency_id' => $currency->id,
+                'customer_group_id' => $customerGroup->id,
+                'priceable_type' => Relation::getMorphAlias(ProductVariant::class) ?: 'product_variant',
+                'priceable_id' => $variant->id,
+                'min_quantity' => 1,
+            ],
+            [
+                'price' => (((int) $p['price']) + $priceDelta) * 100,
+                'compare_price' => null,
+            ]
+        );
+    }
+
+    /**
+     * Seçenek değerlerinin kartezyen çarpımını (tüm kombinasyonları) üretir.
+     *
+     * @param  array<string, array<int, array<string, mixed>>>  $plan
+     * @return array<int, array<string, array<string, mixed>>>
+     */
+    protected function combineVariationValues(array $plan): array
+    {
+        $combinations = [[]];
+
+        foreach ($plan as $optionHandle => $values) {
+            $merged = [];
+
+            foreach ($combinations as $combination) {
+                foreach ($values as $value) {
+                    $merged[] = $combination + [$optionHandle => $value];
+                }
+            }
+
+            $combinations = $merged;
+        }
+
+        return $combinations;
+    }
+
+    /**
+     * Kombinasyondan deterministik SKU üretir (tekrar seed'de çoğaltmaz).
+     *
+     * @param  array<string, array<string, mixed>>  $combination
+     */
+    protected function variationSku(string $productSlug, array $combination): string
+    {
+        $suffix = collect($combination)
+            ->map(fn (array $value): string => Str::upper(Str::slug((string) $value['name'], '-')))
+            ->implode('-');
+
+        return 'LUN-'.Str::upper(Str::slug($productSlug, '-')).'-'.$suffix;
+    }
+
+    /**
+     * Ürüne özel seçeneği ve değerlerini idempotent biçimde oluşturur.
+     *
+     * Renk gibi seçeneklerde değerin `meta.hex` alanı doldurulur; vitrin bu
+     * değeri renk swatch'ı olarak kullanır.
+     *
+     * @param  array<int, array<string, mixed>>  $values
+     */
+    protected function ensureProductOption(string $productSlug, string $optionHandle, array $values): ProductOption
+    {
+        $handle = $productSlug.'-'.$optionHandle;
+        $name = $this->optionLabels[$optionHandle] ?? Str::headline($optionHandle);
+
+        $option = ProductOption::firstOrCreate(
+            ['handle' => $handle],
+            ['name' => ['tr' => $name, 'en' => $name], 'shared' => false]
+        );
+
+        $existing = $option->values()->get();
+
+        foreach ($values as $position => $value) {
+            $alreadyThere = $existing->contains(
+                fn (ProductOptionValue $optionValue): bool => $optionValue->translate('name') === $value['name']
+            );
+
+            if ($alreadyThere) {
+                continue;
+            }
+
+            $option->values()->create([
+                'name' => ['tr' => $value['name'], 'en' => $value['name']],
+                'position' => $position + 1,
+                'meta' => isset($value['hex']) ? ['hex' => $value['hex']] : null,
+            ]);
+        }
+
+        return $option->fresh('values');
+    }
+
     protected function uniqueProductSlug(string $base, int $languageId, ?int $ignoreProductId = null): string
     {
         $morph = (new Product)->getMorphClass();
@@ -841,7 +1394,9 @@ class DemoDataSeeder extends Seeder
             $password = 'password';
         }
 
-        $user = User::updateOrCreate(
+        // Seed initial credentials only; never overwrite a customer's chosen password.
+
+        $user = User::firstOrCreate(
             ['email' => 'musteri@test.com'],
             [
                 'name' => 'Test Müşteri',
@@ -879,7 +1434,8 @@ class DemoDataSeeder extends Seeder
             return;
         }
 
-        $user = User::updateOrCreate(
+        // Preserve existing credentials when demo data is seeded again.
+        $user = User::firstOrCreate(
             ['email' => 'mustafaparlak2307@gmail.com'],
             [
                 'name' => 'Mustafa Parlak',

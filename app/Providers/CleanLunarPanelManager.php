@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Filament\Resources\CollectionGroupResource;
 use App\Filament\Resources\LanguageResource;
+use App\Filament\Resources\ProductOptionResource;
 use App\Filament\Resources\ProductReviewResource;
 use App\Filament\Resources\ProductTypeResource;
 use App\Filament\Resources\TaxClassResource;
@@ -54,6 +55,8 @@ class CleanLunarPanelManager extends BaseLunarPanelManager
             \Lunar\Admin\Filament\Resources\TaxClassResource::class => TaxClassResource::class,
             \Lunar\Admin\Filament\Resources\ProductTypeResource::class => ProductTypeResource::class,
             \Lunar\Admin\Filament\Resources\LanguageResource::class => LanguageResource::class,
+            // Seçenek değerlerine renk kodu (swatch) yönetimi ekler.
+            \Lunar\Admin\Filament\Resources\ProductOptionResource::class => ProductOptionResource::class,
         ];
 
         $mapped = array_map(

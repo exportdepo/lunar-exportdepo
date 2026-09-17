@@ -28,6 +28,8 @@ class RegisterPage extends Component
 
     public function register()
     {
+        $this->email = \App\Support\CustomerEmail::normalize($this->email);
+
         $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
