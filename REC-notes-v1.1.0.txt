@@ -1,10 +1,10 @@
-v1.1.0 - Wishlist and Product Reviews
+v1.1.0 — İstek Listesi ve Ürün Değerlendirmeleri
 
-## What's New
+## Yenilikler
 
-* **Wishlist** — guests use session storage; logged-in members use DB; session list merges into account on login
-* **Wishlist page** — `/istek-listesi`, `WishlistIndicator` count, toggle buttons on storefront pages
-* **Product reviews** — display approved reviews on product pages, rating average, panel moderation (approve/reject)
-* **Admin panel moved** — `/lunar` -> `/exportdepo` with `staff` guard + provider, `PanelLoginTest` added
-* **Auth fixes** — mount redirect removed from Login/Register pages, `guest` middleware (`RedirectIfAuthenticated`), logout 419 fallback
-* **Demo content** — 17 product gallery images, seeded review samples, test passwords in `.env.example
+* **İstek listesi** — Misafirlerin listeleri oturumda, giriş yapan üyelerin listeleri veritabanında tutulur. Giriş yapıldığında oturumdaki liste kullanıcı hesabıyla birleştirilir.
+* **İstek listesi sayfası** — `/istek-listesi` sayfası, `WishlistIndicator` sayacı ve vitrin sayfalarında listeye ekleme/çıkarma düğmeleri eklendi.
+* **Ürün değerlendirmeleri** — Ürün sayfalarında onaylı değerlendirmeler ve puan ortalaması gösterilir. Panelden değerlendirmeleri onaylama/reddetme desteği eklendi.
+* **Yönetim paneli adresi** — Panel `/lunar` adresinden `/exportdepo` adresine taşındı; `staff` kimlik doğrulama koruması ve sağlayıcısı kullanıldı. `PanelLoginTest` eklendi.
+* **Kimlik doğrulama düzeltmeleri** — Giriş ve kayıt sayfalarındaki `mount` yönlendirmesi kaldırıldı; `guest` ara katmanı (`RedirectIfAuthenticated`) kullanıldı. Çıkış sırasında 419 hatasına karşı alternatif yönlendirme eklendi.
+* **Demo içerik** — 17 ürün galerisi görseli ve örnek değerlendirme verileri eklendi. Demo hesap parolalarına ilişkin ortam değişkenleri `.env.example` dosyasında tanımlandı.

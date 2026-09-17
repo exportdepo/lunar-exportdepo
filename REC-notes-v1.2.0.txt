@@ -1,27 +1,27 @@
-v1.2.0 - Product Variations and Customer Email Normalization
+v1.2.0 — Ürün Varyasyonları ve E-posta Normalizasyonu
 
-## What's New
+## Yenilikler
 
-* **Storefront variations** — select product options such as colour and size, with availability handling for missing combinations and a variant dropdown for products without options.
-* **Panel option management** — manage product options and their values through the Filament panel; view and edit generated product variants.
-* **Demo variations** — seeded option combinations, colour hex metadata, price differences and out-of-stock examples, with idempotency coverage.
+* **Vitrinde ürün varyasyonları** — Renk ve beden gibi ürün seçenekleri seçilebilir. Eksik kombinasyonların kullanılabilirliği yönetilir; seçeneği olmayan ürünlerde varyant açılır listesi korunur.
+* **Panelde seçenek yönetimi** — Filament panelinden ürün seçenekleri ve değerleri yönetilebilir; oluşturulan ürün varyantları görüntülenebilir ve düzenlenebilir.
+* **Demo varyasyonlar** — Seçenek kombinasyonları, onaltılık (hex) renk kodları, fiyat farkları ve stok dışı örnekler eklendi. Veri oluşturmanın tekrar çalıştırıldığında kayıtları çoğaltmadığı testlerle doğrulanır.
 
-## Fixes and Maintenance
+## Düzeltmeler ve Bakım
 
-* **Customer email normalization** — trim whitespace and lowercase email addresses in customer authentication flows and the user model.
-* **Existing customer emails** — migration normalizes stored addresses and stops on collisions rather than merging accounts.
-* **Demo customer credentials** — reseeding preserves existing customer passwords and profiles.
-* **CI configuration** — provide the required demo admin password only to the test step; customer password fixtures remain controlled by the tests.
-* **Test coverage** — add seven Feature test files covering variations, panel options, email normalization and demo credentials.
+* **Müşteri e-postalarının normalizasyonu** — Müşteri kimlik doğrulama akışlarında ve kullanıcı modelinde e-posta adreslerinin başındaki/sonundaki boşluklar temizlenir ve harfler küçültülür.
+* **Mevcut müşteri e-postaları** — Veritabanı geçişi (migration), kayıtlı adresleri normalleştirir; çakışma durumunda hesapları birleştirmek yerine işlemi durdurur.
+* **Demo müşteri kimlik bilgileri** — Demo veriler yeniden oluşturulduğunda mevcut müşteri parolaları ve profilleri korunur.
+* **CI yapılandırması** — Zorunlu demo yönetici parolası yalnızca test adımına sağlanır; müşteri parolası test verilerini testlerin kendisi belirler.
+* **Test kapsamı** — Varyasyonlar, panel seçenekleri, e-posta normalizasyonu ve demo kimlik bilgileri için yedi yeni Feature test dosyası eklendi.
 
-## Upgrade Notes
+## Yükseltme Notları
 
-* Back up the database before upgrading, then run `php artisan migrate --force` in the deployment environment.
-* If email normalization reports a collision, resolve the affected accounts manually before retrying. The migration does not merge accounts; rollback does not restore original email casing or whitespace.
-* Running DemoDataSeeder requires `EXPORTDEPO_ADMIN_PASSWORD` in the environment. Use an appropriate private value for your environment, not the CI-only test value. Seeding is not required merely to apply the migration.
+* Yükseltmeden önce veritabanını yedekleyin; ardından dağıtım ortamında `php artisan migrate --force` komutunu çalıştırın.
+* E-posta normalizasyonu bir çakışma bildirirse yeniden denemeden önce ilgili hesapları manuel olarak düzenleyin. Migration hesapları birleştirmez; geri alma işlemi e-postaların önceki büyük/küçük harf biçimini veya boşluklarını geri getirmez.
+* `DemoDataSeeder` çalıştırmak için ortamda `EXPORTDEPO_ADMIN_PASSWORD` tanımlı olmalıdır. Yalnızca CI testleri için kullanılan değeri değil, ortamınıza uygun gizli bir parola kullanın. Yalnızca migration uygulamak için demo veri oluşturmanız gerekmez.
 
-## Validation
+## Doğrulama
 
-* Application and CI fixes through commit `6a4f170`: 97 tests passed locally with 422 assertions.
-* GitHub Actions run 35277419077 completed successfully: https://github.com/exportdepo/lunar-exportdepo/actions/runs/35277419077
-* This release adds documentation on top of that tested commit; no application code is changed by the release-notes commit.
+* `6a4f170` commit'ine kadar olan uygulama ve CI düzeltmeleri için yerelde 97 test, 422 doğrulamayla başarılı oldu.
+* GitHub Actions çalışması 35277419077 başarıyla tamamlandı: https://github.com/exportdepo/lunar-exportdepo/actions/runs/35277419077
+* Bu sürüm, test edilmiş commit'in üzerine dokümantasyon ekler; sürüm notları commit'i uygulama kodunu değiştirmez.
