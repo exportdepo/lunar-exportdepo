@@ -13,9 +13,9 @@
 - 🏪 **Storefront** — Livewire tam sayfa bileşenleriyle: ana sayfa, koleksiyon, ürün detayı, sepet, checkout, sipariş durumu
 - 👤 **Hesap** — kayıt/giriş/şifre sıfırlama, "Hesabım" ve sipariş geçmişi sayfaları
 - 💳 **Ödeme** — Stripe entegrasyonu (webhook desteğiyle); `STRIPE_*` boşsa manuel ödeme (cash-in-hand) fallback'i
-- 🎛️ **Yönetim paneli** — Lunar Hub (`/exportdepo`) + özel Filament kaynakları: CollectionGroup, ProductType, TaxClass, Language, ProductReview
+- 🎛️ **Yönetim paneli** — Lunar Hub (`/exportdepo`) + özel Filament kaynakları: CollectionGroup, ProductType, TaxClass, Language, ProductReview, ProductOption
+- 🧩 **Ürün varyasyonları** — renk/beden gibi seçenekler; vitrinde kombinasyon seçimi, panelden seçenek ve varyant yönetimi
 - 🇹🇷 **Türkiye odaklı** — TRY para birimi, Türkçe rotalar ve demo veriler
-
 - ⭐ **Ürün yorumları** — onaylanan yorumlar vitrinde görünür; onay akışı panelden yönetilir.
 - ❤️ **İstek listesi** — misafirler için oturumda, üyeler için veritabanında saklanır; girişte birleştirilir.
 
@@ -29,7 +29,7 @@
 | Yönetim paneli | Filament 4 (Lunar Hub) |
 | Ödeme | Stripe PHP SDK ^21.3 |
 | Veritabanı | SQLite (geliştirme/test) — MySQL/PostgreSQL uyumlu |
-| Test | PHPUnit 11 — 68 test / 233 assertion |
+| Test | PHPUnit 11 |
 
 ## Gereksinimler
 
@@ -51,17 +51,19 @@ php artisan key:generate
 # 3. Veritabanı (varsayılan: SQLite)
 touch database/database.sqlite
 php artisan migrate
+
+# 4. Demo veri (öncesinde .env içinde EXPORTDEPO_ADMIN_PASSWORD tanımlayın)
 php artisan db:seed --class=DemoDataSeeder
 
-# 4. Frontend
+# 5. Frontend
 npm run build        # veya geliştirme için: npm run dev
 
-# 5. Çalıştır
+# 6. Çalıştır
 php artisan serve
 # → http://127.0.0.1:8000
 ```
 
-Demo seeder; elektronik ve giyim koleksiyonlarında 15+ Türkçe ürün, yönetim paneli için admin staff hesabı oluşturur. Admin şifresi `.env` içindeki `EXPORTDEPO_ADMIN_PASSWORD` ile belirlenir.
+Demo seeder; elektronik ve giyim koleksiyonlarında 15+ Türkçe ürün, ürün seçenekleri ve varyasyonları, yönetim paneli için admin staff hesabı oluşturur. Admin şifresi `.env` içindeki `EXPORTDEPO_ADMIN_PASSWORD` ile belirlenir; bu değişken tanımlı değilse seeder hata verir.
 
 ## Ortam Değişkenleri
 
@@ -96,6 +98,10 @@ php artisan test
 ```
 
 Testler bellek içi SQLite (`:memory:`) üzerinde, `RefreshDatabase` ile koşar. Her push'ta GitHub Actions (`.github/workflows/tests.yml`) tüm test paketini PHP 8.4 ile otomatik çalıştırır.
+
+## Sürümler
+
+Sürümler [Semantik Sürümleme](https://semver.org/lang/tr/) yaklaşımıyla `vX.Y.Z` biçiminde etiketlenir. Değişiklik geçmişi [CHANGELOG.md](CHANGELOG.md) dosyasında; yayımlanan sürümlerin özetleri ve yükseltme notları [GitHub Releases](https://github.com/exportdepo/lunar-exportdepo/releases) sayfasında tutulur.
 
 ## Proje Yapısı
 
