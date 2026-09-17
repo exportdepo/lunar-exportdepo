@@ -18,14 +18,6 @@ jobs:
   tests:
     runs-on: ubuntu-latest
 
-    # DemoDataSeeder artık panel admin şifresini zorunlu kılıyor (EXPORTDEPO_ADMIN_PASSWORD).
-    # CI'da yalnızca test amaçlı demo kimlik bilgileri sağlanır; gerçek değerler .env'de tutulur.
-    env:
-      EXPORTDEPO_ADMIN_PASSWORD: ci-demo-admin-password
-      EXPORTDEPO_ADMIN2_PASSWORD: ci-demo-legacy-admin-password
-      EXPORTDEPO_CUSTOMER_PASSWORD: ci-demo-customer-password
-      EXPORTDEPO_CUSTOMER2_PASSWORD: ci-demo-legacy-customer-password
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -70,4 +62,8 @@ jobs:
         run: php artisan key:generate
 
       - name: Execute tests (Unit & Feature)
+        # Seeder için yalnızca test amaçlı yönetici parolası gerekir.
+        # Müşteri parolalarını testler belirler; burada tanımlamak override işlemini engeller.
+        env:
+          EXPORTDEPO_ADMIN_PASSWORD: ci-demo-admin-password
         run: php artisan test
