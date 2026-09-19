@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Storefront;
 
+use App\Livewire\Storefront\Concerns\InteractsWithCart;
 use App\Livewire\Storefront\Concerns\InteractsWithWishlist;
 use App\Support\StorefrontPricing;
 use App\Support\StorefrontSearch;
@@ -15,6 +16,7 @@ use Lunar\Models\Product;
 #[Layout('layouts.storefront')]
 class CollectionPage extends Component
 {
+    use InteractsWithCart;
     use InteractsWithWishlist;
 
     public string $slug;

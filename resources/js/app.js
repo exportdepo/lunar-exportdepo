@@ -64,3 +64,18 @@ document.addEventListener('alpine:init', () => {
         },
     });
 });
+
+/**
+ * Livewire -> Alpine köprüsü.
+ * Ürün sepete eklendiğinde (`cart-added` olayı) sepet çekmecesi otomatik açılır;
+ * böylece kullanıcı listelerden eklerken anında geri bildirim görür.
+ */
+document.addEventListener('livewire:init', () => {
+    window.Livewire.on('cart-added', () => {
+        try {
+            window.Alpine?.store('cartDrawer')?.show();
+        } catch (error) {
+            // Alpine hazır değilse sessizce geç; çekmece elle açılabilir.
+        }
+    });
+});
