@@ -44,44 +44,6 @@
 
     {{ $slot }}
 
-    {{--
-        Karanlık/Açık tema düğmesi.
-        Phase 3'te header bileşeninin içine taşınacaktır; şimdilik sabit konumda,
-        her sayfadan erişilebilir şekilde durur.
-    --}}
-    <button type="button"
-            x-data
-            @click="$store.theme.toggle()"
-            :aria-label="$store.theme.dark ? 'Açık temaya geç' : 'Koyu temaya geç'"
-            :title="$store.theme.dark ? 'Açık temaya geç' : 'Koyu temaya geç'"
-            class="fixed bottom-4 right-4 z-50 inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 shadow-lg backdrop-blur-sm transition-colors hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800/90 dark:text-slate-400 dark:hover:text-indigo-400">
-        {{-- Koyu temaya geçme ikonu (açık temada görünür) --}}
-        <svg x-show="!$store.theme.dark"
-             x-cloak
-             xmlns="http://www.w3.org/2000/svg"
-             class="h-5 w-5"
-             fill="none"
-             viewBox="0 0 24 24"
-             stroke="currentColor"
-             stroke-width="2"
-             aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-        </svg>
-        {{-- Açık temaya geçme ikonu (koyu temada görünür) --}}
-        <svg x-show="$store.theme.dark"
-             x-cloak
-             xmlns="http://www.w3.org/2000/svg"
-             class="h-5 w-5"
-             fill="none"
-             viewBox="0 0 24 24"
-             stroke="currentColor"
-             stroke-width="2"
-             aria-hidden="true">
-            <circle cx="12" cy="12" r="5" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-        </svg>
-    </button>
-
     @livewireScripts
 </body>
 </html>

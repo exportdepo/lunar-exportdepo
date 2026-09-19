@@ -41,4 +41,26 @@ document.addEventListener('alpine:init', () => {
             }
         },
     });
+
+    /**
+     * Sepet çekmecesi (drawer) durumu.
+     * Header'daki sepet düğmesi ile `components/cart-drawer.blade.php` kabuğu
+     * arasında ortak durumdur. Global store seçilmesiyle durum, Livewire'ın
+     * DOM morph işlemlerinden etkilenmez ve her iki bileşen aynı kaynağı okur.
+     */
+    Alpine.store('cartDrawer', {
+        open: false,
+
+        show() {
+            this.open = true;
+        },
+
+        hide() {
+            this.open = false;
+        },
+
+        toggle() {
+            this.open = !this.open;
+        },
+    });
 });

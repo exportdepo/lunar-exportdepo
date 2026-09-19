@@ -62,7 +62,7 @@ class StorefrontRoutesTest extends TestCase
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('cart-dropdown')
+            ->assertSee('cart-drawer')
             ->assertSee('cart-badge');
     }
 

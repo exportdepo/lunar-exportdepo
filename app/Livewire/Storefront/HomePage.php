@@ -6,6 +6,7 @@ use App\Livewire\Storefront\Concerns\InteractsWithWishlist;
 use App\Support\StorefrontPricing;
 use App\Support\WishlistManager;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Lunar\Models\Collection;
 use Lunar\Models\Product;
@@ -18,6 +19,13 @@ class HomePage extends Component
     public array $products = [];
 
     public array $collections = [];
+
+    /**
+     * Header arama çubuğundan (`?q=`) gelen global arama terimi.
+     * Ürün adı ve açıklamasında büyük/küçük harf duyarsız filtreleme yapar.
+     */
+    #[Url]
+    public string $q = '';
 
     public function mount()
     {
@@ -46,6 +54,8 @@ class HomePage extends Component
             ];
         })->all();
 
+        $this->applySearchFilter();
+
         $collections = Collection::with(['media', 'urls'])
             ->orderBy('created_at')
             ->get();
@@ -64,6 +74,26 @@ class HomePage extends Component
         })->all();
 
         $this->wishlistIds = WishlistManager::ids();
+    }
+
+    /**
+     * Header araması: ürün adı ve açıklamasında filtreleme.
+     */
+    private function applySearchFilter(): void
+    {
+        $query = mb_strtolower(trim($this->q));
+
+        if ($query === '') {
+            return;
+        }
+
+        $this->products = array_values(array_filter(
+            $this->products,
+            fn (array $product): bool => str_contains(
+                mb_strtolower(($product['name'] ?? '').' '.($product['description'] ?? '')),
+                $query
+            )
+        ));
     }
 
     public function render()

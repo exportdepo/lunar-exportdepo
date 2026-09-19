@@ -48,15 +48,15 @@
     {{-- Ürün Listesi --}}
     <section id="urunler" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-slate-900">Tüm Ürünler</h2>
-            <span class="text-sm text-slate-500">{{ count($products) }} ürün</span>
+            <h2 class="text-2xl font-bold text-slate-900">@if (filled($q)) «{{ $q }}» için arama sonuçları @else Tüm Ürünler @endif</h2>
+            <span class="text-sm text-slate-500">{{ count($products) }} {{ filled($q) ? 'sonuç' : 'ürün' }}</span>
         </div>
 
         @if (empty($products))
             <div class="bg-white border border-dashed border-slate-300 rounded-2xl p-12 text-center">
                 <div class="text-5xl mb-4">📦</div>
-                <h3 class="text-xl font-semibold text-slate-800 mb-2">Henüz ürün yok</h3>
-                <p class="text-slate-500">Demo veri yüklenmedi.</p>
+                <h3 class="text-xl font-semibold text-slate-800 mb-2">@if (filled($q)) Aramanızla eşleşen ürün bulunamadı @else Henüz ürün yok @endif</h3>
+                <p class="text-slate-500">@if (filled($q)) Farklı anahtar kelimelerle tekrar deneyin. @else Demo veri yüklenmedi. @endif</p>
             </div>
         @else
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
