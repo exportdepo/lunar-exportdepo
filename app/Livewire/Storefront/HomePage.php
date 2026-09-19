@@ -4,6 +4,7 @@ namespace App\Livewire\Storefront;
 
 use App\Livewire\Storefront\Concerns\InteractsWithWishlist;
 use App\Support\StorefrontPricing;
+use App\Support\StorefrontSearch;
 use App\Support\WishlistManager;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -77,25 +78,22 @@ class HomePage extends Component
     }
 
     /**
-     * Header araması: ürün adı ve açıklamasında filtreleme.
+     * Header araması: ürün adı ve açıklamasında Türkçe-duyarlı filtreleme.
      */
     private function applySearchFilter(): void
     {
-        $query = mb_strtolower(trim($this->q));
-
-        if ($query === '') {
+        if (trim($this->q) === '') {
             return;
         }
 
         $this->products = array_values(array_filter(
             $this->products,
-            fn (array $product): bool => str_contains(
-                mb_strtolower(($product['name'] ?? '').' '.($product['description'] ?? '')),
-                $query
+            fn (array $product): bool => StorefrontSearch::matches(
+                ($product['name'] ?? '').' '.($product['description'] ?? ''),
+                $this->q
             )
         ));
     }
-
     public function render()
     {
         return view('livewire.storefront.home-page');

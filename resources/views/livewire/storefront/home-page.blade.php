@@ -1,5 +1,6 @@
 <div>
-    {{-- Hero --}}
+    @unless (filled($q))
+{{-- Hero --}}
     <section class="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 text-center">
             <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4">
@@ -21,8 +22,11 @@
             </div>
         </div>
     </section>
+    @endunless
+
 
     {{-- Koleksiyon Kartları --}}
+    @unless (filled($q))
     @if (!empty($collections))
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
             <h2 class="text-2xl font-bold text-slate-900 mb-6">Kategoriler</h2>
@@ -45,11 +49,20 @@
             </div>
         </section>
     @endif
+    @endunless
+
     {{-- Ürün Listesi --}}
     <section id="urunler" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-slate-900">@if (filled($q)) «{{ $q }}» için arama sonuçları @else Tüm Ürünler @endif</h2>
-            <span class="text-sm text-slate-500">{{ count($products) }} {{ filled($q) ? 'sonuç' : 'ürün' }}</span>
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">@if (filled($q)) «{{ $q }}» için arama sonuçları @else Tüm Ürünler @endif</h2>
+                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ count($products) }} {{ filled($q) ? 'sonuç bulundu' : 'ürün' }}</p>
+            </div>
+            @if (filled($q))
+                <a href="{{ url('/') }}" class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:border-slate-300 hover:text-indigo-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:text-indigo-400">
+                    ✕ Aramayı temizle
+                </a>
+            @endif
         </div>
 
         @if (empty($products))

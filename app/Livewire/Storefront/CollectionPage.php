@@ -4,6 +4,7 @@ namespace App\Livewire\Storefront;
 
 use App\Livewire\Storefront\Concerns\InteractsWithWishlist;
 use App\Support\StorefrontPricing;
+use App\Support\StorefrontSearch;
 use App\Support\WishlistManager;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Attributes\Layout;
@@ -137,18 +138,12 @@ class CollectionPage extends Component
         // Türkçe karakterler \uXXXX kaçışıyla tutulduğu için SQL LIKE güvenilir
         // eşleşme sağlamaz. Bu yüzden arama PHP tarafında yapılır.
         if ($this->searchTerm !== '') {
-            $needle = $this->normalizeSearch($this->searchTerm);
-
-            $products = $products->filter(function (Product $product) use ($needle): bool {
-                $haystack = $this->normalizeSearch(
-                    (string) ($product->translateAttribute('name') ?? '').' '.
-                    (string) ($product->translateAttribute('description') ?? '')
-                );
-
-                return str_contains($haystack, $needle);
-            });
+            $products = $products->filter(fn (Product $product): bool => StorefrontSearch::matches(
+                (string) ($product->translateAttribute('name') ?? '').' '.
+                (string) ($product->translateAttribute('description') ?? ''),
+                $this->searchTerm
+            ));
         }
-
         $this->products = $products
             ->map(function (Product $product): array {
                 $variant = $product->variants->first();
@@ -168,16 +163,6 @@ class CollectionPage extends Component
             })
             ->values()
             ->all();
-    }
-
-    /**
-     * Türkçe-duyarlı küçük harf normalizasyonu.
-     * PHP'nin mb_strtolower'ı 'I' -> 'i' ve 'İ' -> 'i̇' dönüşümü yaptığı için
-     * önce Türkçe eşleme uygulanır: 'I' -> 'ı', 'İ' -> 'i'.
-     */
-    protected function normalizeSearch(string $value): string
-    {
-        return mb_strtolower(str_replace(['İ', 'I'], ['i', 'ı'], $value), 'UTF-8');
     }
 
     public function updatedSearchTerm(): void
