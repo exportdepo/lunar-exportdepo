@@ -11,7 +11,7 @@
 --}}
 <header class="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
     <div x-data="{ mobileOpen: false }" @keydown.escape.window="mobileOpen = false" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="flex h-16 items-center justify-between gap-3">
+        <div class="flex h-16 items-center gap-4">
 
             {{-- Logo --}}
             <a href="{{ url('/') }}" aria-label="ExportDepo ana sayfa" class="group flex shrink-0 items-center gap-2">
@@ -20,7 +20,7 @@
             </a>
 
             {{-- Masaüstü navigasyon --}}
-            <nav aria-label="Ana menü" class="hidden items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300 md:flex">
+            <nav aria-label="Ana menü" class="hidden shrink-0 items-center gap-5 whitespace-nowrap text-sm font-medium text-slate-600 dark:text-slate-300 lg:flex">
                 <a href="{{ url('/') }}" class="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Anasayfa</a>
                 <a href="{{ url('/koleksiyon/elektronik') }}" class="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Elektronik</a>
                 <a href="{{ url('/koleksiyon/giyim') }}" class="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Giyim</a>
@@ -28,7 +28,7 @@
             </nav>
 
             {{-- Masaüstü arama --}}
-            <form action="{{ url('/') }}" method="GET" role="search" class="relative hidden w-72 lg:block">
+            <form action="{{ url('/') }}" method="GET" role="search" class="relative hidden min-w-0 max-w-md flex-1 lg:block">
                 <input type="search"
                        name="q"
                        value="{{ request('q') }}"
@@ -41,7 +41,7 @@
             </form>
 
             {{-- Aksiyonlar --}}
-            <div class="flex items-center gap-1 sm:gap-2">
+            <div class="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
 
                 {{-- Tema düğmesi (mobilde mobil menüde) --}}
                 <button type="button"
@@ -49,7 +49,7 @@
                         @click="$store.theme.toggle()"
                         :aria-label="$store.theme.dark ? 'Açık temaya geç' : 'Koyu temaya geç'"
                         :title="$store.theme.dark ? 'Açık temaya geç' : 'Koyu temaya geç'"
-                        class="hidden h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-indigo-400 sm:inline-flex">
+                        class="hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-indigo-400 sm:inline-flex">
                     <svg x-show="!$store.theme.dark" x-cloak xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
                     </svg>
@@ -61,7 +61,7 @@
 
                 {{-- Üyelik: kullanıcı menüsü --}}
                 @auth
-                    <div class="relative hidden sm:block" x-data="{ open: false }">
+                    <div class="relative hidden shrink-0 sm:block" x-data="{ open: false }">
                         <button type="button"
                                 @click="open = !open"
                                 aria-controls="user-dropdown"
@@ -70,7 +70,7 @@
                             <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-xs font-bold text-white">
                                 {{ mb_substr(auth()->user()->firstName() ?: auth()->user()->name, 0, 1) }}
                             </span>
-                            <span class="hidden text-sm font-semibold lg:inline">{{ auth()->user()->firstName() ?: auth()->user()->name }}</span>
+                            <span class="hidden text-sm font-semibold xl:inline">{{ auth()->user()->firstName() ?: auth()->user()->name }}</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                             </svg>
@@ -92,8 +92,8 @@
                         </div>
                     </div>
                 @else
-                    <a href="{{ url('/giris') }}" class="hidden items-center rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-indigo-400 sm:inline-flex">Giriş Yap</a>
-                    <x-button size="sm" href="{{ url('/kayit') }}" class="hidden sm:inline-flex">Üye Ol</x-button>
+                    <a href="{{ url('/giris') }}" class="hidden shrink-0 items-center rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-indigo-400 lg:inline-flex">Giriş Yap</a>
+                    <x-button size="sm" href="{{ url('/kayit') }}" class="hidden shrink-0 sm:inline-flex">Üye Ol</x-button>
                 @endauth
 
                 {{-- İstek listesi + sepet (Livewire) --}}
@@ -106,7 +106,7 @@
                         :aria-expanded="mobileOpen"
                         aria-controls="mobile-menu"
                         aria-label="Menüyü aç/kapat"
-                        class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden">
+                        class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 lg:hidden">
                     <svg x-show="!mobileOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
