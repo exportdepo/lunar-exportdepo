@@ -95,7 +95,7 @@
             {{ $description }}
         </p>
 
-        <div class="mt-auto flex items-end justify-between gap-3 border-t border-slate-100 pt-3 dark:border-slate-800">
+        <div class="mt-auto flex flex-wrap items-end justify-between gap-x-3 gap-y-2 border-t border-slate-100 pt-3 dark:border-slate-800">
             <div>
                 <span class="text-lg font-bold text-slate-900 dark:text-white">{{ $price ?? '—' }}</span>
                 <span class="block text-xs text-slate-500 dark:text-slate-400">{{ $stockLabel }}</span>
