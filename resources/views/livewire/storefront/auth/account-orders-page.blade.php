@@ -19,7 +19,7 @@
         @else
             <div class="space-y-3">
                 @foreach ($orders as $order)
-                    <a href="{{ url('/siparis/' . $order['reference']) }}" class="block rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-950">
+                    <a href="{{ url('/siparis/' . $order['reference']) }}" class="block rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
                         <div class="flex flex-wrap items-center justify-between gap-3">
                             <div>
                                 <div class="font-bold text-slate-900 dark:text-white">#{{ $order['reference'] }}</div>

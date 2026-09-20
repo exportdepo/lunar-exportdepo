@@ -38,7 +38,7 @@
                              class="absolute inset-0 h-full w-full object-cover">
                     @endforeach
                     @if (empty($images) || empty($images[0]['url']))
-                        <div class="absolute inset-0 flex items-center justify-center text-8xl text-slate-300 dark:text-slate-600">📦</div>
+                        <div class="absolute inset-0 flex items-center justify-center text-8xl text-slate-300 dark:text-slate-600" aria-hidden="true">📦</div>
                     @endif
 
                     @if ($product['stock'] !== null && $product['stock'] <= 0)

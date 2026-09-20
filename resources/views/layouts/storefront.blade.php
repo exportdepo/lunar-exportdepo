@@ -13,7 +13,7 @@
     <x-header />
 
     {{-- Ana içerik --}}
-    <main class="flex-1">
+    <main id="main-content" tabindex="-1" class="flex-1 focus:outline-none">
         {{ $slot }}
     </main>
 

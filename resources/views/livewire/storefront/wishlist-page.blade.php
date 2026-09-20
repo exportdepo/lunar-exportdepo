@@ -31,16 +31,16 @@
         @else
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             @foreach ($items as $item)
-            <div wire:key="wishlist-item-{{ $item['id'] }}" class="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-xl dark:border-slate-800 dark:bg-slate-950">
+            <div wire:key="wishlist-item-{{ $item['id'] }}" class="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-xl dark:border-slate-800 dark:bg-slate-900">
                 <a href="{{ $item['url'] ? url('/urun/' . $item['url']) : '#' }}" class="flex flex-col flex-1">
                 <div class="relative aspect-square overflow-hidden bg-slate-100 dark:bg-slate-800">
                     @if ($item['image_url'])
                     <img src="{{ $item['image_url'] }}" alt="{{ $item['name'] }}" loading="lazy" class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500">
                     @else
-                    <div class="flex h-full w-full items-center justify-center text-6xl text-slate-300 dark:text-slate-600">📦</div>
+                    <div class="flex h-full w-full items-center justify-center text-6xl text-slate-300 dark:text-slate-600" aria-hidden="true">📦</div>
                     @endif
                     @if ($item['stock'] !== null && $item['stock'] <= 0)
-                    <span class="absolute top-2 right-2 rounded-full px-2 py-1 text-xs font-semibold bg-rose-100 text-rose-800">Tükendi</span>
+                    <span class="absolute top-2 right-2 rounded-full px-2 py-1 text-xs font-semibold bg-rose-100 text-rose-800 dark:bg-rose-500/20 dark:text-rose-300">Tükendi</span>
                     @endif
                 </div>
                 <div class="p-4 pb-0 flex-1 flex flex-col">

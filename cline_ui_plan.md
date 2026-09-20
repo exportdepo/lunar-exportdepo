@@ -1,6 +1,6 @@
 # ExportDepo E-Ticaret UI Yenileme ve Geliştirme Rehberi
 
-> **Durum:** Faz 1-6 + UI Cila Turu tamamlandı · Dal: `ui-refactor` (push edildi) · main'e tek seferde merge + `v1.3.0` etiketi: 21.09.2026 kararı (aynı oturumda uygulanır)
+> **Durum:** Faz 1-7 + UI Cila Turu tamamlandı ve `main`'de · Dal: `ui-refactor` (Phase 8 çalışma dalı) · Sürümler: `v1.3.0` (Faz 1-6) + `v1.3.1` (Phase 7)
 > · Testler: 103 passed / 449 assertion · deprecation: 0 · Son güncelleme: 21.09.2026
 
 Sevgili Cline, 
@@ -35,6 +35,7 @@ Bu belge, storefront arayüzü yenileme çalışmasının canlı yol haritasıd�
 | Hotfix | `5c7d5a8` | İstek listesi adet rozetindeki bozuk kalp SVG path'i onarıldı |
 | UI Cila Turu | `8bc3d26`→`c508d36` | Kart grid yoğunlaşması (ana sayfa + istek listesi 5, PLP 4 sütun; ikon-only "Sepete Ekle"), istek listesi kart alt satırı + çöp butonu görsel köşesine, header yeniden düzeni (nav tam ortada, sağ ikon kümesi, gereksiz "Anasayfa" menü öğesi kaldırıldı), inline arama → ikon + ekran ortası modal popup, mobil menü md:hidden→lg:hidden düzeltmesi; hepsi editör aracıyla (kural 1) |
 | Phase 6 | `bb8566d` + `eb5b484` + `e68daff` | Kalıntı temizliği: header/cart-indicator yorumlarındaki ASCII Türkçe + bayat arama yorumunun onarımı, kullanılmayan `welcome.blade.php` silindi, `LogoutTest` `#[Test]` attribute'larına taşındı (3 deprecation uyarısı bitti), `AddToCartFromListTest` uniqid() → `Str::ulid()` (çakışmaya dayanıklı üretim; 3x tekrar koşusu yeşil) |
+| Phase 7 | `ec902da` + `2e6d80e` | Erişilebilirlik/QA: skip-link + `main` landmark (`id`/`tabindex`), global focus-visible emniyet ağı ve `prefers-reduced-motion` kuralı (app.css), sepet çekecesine `aria-labelledby`, 9 kart/bant yüzeyinde `dark:bg-slate-950`→`900` normalizasyonu, dekoratif katmanlara `aria-hidden`, wishlist "Tükendi" rozetine dark varyant; form etiketi/alt metin denetimi tam (PDP 5/5 + PLP 4/4 ilişkili) |
 
 *Not: Faz 5 view'ları Python/PowerShell betikleriyle yazıldığı için Türkçe karakterler
 ASCII'ye düşmüş, bazı Tailwind sınıfları ve bir SVG path'i bozulmuştu; 5d-5e ve hotfix
@@ -69,20 +70,12 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
 - **Bilinen boşluklar:** `lang/` dizini yok (tüm metin view'larda gömülü);
   checkout'a özel feature test yok; `emails/order-confirmation` şablonu tasarımsız
   (21.09.2026 itibarıyla `welcome.blade.php` silindi ve uniqid() çakışma riski
-  `Str::ulid()` ile giderildi — Phase 6)
+  `Str::ulid()` ile giderildi — Phase 6); Phase 7 artıkları: gerçek cihazda manuel
+  mobil QA, ölçümlü kontrast denetimi, modal/çekmecede focus-trap (ertelendi)
 
 ## 6. Sonraki Fazlar (her faz başlamadan kullanıcı onayı alınır)
 
-### Phase 7: Erişilebilirlik ve QA Turu
-- Klavye navigasyonu, `focus-visible` tutarlılığı, skip-link, `prefers-reduced-motion`
-  (21.09 ön taraması: skip-link ve motion-reduce YOK; focus-visible yalnız 4 dosyada)
-- `<main>` landmark'ına `id="main-content"` + `tabindex="-1"` (skip-link hedefi —
-  `layouts/storefront.blade.php:16`)
-- Form label/alt metin/kontrast denetimi; mobil QA (sepet çekmecesi, mobil menü, PLP filtre)
-- Dark mode tam tur (`dark:bg-slate-900` ×17 / `dark:bg-slate-950` ×10 karışıklığının
-  normalizasyonu — 21.09 sayımı)
-
-### Phase 8: Checkout Derinleştirme
+### Phase 8: Checkout Derinleştirme (sıradaki)
 - `CheckoutTest` yazımı: `placeOrder` akışı, validasyon hataları, başarı ekranı, boş sepet
 - Adres formu UX iyileştirmeleri; Stripe Elements görsel entegrasyon değerlendirmesi
 
@@ -97,7 +90,8 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
 
 ## 7. Sürüm Kararları (kullanıcı onayına bağlı)
 - `ui-refactor` 21.09.2026'da `origin/ui-refactor`'a push edildi (upstream takibi kuruldu)
-- **Karar (21.09.2026):** Phase 6 sonrası `main`'e TEK SEFERDE merge + `v1.3.0`
-  annotated etiketi (mevcut etiketler annotated, mesaj ASCII) — aynı oturumda
-  uygulanır; Phase 7 çalışmaları `ui-refactor` üzerinde sürer
+- **Uygulandı (21.09.2026):** `main`'e TEK SEFERDE merge (`3ebb38f`, `--no-ff`) +
+  `v1.3.0` annotated etiketi (Faz 1-6); ardından Phase 7 için İKİNCİ merge +
+  `v1.3.1` annotated etiketi (kullanıcı tercihi) — tüm fazlar artık `main`'de;
+  Phase 8 `ui-refactor` üzerinde sürecek
 - Yedekler mevcut: `backup/pre-ui-refresh` dalı + `backup-pre-ui-phase1` etiketi

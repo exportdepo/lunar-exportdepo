@@ -42,6 +42,12 @@
 </head>
 <body class="min-h-screen flex flex-col bg-slate-50 text-slate-900 antialiased font-sans dark:bg-slate-950 dark:text-slate-100">
 
+    {{-- Erişilebilirlik: klavye kullanıcıları için sayfa içeriğine atlama bağlantısı (ilk Tab'da görünür olur) --}}
+    <a href="#main-content"
+       class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-indigo-600 focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg">
+        İçeriğe geç
+    </a>
+
     {{ $slot }}
 
     @livewireScripts
