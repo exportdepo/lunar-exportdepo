@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Livewire\Storefront\CollectionPage;
 use App\Livewire\Storefront\HomePage;
+use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Lunar\Facades\CartSession;
 use Lunar\Models\Channel;
@@ -47,7 +48,7 @@ class AddToCartFromListTest extends TestCase
     {
         $language = $this->storefrontLanguage();
         $product = $this->publishedProductWithVariant(stock: 3, languageId: $language->id);
-        $slug = 'liste-koleksiyon-'.uniqid();
+        $slug = 'liste-koleksiyon-'.Str::ulid();
 
         $collection = Collection::factory()->create();
         $collection->urls()->create([
@@ -92,7 +93,7 @@ class AddToCartFromListTest extends TestCase
     private function storefrontLanguage(): Language
     {
         return Language::factory()->create([
-            'code' => 'tr-'.uniqid(),
+            'code' => 'tr-'.Str::ulid(),
             'default' => true,
         ]);
     }
@@ -105,7 +106,7 @@ class AddToCartFromListTest extends TestCase
 
         Currency::query()->where('default', true)->update(['default' => false]);
         $currency = Currency::factory()->create([
-            'code' => 'TRY'.uniqid(),
+            'code' => 'TRY'.Str::ulid(),
             'default' => true,
         ]);
 
@@ -130,13 +131,13 @@ class AddToCartFromListTest extends TestCase
         ]);
         $product->urls()->create([
             'language_id' => $languageId,
-            'slug' => 'liste-urun-'.uniqid(),
+            'slug' => 'liste-urun-'.Str::ulid(),
             'default' => true,
         ]);
 
         $variant = $product->variants()->create([
             'tax_class_id' => TaxClass::factory()->create()->id,
-            'sku' => 'LIST-'.uniqid(),
+            'sku' => 'LIST-'.Str::ulid(),
             'stock' => $stock,
             'unit_quantity' => 1,
             'min_quantity' => 1,
