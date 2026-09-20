@@ -7,7 +7,8 @@
 @source "../**/*.js";
 @source "../**/*.vue";
 
-/* ============================================================================   Karanlık Mod (Dark Mode)
+/* ============================================================================
+   Karanlık Mod (Dark Mode)
    ---------------------------------------------------------------------------
    Tailwind v4'te `dark:` varyantı varsayılan olarak `prefers-color-scheme`
    medya sorgusuna bağlıdır. Kullanıcı tercihini `<html class="dark">` sınıfı

@@ -3,16 +3,17 @@
         @if ($orderReference)
             <x-cart-alert type="success" icon="✓">
                 <x-slot:header>
-                    <h1 class="text-3xl font-extrabold text-emerald-900 dark:text-emerald-202">Siparişiniz alındı</h1>
+                    <h1 class="text-3xl font-extrabold text-emerald-900 dark:text-emerald-200">Siparişiniz alındı</h1>
                 </x-slot:header>
-                <div class="mt-3 grid gap-2 text-center">
-                    <p class="text-emerald-800">Sipariş numaranız: <strong>{{ $orderReference }}</strong></p>
-                    <p class="text-sm text-emerald-700">Ödeme: {{ $paymentMethod === 'stripe' ? 'Kart' : 'Manuel' }}</p>
-                </div>
-                <div class="mt-8 flex flex-col gap-3 sm:flex-row justify-center">
-                    <x-button href="{{ url('/siparis/' . $orderReference) }}">Takip et</x-button>
-                    <x-button href="{{ url('/') }}" variant="ghost">Ana sayfa</x-button>
-                </div>
+                <p>Sipariş numaranız: <strong class="text-base">{{ $orderReference }}</strong></p>
+                <p class="mt-1">Ödeme yöntemi: {{ $paymentMethod === 'stripe' ? 'Kart ile ödeme' : 'Manuel ödeme' }}</p>
+                <p class="mt-1">Sipariş onayını e-posta adresinize gönderdik.</p>
+                <x-slot:footer>
+                    <div class="flex flex-col justify-center gap-3 sm:flex-row">
+                        <x-button href="{{ url('/siparis/' . $orderReference) }}" variant="secondary">Siparişinizi takip edin</x-button>
+                        <x-button href="{{ url('/') }}" variant="outline">Alışverişe dön</x-button>
+                    </div>
+                </x-slot:footer>
             </x-cart-alert>
         @elseif (empty($summary))
             <x-empty-state icon="🛒" title="Sepetiniz boş" description="Checkout için ürün ekleyin.">
@@ -23,15 +24,15 @@
                 <p class="text-sm font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Son adım</p>
                 <h1 class="mt-2 text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl">Siparişi tamamla</h1>
             </div>
-            <form wire:submit="placeOrder" class="grid gap-8 lg:grid-cols=[minmax(0,1fr)_20rem] lg:items-start">
+            <form wire:submit="placeOrder" class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
                 <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950 sm:p-8">
                     <h2 class="text-xl font-bold text-slate-900 dark:text-white">Teslimat adresi</h2>
-                    <div class="mt-6 grid gap-5 sm:grid-cols=2">
+                    <div class="mt-6 grid gap-5 sm:grid-cols-2">
                         <x-input name="firstName" label="Ad" wire:model="firstName" required />
                         <x-input name="lastName" label="Soyad" wire:model="lastName" required />
                         <x-input name="email" type="email" label="E-posta" wire:model="email" autocomplete="email" required />
                         <x-input name="phone" type="tel" label="Telefon" wire:model="phone" autocomplete="tel" required />
-                        <div class="sm:col-span=2">
+                        <div class="sm:col-span-2">
                             <x-input name="lineOne" label="Adres" wire:model="lineOne" hint="Tam adres" required />
                         </div>
                         <x-input name="city" label="İl" wire:model="city" required />
@@ -56,9 +57,9 @@
                     @enderror
                 </div>
 
-                <aside class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-955">
+                <aside class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950 lg:sticky lg:top-24 lg:self-start">
                     <h2 class="text-lg font-bold text-slate-900 dark:text-white">Sipariş özeti</h2>
-                    <div class="mt-5 flex items-center justify-between text-sm text-slate-600 dark:text-slate-400"><span>{{ $summary['count'] }} ürün</span><span class="font-semibold text-slate-900 dark:text-white">TRY</span></div>
+                    <div class="mt-5 flex items-center justify-between text-sm text-slate-600 dark:text-slate-400"><span>{{ $summary['count'] }} ürün</span><span class="font-semibold text-slate-900 dark:text-white">₺</span></div>
                     <div class="mt-4 space-y-2 text-sm">
                         <div class="flex items-center justify-between"><span class="text-slate-600 dark:text-slate-400">Ürünler (KDV hariç)</span><span class="font-semibold text-slate-900 dark:text-white">{{ number_format($summary['sub_total'] / 100, 2, ',', '.') }} ₺</span></div>
                         <div class="flex items-center justify-between"><span class="text-slate-600 dark:text-slate-400">KDV</span><span class="font-semibold text-slate-900 dark:text-white">{{ number_format($summary['tax_total'] / 100, 2, ',', '.') }} ₺</span></div>
