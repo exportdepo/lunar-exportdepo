@@ -1,10 +1,10 @@
 {{--
     ExportDepo yapiskan (sticky) ust navigasyon bileseni.
 
-    - Logo, masaustu navigasyonu, tema dugmesi, uyelik alani, istek listesi ve
-      sepet rozetini icerir; arama ikonla acilir, panel header altina iner.
-    - Masaustu yerlesim: logo + nav solda, aksiyonlar sagda; ikon kumesi sirasi:
-      arama, tema, istek listesi, sepet, kullanici menusu en sagda.
+    - Logo, tema dugmesi, uyelik alani, istek listesi ve sepet rozetini icerir;
+      arama ikonla acilir ve ekran ortasinda modal (popup) olarak belirir.
+    - Masaustu yerlesim: logo solda, nav ortada (absolute ortalama), aksiyonlar
+      sagda; ikon sirasi: arama, tema, istek listesi, sepet, kullanici en sagda.
     - Mobilde hamburger menu (Alpine `mobileOpen` durumu) ile acilir panel.
     - Sepet dugmesi ve cekmece `livewire:storefront.cart-indicator` bilesenindedir;
       acilip kapanma `$store.cartDrawer` Alpine store'u ile yonetilir.
@@ -13,7 +13,7 @@
 --}}
 <header class="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
     <div x-data="{ mobileOpen: false, searchOpen: false }" @keydown.escape.window="mobileOpen = false; searchOpen = false" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="flex h-16 items-center gap-4">
+        <div class="relative flex h-16 items-center gap-4">
 
             {{-- Logo --}}
             <a href="{{ url('/') }}" aria-label="ExportDepo ana sayfa" class="group flex shrink-0 items-center gap-2">
@@ -22,7 +22,7 @@
             </a>
 
             {{-- Masaüstü navigasyon --}}
-            <nav aria-label="Ana menü" class="hidden shrink-0 items-center gap-5 whitespace-nowrap text-sm font-medium text-slate-600 dark:text-slate-300 lg:flex">
+            <nav aria-label="Ana menü" class="absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-5 whitespace-nowrap text-sm font-medium text-slate-600 dark:text-slate-300 lg:flex">
                 <a href="{{ url('/koleksiyon/elektronik') }}" class="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Elektronik</a>
                 <a href="{{ url('/koleksiyon/giyim') }}" class="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Giyim</a>
                 <a href="{{ url('/koleksiyon/ev-yasam') }}" class="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Ev &amp; Yaşam</a>
@@ -35,7 +35,7 @@
                 <button type="button"
                         @click="searchOpen = !searchOpen; mobileOpen = false; $nextTick(() => $refs.searchInput.focus())"
                         :aria-expanded="searchOpen"
-                        aria-controls="header-search-panel"
+                        aria-controls="header-search-modal"
                         aria-label="Arama yap"
                         title="Arama yap"
                         class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-indigo-400">
@@ -118,26 +118,38 @@
             </div>
         </div>
 
-        {{-- Arama paneli: ikon ile açılır, header altına süzülür --}}
-        <div id="header-search-panel"
+        {{-- Arama popup: ikon ile açılır, ekran ortasında modal olarak belirir --}}
+        <div id="header-search-modal"
              x-show="searchOpen"
              x-cloak
              x-transition.opacity.duration.200ms
-             class="border-t border-slate-100 py-4 dark:border-slate-800">
-            <form action="{{ url('/') }}" method="GET" role="search" class="relative mx-auto max-w-xl">
-                <input type="search"
-                       name="q"
-                       value="{{ request('q') }}"
-                       placeholder="Ürün ara..."
-                       aria-label="Ürün ara"
-                       x-ref="searchInput"
-                       class="w-full rounded-xl border border-slate-300 bg-slate-50 py-3 pl-12 pr-4 text-base text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400">
-                <button type="submit" aria-label="Ara" class="absolute left-0 top-0 z-10 inline-flex h-full w-12 items-center justify-center rounded-l-xl text-slate-400 transition-colors hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-indigo-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                    </svg>
-                </button>
-            </form>
+             @click.self="searchOpen = false"
+             role="dialog"
+             aria-modal="true"
+             aria-label="Arama"
+             class="fixed inset-0 z-50 flex items-start justify-center bg-slate-950/60 px-4 pt-24 sm:pt-32">
+            <div x-show="searchOpen"
+                 x-cloak
+                 x-transition.scale.95.duration.200ms
+                 class="w-full max-w-xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-800">
+                <form action="{{ url('/') }}" method="GET" role="search" class="relative">
+                    <input type="search"
+                           name="q"
+                           value="{{ request('q') }}"
+                           placeholder="Ürün ara..."
+                           aria-label="Ürün ara"
+                           x-ref="searchInput"
+                           class="w-full border-0 bg-slate-100 py-3.5 pl-12 pr-4 text-base text-slate-900 placeholder:text-slate-400 transition-colors focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:bg-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500">
+                    <button type="submit" aria-label="Ara" class="absolute left-0 top-0 z-10 inline-flex h-full w-12 items-center justify-center text-slate-400 transition-colors hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-indigo-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                    </button>
+                </form>
+                <div class="border-t border-slate-100 px-4 py-2.5 text-xs text-slate-400 dark:border-slate-700 dark:text-slate-500">
+                    Aramak için <span class="font-semibold">Enter</span>'a basın · Kapatmak için <span class="font-semibold">Esc</span>'e basın
+                </div>
+            </div>
         </div>
 
         {{-- Mobil menü paneli --}}
