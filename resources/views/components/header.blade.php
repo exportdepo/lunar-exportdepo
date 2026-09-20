@@ -4,7 +4,7 @@
     - Logo, masaustu navigasyonu, arama cubugu, tema dugmesi, uyelik alani,
       istek listesi ve sepet rozetini icerir.
     - Masaustu yerlesim: logo + nav solda, arama ortada (flex-1 + justify-center),
-      aksiyonlar sagda (istek listesi, sepet, tema, kullanici menusu en sagda).
+      aksiyonlar sagda (tema, istek listesi, sepet, kullanici menusu en sagda).
     - Mobilde hamburger menu (Alpine `mobileOpen` durumu) ile acilir panel.
     - Sepet dugmesi ve cekmece `livewire:storefront.cart-indicator` bilesenindedir;
       acilip kapanma `$store.cartDrawer` Alpine store'u ile yonetilir.
@@ -30,7 +30,7 @@
 
             {{-- Masaüstü arama: sol grup ile sağ aksiyonlar arasında ortalanır --}}
             <div class="hidden min-w-0 flex-1 justify-center lg:flex">
-                <form action="{{ url('/') }}" method="GET" role="search" class="relative w-full max-w-md">
+                <form action="{{ url('/') }}" method="GET" role="search" class="relative w-full max-w-sm">
                     <input type="search"
                            name="q"
                            value="{{ request('q') }}"
@@ -48,10 +48,6 @@
             {{-- Aksiyonlar --}}
             <div class="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
 
-                {{-- İstek listesi + sepet (Livewire) --}}
-                <livewire:storefront.wishlist-indicator />
-                <livewire:storefront.cart-indicator />
-
                 {{-- Tema düğmesi (mobilde mobil menüde) --}}
                 <button type="button"
                         x-data
@@ -67,6 +63,10 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
                     </svg>
                 </button>
+
+                {{-- İstek listesi + sepet (Livewire) --}}
+                <livewire:storefront.wishlist-indicator />
+                <livewire:storefront.cart-indicator />
 
                 {{-- Üyelik: kullanıcı menüsü --}}
                 @auth
