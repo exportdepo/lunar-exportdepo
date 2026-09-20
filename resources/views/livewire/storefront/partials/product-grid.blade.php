@@ -5,8 +5,11 @@
     - $gridProducts : ürün dizileri (id, name, description, price, stock, image_url, url)
     - $wishlistIds  : sayfanın istek listesindeki ürün idleri (Livewire public property)
     - $gridClasses  : opsiyonel sütun yoğunluğu (varsayılan: 1/2/3/4 sütun).
-                      Dar içerik alanlarında (örn. PLP filtre sütunu) daha seyrek
-                      değer verilir: "grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
+                      Dar içerik alanlarında (örn. PLP filtre sütunu) veya kart alt
+                      satırındaki fiyat + "Sepete Ekle"nin tek satırda kalması
+                      gerektiğinde (ana sayfa, PLP; istek listesi aynı değeri
+                      kullanır) daha seyrek değer verilir:
+                      "grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
 --}}
 @props([
     'gridClasses' => 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',

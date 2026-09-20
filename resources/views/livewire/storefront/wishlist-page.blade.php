@@ -29,7 +29,7 @@
             <x-button href="{{ url('/') }}">Ürünleri keşfet</x-button>
         </x-empty-state>
         @else
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
             @foreach ($items as $item)
             <div wire:key="wishlist-item-{{ $item['id'] }}" class="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-xl dark:border-slate-800 dark:bg-slate-950">
                 <a href="{{ $item['url'] ? url('/urun/' . $item['url']) : '#' }}" class="flex flex-col flex-1">
