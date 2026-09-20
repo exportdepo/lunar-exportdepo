@@ -48,26 +48,33 @@
                     <p class="text-sm text-slate-500 mb-3 line-clamp-2 flex-1 dark:text-slate-400">{{ $item['description'] }}</p>
                 </div>
                 </a>
+
+                {{-- Listeden çıkar: görselin sol üst köşesi (product-card kalp deseni) --}}
+                <button type="button"
+                        wire:click="remove({{ $item['id'] }})"
+                        wire:loading.attr="disabled"
+                        wire:key="wishlist-remove-{{ $item['id'] }}"
+                        title="Listeden çıkar"
+                        aria-label="Listeden çıkar: {{ $item['name'] }}"
+                        class="absolute top-2 left-2 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition-colors hover:text-rose-500 dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-400 dark:hover:text-rose-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3m-4 0h14"/></svg>
+                </button>
+
                 <div class="flex flex-wrap items-end justify-between gap-x-3 gap-y-2 border-t border-slate-100 p-4 pt-3 dark:border-slate-800">
                     <div>
                         <span class="text-lg font-bold text-slate-900 dark:text-white">{{ $item['price'] !== null ? number_format($item['price'] / 100, 2, ',', '.') . ' ₺' : '—' }}</span>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button type="button"
-                                wire:click="addToCart({{ $item['id'] }})"
-                                wire:loading.attr="disabled"
-                                @if ($item['stock'] === null || $item['stock'] <= 0) disabled @endif
-                                title="{{ $item['stock'] !== null && $item['stock'] > 0 ? 'Sepete Ekle' : 'Stokta yok' }}"
-                                aria-label="{{ $item['stock'] !== null && $item['stock'] > 0 ? 'Sepete Ekle' : 'Stokta yok' }}: {{ $item['name'] }}"
-                                class="inline-flex h-9 w-9 shrink-0 select-none items-center justify-center rounded-lg bg-indigo-600 text-white shadow-sm transition-all duration-150 hover:bg-indigo-700 hover:shadow-md active:bg-indigo-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:active:bg-indigo-300 dark:focus-visible:ring-indigo-400 dark:focus-visible:ring-offset-slate-950">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                        </button>
-                        <x-button wire:click="remove({{ $item['id'] }})" wire:loading.attr="disabled" variant="ghost" size="sm" type="button" title="Listeden çıkar" aria-label="Listeden çıkar" class="shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3m-4 0h14"/></svg>
-                        </x-button>
-                    </div>
+                    <button type="button"
+                            wire:click="addToCart({{ $item['id'] }})"
+                            wire:loading.attr="disabled"
+                            @if ($item['stock'] === null || $item['stock'] <= 0) disabled @endif
+                            title="{{ $item['stock'] !== null && $item['stock'] > 0 ? 'Sepete Ekle' : 'Stokta yok' }}"
+                            aria-label="{{ $item['stock'] !== null && $item['stock'] > 0 ? 'Sepete Ekle' : 'Stokta yok' }}: {{ $item['name'] }}"
+                            class="inline-flex h-9 w-9 shrink-0 select-none items-center justify-center rounded-lg bg-indigo-600 text-white shadow-sm transition-all duration-150 hover:bg-indigo-700 hover:shadow-md active:bg-indigo-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:active:bg-indigo-300 dark:focus-visible:ring-indigo-400 dark:focus-visible:ring-offset-slate-950">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </button>
                 </div>
                 @if ($addedProductId === $item['id'])
                 <div class="px-4 pb-4 -mt-1">
