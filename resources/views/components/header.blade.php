@@ -21,7 +21,6 @@
 
             {{-- Masaüstü navigasyon --}}
             <nav aria-label="Ana menü" class="hidden shrink-0 items-center gap-5 whitespace-nowrap text-sm font-medium text-slate-600 dark:text-slate-300 lg:flex">
-                <a href="{{ url('/') }}" class="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Anasayfa</a>
                 <a href="{{ url('/koleksiyon/elektronik') }}" class="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Elektronik</a>
                 <a href="{{ url('/koleksiyon/giyim') }}" class="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Giyim</a>
                 <a href="{{ url('/koleksiyon/ev-yasam') }}" class="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Ev &amp; Yaşam</a>
@@ -143,7 +142,6 @@
 
             {{-- Mobil navigasyon --}}
             <nav aria-label="Mobil menü" class="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-                <a href="{{ url('/') }}" class="rounded-lg px-3 py-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800">🏠 Anasayfa</a>
                 <a href="{{ url('/koleksiyon/elektronik') }}" class="rounded-lg px-3 py-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800">🎧 Elektronik</a>
                 <a href="{{ url('/koleksiyon/giyim') }}" class="rounded-lg px-3 py-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800">👕 Giyim</a>
                 <a href="{{ url('/koleksiyon/ev-yasam') }}" class="rounded-lg px-3 py-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800">🏡 Ev &amp; Yaşam</a>
