@@ -10,8 +10,9 @@
         ['id', 'name', 'description', 'price' (kuruş), 'stock', 'image_url', 'url' (slug)]
 
     Notlar:
-    - `addToCart = true` iken "Sepete Ekle" düğmesi üst Livewire bileşenindeki
-      `addToCart($id)` aksiyonunu çağırır (Phase 4 sayfa entegrasyonunda tanımlanır).
+    - `addToCart = true` iken sepet ikonlu "Sepete Ekle" düğmesi (ikon-only;
+      `title`/`aria-label` ile etiketli, tükendiğinde `disabled`) üst Livewire
+      bileşenindeki `addToCart($id)` aksiyonunu çağırır.
     - Kart, grid içinde eşit yükseklikte durması için `h-full` + flex kolon yapısındadır.
 --}}
 @props([
@@ -102,16 +103,17 @@
             </div>
 
             @if ($addToCart && $productId)
-                <x-button size="sm"
-                          wire:click="addToCart({{ $productId }})"
-                          :disabled="$soldOut"
-                          wire:loading.attr="disabled"
-                          class="shrink-0">
+                <button type="button"
+                        wire:click="addToCart({{ $productId }})"
+                        wire:loading.attr="disabled"
+                        @if ($soldOut) disabled @endif
+                        title="{{ $soldOut ? 'Stokta yok' : 'Sepete Ekle' }}"
+                        aria-label="{{ $soldOut ? 'Stokta yok' : 'Sepete Ekle' }}: {{ $name }}"
+                        class="inline-flex h-9 w-9 shrink-0 select-none items-center justify-center rounded-lg bg-indigo-600 text-white shadow-sm transition-all duration-150 hover:bg-indigo-700 hover:shadow-md active:bg-indigo-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:active:bg-indigo-300 dark:focus-visible:ring-indigo-400 dark:focus-visible:ring-offset-slate-950">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
-                    Sepete Ekle
-                </x-button>
+                </button>
             @else
                 <a href="{{ $href }}"
                    aria-label="{{ $name }} ürününü incele"

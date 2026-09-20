@@ -74,7 +74,7 @@
                 @include('livewire.storefront.partials.product-grid', [
                     'gridProducts' => $featuredProducts,
                     'wishlistIds' => $wishlistIds,
-                    'gridClasses' => 'grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3',
+                    'gridClasses' => 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5',
                 ])
             @endif
         </section>
@@ -127,7 +127,7 @@
                 @include('livewire.storefront.partials.product-grid', [
                     'gridProducts' => $remainingProducts,
                     'wishlistIds' => $wishlistIds,
-                    'gridClasses' => 'grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3',
+                    'gridClasses' => 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5',
                 ])
             </section>
         @endif
@@ -157,7 +157,7 @@
                 @include('livewire.storefront.partials.product-grid', [
                     'gridProducts' => $products,
                     'wishlistIds' => $wishlistIds,
-                    'gridClasses' => 'grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3',
+                    'gridClasses' => 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5',
                 ])
             @endif
         </section>

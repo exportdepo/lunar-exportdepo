@@ -182,7 +182,7 @@
                     @include('livewire.storefront.partials.product-grid', [
                         'gridProducts' => $products,
                         'wishlistIds' => $wishlistIds,
-                        'gridClasses' => 'grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3',
+                        'gridClasses' => 'grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4',
                     ])
                 @endif
             </div>
