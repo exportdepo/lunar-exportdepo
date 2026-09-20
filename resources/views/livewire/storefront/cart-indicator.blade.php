@@ -1,11 +1,11 @@
 {{--
-    ExportDepo sepet rozeti + cekmece icerigi (Livewire).
+    ExportDepo sepet rozeti + çekmece içeriği (Livewire).
 
-    - Dugme, Alpine `$store.cartDrawer.toggle()` ile cekmeceyi acar/kapatir.
-    - Cekmece kabugu `components/cart-drawer.blade.php` bilesenidir; sepet
-      satirlari slot'a, toplamlar ve CTA'lar `footer` slot'una aktarilir.
-    - Sepet verisi `CartSession` uzerinden gelir; `cart-updated` olayinda
-      yenilenir (urun ekleme/cikarma islemleri bu olayi tetikler).
+    - Düğme, Alpine `$store.cartDrawer.toggle()` ile çekmeceyi açar/kapatır.
+    - Çekmece kabuğu `components/cart-drawer.blade.php` bileşenidir; sepet
+      satırları slot'a, toplamlar ve CTA'lar `footer` slot'una aktarılır.
+    - Sepet verisi `CartSession` üzerinden gelir; `cart-updated` olayında
+      yenilenir (ürün ekleme/çıkarma işlemleri bu olayı tetikler).
 --}}
 <div class="shrink-0">
     <button type="button"

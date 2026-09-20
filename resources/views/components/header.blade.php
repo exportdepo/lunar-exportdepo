@@ -1,15 +1,15 @@
 {{--
-    ExportDepo yapiskan (sticky) ust navigasyon bileseni.
+    ExportDepo yapışkan (sticky) üst navigasyon bileşeni.
 
-    - Logo, tema dugmesi, uyelik alani, istek listesi ve sepet rozetini icerir;
-      arama ikonla acilir ve ekran ortasinda modal (popup) olarak belirir.
-    - Masaustu yerlesim: logo solda, nav ortada (absolute ortalama), aksiyonlar
-      sagda; ikon sirasi: arama, tema, istek listesi, sepet, kullanici en sagda.
-    - Mobilde hamburger menu (Alpine `mobileOpen` durumu) ile acilir panel.
-    - Sepet dugmesi ve cekmece `livewire:storefront.cart-indicator` bilesenindedir;
-      acilip kapanma `$store.cartDrawer` Alpine store'u ile yonetilir.
+    - Logo, tema düğmesi, üyelik alanı, istek listesi ve sepet rozetini içerir;
+      arama ikonla açılır ve ekran ortasında modal (popup) olarak belirir.
+    - Masaüstü yerleşim: logo solda, nav ortada (absolute ortalama), aksiyonlar
+      sağda; ikon sırası: arama, tema, istek listesi, sepet, kullanıcı en sağda.
+    - Mobilde hamburger menü (Alpine `mobileOpen` durumu) ile açılır panel.
+    - Sepet düğmesi ve çekmece `livewire:storefront.cart-indicator` bileşenindedir;
+      açılıp kapanma `$store.cartDrawer` Alpine store'u ile yönetilir.
     - Not: panelde `backdrop-blur` KULLANILMAZ; aksi halde backdrop-filter,
-      icindeki `fixed` cekmeceyi viewport yerine header'a gore konumlandirir.
+      içindeki `fixed` çekmeceyi viewport yerine header'a göre konumlandırır.
 --}}
 <header class="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
     <div x-data="{ mobileOpen: false, searchOpen: false }" @keydown.escape.window="mobileOpen = false; searchOpen = false" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -31,7 +31,7 @@
             {{-- Aksiyonlar --}}
             <div class="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
 
-                {{-- Arama: ikon header altındaki paneli açar --}}
+                {{-- Arama: ikon ekran ortasındaki modal popup'ı açar --}}
                 <button type="button"
                         @click="searchOpen = !searchOpen; mobileOpen = false; $nextTick(() => $refs.searchInput.focus())"
                         :aria-expanded="searchOpen"
