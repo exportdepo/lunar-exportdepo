@@ -31,6 +31,7 @@
      class="fixed inset-0 z-50"
      role="dialog"
      aria-modal="true"
+     aria-labelledby="cart-drawer-title"
      :aria-hidden="!$store.cartDrawer.open">
 
     {{-- Karartma katmanı: tıklanınca çekmece kapanır --}}
@@ -52,7 +53,7 @@
 
         {{-- Başlık --}}
         <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
-            <h2 class="text-base font-bold text-slate-900 dark:text-white">{{ $title }}</h2>
+            <h2 id="cart-drawer-title" class="text-base font-bold text-slate-900 dark:text-white">{{ $title }}</h2>
             <button type="button"
                     @click="$store.cartDrawer.hide()"
                     aria-label="Sepeti kapat"

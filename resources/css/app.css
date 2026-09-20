@@ -30,4 +30,47 @@
     [x-cloak] {
         display: none !important;
     }
+
+    /* Erişilebilirlik: klavye odak güvenlik ağı. Kendi focus-visible stili olan
+       bileşenler (x-button, x-input, ürün kartı düğmeleri vb.) sınıf bazlı
+       kurallarıyla bunu geçersiz kılar; bu kural çıplak bağlantı ve düğmelerde
+       görünür odak çerçevesini garanti eder. */
+    a:focus-visible,
+    button:focus-visible,
+    summary:focus-visible,
+    [role='button']:focus-visible,
+    [role='tab']:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    [tabindex]:focus-visible {
+        outline: 2px solid var(--color-indigo-500);
+        outline-offset: 2px;
+    }
+
+    .dark a:focus-visible,
+    .dark button:focus-visible,
+    .dark summary:focus-visible,
+    .dark [role='button']:focus-visible,
+    .dark [role='tab']:focus-visible,
+    .dark input:focus-visible,
+    .dark select:focus-visible,
+    .dark textarea:focus-visible,
+    .dark [tabindex]:focus-visible {
+        outline-color: var(--color-indigo-400);
+    }
+
+    /* Erişilebilirlik: "hareketi azalt" sistem tercihi — geçiş ve animasyonlar
+       anlık olur, yumuşak kaydırma kapanır. `!important`, Alpine'in satır içi
+       transition stillerini de (x-transition dahil) geçersiz kılar. */
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        ::before,
+        ::after {
+            scroll-behavior: auto !important;
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+        }
+    }
 }
