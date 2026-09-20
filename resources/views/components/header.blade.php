@@ -1,10 +1,10 @@
 {{--
     ExportDepo yapiskan (sticky) ust navigasyon bileseni.
 
-    - Logo, masaustu navigasyonu, arama cubugu, tema dugmesi, uyelik alani,
-      istek listesi ve sepet rozetini icerir.
-    - Masaustu yerlesim: logo + nav solda, arama ortada (flex-1 + justify-center),
-      aksiyonlar sagda (tema, istek listesi, sepet, kullanici menusu en sagda).
+    - Logo, masaustu navigasyonu, tema dugmesi, uyelik alani, istek listesi ve
+      sepet rozetini icerir; arama ikonla acilir, panel header altina iner.
+    - Masaustu yerlesim: logo + nav solda, aksiyonlar sagda; ikon kumesi sirasi:
+      arama, tema, istek listesi, sepet, kullanici menusu en sagda.
     - Mobilde hamburger menu (Alpine `mobileOpen` durumu) ile acilir panel.
     - Sepet dugmesi ve cekmece `livewire:storefront.cart-indicator` bilesenindedir;
       acilip kapanma `$store.cartDrawer` Alpine store'u ile yonetilir.
@@ -12,7 +12,7 @@
       icindeki `fixed` cekmeceyi viewport yerine header'a gore konumlandirir.
 --}}
 <header class="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-    <div x-data="{ mobileOpen: false }" @keydown.escape.window="mobileOpen = false" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div x-data="{ mobileOpen: false, searchOpen: false }" @keydown.escape.window="mobileOpen = false; searchOpen = false" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center gap-4">
 
             {{-- Logo --}}
@@ -28,25 +28,21 @@
                 <a href="{{ url('/koleksiyon/ev-yasam') }}" class="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Ev &amp; Yaşam</a>
             </nav>
 
-            {{-- Masaüstü arama: sol grup ile sağ aksiyonlar arasında ortalanır --}}
-            <div class="hidden min-w-0 flex-1 justify-center lg:flex">
-                <form action="{{ url('/') }}" method="GET" role="search" class="relative w-full max-w-sm">
-                    <input type="search"
-                           name="q"
-                           value="{{ request('q') }}"
-                           placeholder="Ürün ara..."
-                           aria-label="Ürün ara"
-                           class="w-full rounded-lg border border-slate-300 bg-slate-50 py-2 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400">
-                    <button type="submit" aria-label="Ara" class="absolute left-0 top-0 z-10 inline-flex h-full w-9 items-center justify-center rounded-l-lg text-slate-400 transition-colors hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-indigo-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                    </svg>
-                    </button>
-                </form>
-            </div>
-
             {{-- Aksiyonlar --}}
             <div class="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+
+                {{-- Arama: ikon header altındaki paneli açar --}}
+                <button type="button"
+                        @click="searchOpen = !searchOpen; mobileOpen = false; $nextTick(() => $refs.searchInput.focus())"
+                        :aria-expanded="searchOpen"
+                        aria-controls="header-search-panel"
+                        aria-label="Arama yap"
+                        title="Arama yap"
+                        class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-indigo-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
+                </button>
 
                 {{-- Tema düğmesi (mobilde mobil menüde) --}}
                 <button type="button"
@@ -107,7 +103,7 @@
 
                 {{-- Hamburger (mobil) --}}
                 <button type="button"
-                        @click="mobileOpen = !mobileOpen"
+                        @click="mobileOpen = !mobileOpen; searchOpen = false"
                         :aria-expanded="mobileOpen"
                         aria-controls="mobile-menu"
                         aria-label="Menüyü aç/kapat"
@@ -122,27 +118,34 @@
             </div>
         </div>
 
-        {{-- Mobil menü paneli --}}
-        <div id="mobile-menu"
-             x-show="mobileOpen"
+        {{-- Arama paneli: ikon ile açılır, header altına süzülür --}}
+        <div id="header-search-panel"
+             x-show="searchOpen"
              x-cloak
              x-transition.opacity.duration.200ms
-             class="border-t border-slate-100 py-4 dark:border-slate-800 md:hidden">
-
-            {{-- Mobil arama --}}
-            <form action="{{ url('/') }}" method="GET" role="search" class="relative mb-4">
+             class="border-t border-slate-100 py-4 dark:border-slate-800">
+            <form action="{{ url('/') }}" method="GET" role="search" class="relative mx-auto max-w-xl">
                 <input type="search"
                        name="q"
                        value="{{ request('q') }}"
                        placeholder="Ürün ara..."
                        aria-label="Ürün ara"
-                       class="w-full rounded-lg border border-slate-300 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400">
-                <button type="submit" aria-label="Ara" class="absolute left-0 top-0 z-10 inline-flex h-full w-9 items-center justify-center rounded-l-lg text-slate-400 transition-colors hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-indigo-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                </svg>
+                       x-ref="searchInput"
+                       class="w-full rounded-xl border border-slate-300 bg-slate-50 py-3 pl-12 pr-4 text-base text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400">
+                <button type="submit" aria-label="Ara" class="absolute left-0 top-0 z-10 inline-flex h-full w-12 items-center justify-center rounded-l-xl text-slate-400 transition-colors hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-indigo-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
                 </button>
             </form>
+        </div>
+
+        {{-- Mobil menü paneli --}}
+        <div id="mobile-menu"
+             x-show="mobileOpen"
+             x-cloak
+             x-transition.opacity.duration.200ms
+             class="border-t border-slate-100 py-4 dark:border-slate-800 lg:hidden">
 
             {{-- Mobil navigasyon --}}
             <nav aria-label="Mobil menü" class="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
