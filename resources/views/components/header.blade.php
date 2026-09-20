@@ -3,6 +3,8 @@
 
     - Logo, masaustu navigasyonu, arama cubugu, tema dugmesi, uyelik alani,
       istek listesi ve sepet rozetini icerir.
+    - Masaustu yerlesim: logo + nav solda, arama ortada (flex-1 + justify-center),
+      aksiyonlar sagda (istek listesi, sepet, tema, kullanici menusu en sagda).
     - Mobilde hamburger menu (Alpine `mobileOpen` durumu) ile acilir panel.
     - Sepet dugmesi ve cekmece `livewire:storefront.cart-indicator` bilesenindedir;
       acilip kapanma `$store.cartDrawer` Alpine store'u ile yonetilir.
@@ -26,23 +28,29 @@
                 <a href="{{ url('/koleksiyon/ev-yasam') }}" class="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Ev &amp; Yaşam</a>
             </nav>
 
-            {{-- Masaüstü arama --}}
-            <form action="{{ url('/') }}" method="GET" role="search" class="relative hidden min-w-0 max-w-md flex-1 lg:block">
-                <input type="search"
-                       name="q"
-                       value="{{ request('q') }}"
-                       placeholder="Ürün ara..."
-                       aria-label="Ürün ara"
-                       class="w-full rounded-lg border border-slate-300 bg-slate-50 py-2 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400">
-                <button type="submit" aria-label="Ara" class="absolute left-0 top-0 z-10 inline-flex h-full w-9 items-center justify-center rounded-l-lg text-slate-400 transition-colors hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-indigo-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                </svg>
-                </button>
-            </form>
+            {{-- Masaüstü arama: sol grup ile sağ aksiyonlar arasında ortalanır --}}
+            <div class="hidden min-w-0 flex-1 justify-center lg:flex">
+                <form action="{{ url('/') }}" method="GET" role="search" class="relative w-full max-w-md">
+                    <input type="search"
+                           name="q"
+                           value="{{ request('q') }}"
+                           placeholder="Ürün ara..."
+                           aria-label="Ürün ara"
+                           class="w-full rounded-lg border border-slate-300 bg-slate-50 py-2 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400">
+                    <button type="submit" aria-label="Ara" class="absolute left-0 top-0 z-10 inline-flex h-full w-9 items-center justify-center rounded-l-lg text-slate-400 transition-colors hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-indigo-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
+                    </button>
+                </form>
+            </div>
 
             {{-- Aksiyonlar --}}
             <div class="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+
+                {{-- İstek listesi + sepet (Livewire) --}}
+                <livewire:storefront.wishlist-indicator />
+                <livewire:storefront.cart-indicator />
 
                 {{-- Tema düğmesi (mobilde mobil menüde) --}}
                 <button type="button"
@@ -96,10 +104,6 @@
                     <a href="{{ url('/giris') }}" class="hidden shrink-0 items-center rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-indigo-400 lg:inline-flex">Giriş Yap</a>
                     <x-button size="sm" href="{{ url('/kayit') }}" class="hidden shrink-0 sm:inline-flex">Üye Ol</x-button>
                 @endauth
-
-                {{-- İstek listesi + sepet (Livewire) --}}
-                <livewire:storefront.wishlist-indicator />
-                <livewire:storefront.cart-indicator />
 
                 {{-- Hamburger (mobil) --}}
                 <button type="button"
