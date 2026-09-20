@@ -96,6 +96,6 @@ bunları temizledi. 20.09.2026 taraması: görünen metinlerde 0 bozuk Türkçe.
 - `order-confirmation` e-postasının marka uyumlu, koyu mod dostu sade HTML'e alınması
 
 ## 7. Sürüm Kararları (kullanıcı onayına bağlı)
-- `ui-refactor` henüz push edilmedi → `git push origin ui-refactor`
+- `ui-refactor` 21.09.2026'da `origin/ui-refactor`'a push edildi (upstream takibi kuruldu)
 - `main`'e merge stratejisi (tek seferde mi, faz bazlı mı) ve sürüm etiketi (ör. `v1.2.0`)
 - Yedekler mevcut: `backup/pre-ui-refresh` dalı + `backup-pre-ui-phase1` etiketi
