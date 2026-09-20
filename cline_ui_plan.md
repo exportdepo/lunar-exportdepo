@@ -1,7 +1,7 @@
 # ExportDepo E-Ticaret UI Yenileme ve Geliştirme Rehberi
 
-> **Durum:** Faz 1-5 tamamlandı · Dal: `ui-refactor` (main'e merge yok — karar kullanıcıya ait)
-> · Testler: 103 passed / 449 assertion · Son güncelleme: 20.09.2026
+> **Durum:** Faz 1-5 + UI Cila Turu tamamlandı · Dal: `ui-refactor` (push edildi; main'e merge yok — karar kullanıcıya ait)
+> · Testler: 103 passed / 449 assertion · Son güncelleme: 21.09.2026
 
 Sevgili Cline, 
 Bu belge, storefront arayüzü yenileme çalışmasının canlı yol haritasıdır: tamamlanan fazlar, kanıtlanmış çalışma kuralları ve sonraki fazlar burada takip edilir. Lütfen aşağıdaki kurallara ve fazlara sıkı sıkıya bağlı kalarak geliştirmeleri yap.
@@ -33,6 +33,7 @@ Bu belge, storefront arayüzü yenileme çalışmasının canlı yol haritasıd�
 | 5a-5c | `4bc7889` | auth/sepet/checkout view'larının atomik bileşenlere refaktoru; GEÇİCİ CSS kaldırıldı |
 | 5d-5e | `77ac69c` | wishlist/hesap/siparişlerim sayfaları; `x-cart-alert` panel modu; Türkçe + ₺ + `wire:key`/`aria-label`/`wire:loading` onarımı |
 | Hotfix | `5c7d5a8` | İstek listesi adet rozetindeki bozuk kalp SVG path'i onarıldı |
+| UI Cila Turu | `8bc3d26`→`c508d36` | Kart grid yoğunlaşması (ana sayfa + istek listesi 5, PLP 4 sütun; ikon-only "Sepete Ekle"), istek listesi kart alt satırı + çöp butonu görsel köşesine, header yeniden düzeni (nav tam ortada, sağ ikon kümesi, gereksiz "Anasayfa" menü öğesi kaldırıldı), inline arama → ikon + ekran ortası modal popup, mobil menü md:hidden→lg:hidden düzeltmesi; hepsi editör aracıyla (kural 1) |
 
 *Not: Faz 5 view'ları Python/PowerShell betikleriyle yazıldığı için Türkçe karakterler
 ASCII'ye düşmüş, bazı Tailwind sınıfları ve bir SVG path'i bozulmuştu; 5d-5e ve hotfix
@@ -65,16 +66,23 @@ bunları temizledi. 20.09.2026 taraması: görünen metinlerde 0 bozuk Türkçe.
 - **Testler:** 26 feature test dosyası / 103 test / 449 assertion — TODO-FIXME: 0
 - **Bilinen boşluklar:** `lang/` dizini yok (tüm metin view'larda gömülü);
   `welcome.blade.php` kullanılmıyor; checkout'a özel feature test yok;
-  `emails/order-confirmation` şablonu tasarımsız
+  `emails/order-confirmation` şablonu tasarımsız; `AddToCartFromListTest`'te
+  uniqid() tabanlı para birimi kodu zamanlama çakışması (21.09.2026'da bir kez
+  tetiklendi, tekrar koşuda yeşil — Phase 6'da giderilecek)
 
 ## 6. Sonraki Fazlar (her faz başlamadan kullanıcı onayı alınır)
 
-### Phase 6: Kalıntı Temizliği (~30 dk)
-- `header.blade.php` (satır 7, 10) ve `cart-indicator.blade.php` (satır 2, 4, 8)
-  **yorumlarındaki** ASCII Türkçe'nin onarımı
+### Phase 6: Kalıntı Temizliği (~30-45 dk)
+- `header.blade.php` ve `cart-indicator.blade.php` **yorumlarındaki** ASCII Türkçe'nin
+  onarımı (eski satır numaraları header yeniden düzeninden sonra geçersiz; 21.09
+  taraması: yalnızca iki dosyanın üst yorum blokları + header'daki bayat "paneli
+  açar" arama yorumu)
 - Kullanılmayan `welcome.blade.php`'nin silinmesi
 - `LogoutTest` doc-comment metadata'larının PHPUnit attribute'larına taşınması
   (her test çalıştırmasında 3 deprecation uyarısı basıyor)
+- `AddToCartFromListTest`'te uniqid() değerlerinin çakışmaya dayanıklı üretime
+  alınması (para birimi/dil kodu, slug, SKU — `currencies.code` ve
+  `languages.code` UNIQUE kısıtlı)
 - İstenirse: checkout `has-[:checked]` ödeme vurgusu (ertelenmiş karar)
 
 ### Phase 7: Erişilebilirlik ve QA Turu
@@ -97,5 +105,5 @@ bunları temizledi. 20.09.2026 taraması: görünen metinlerde 0 bozuk Türkçe.
 
 ## 7. Sürüm Kararları (kullanıcı onayına bağlı)
 - `ui-refactor` 21.09.2026'da `origin/ui-refactor`'a push edildi (upstream takibi kuruldu)
-- `main`'e merge stratejisi (tek seferde mi, faz bazlı mı) ve sürüm etiketi (ör. `v1.2.0`)
+- `main`'e merge stratejisi (tek seferde mi, faz bazlı mı) ve sürüm etiketi (ör. `v1.3.0`; `v1.2.0` zaten mevcut)
 - Yedekler mevcut: `backup/pre-ui-refresh` dalı + `backup-pre-ui-phase1` etiketi
