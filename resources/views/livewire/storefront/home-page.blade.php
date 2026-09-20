@@ -100,7 +100,7 @@
                                 <span class="absolute inset-0 flex items-center justify-center bg-slate-100 text-5xl dark:bg-slate-800" aria-hidden="true">🗂️</span>
                             @endif
 
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/20 to-transparent"></div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/20 to-transparent" aria-hidden="true"></div>
 
                             <div class="absolute inset-x-0 bottom-0 p-5 text-white">
                                 <h3 class="text-xl font-bold">{{ $collection['name'] }}</h3>

@@ -25,7 +25,7 @@
                 <h1 class="mt-2 text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl">Siparişi tamamla</h1>
             </div>
             <form wire:submit="placeOrder" class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
-                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950 sm:p-8">
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
                     <h2 class="text-xl font-bold text-slate-900 dark:text-white">Teslimat adresi</h2>
                     <div class="mt-6 grid gap-5 sm:grid-cols-2">
                         <x-input name="firstName" label="Ad" wire:model="firstName" required />
@@ -57,7 +57,7 @@
                     @enderror
                 </div>
 
-                <aside class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950 lg:sticky lg:top-24 lg:self-start">
+                <aside class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 lg:sticky lg:top-24 lg:self-start">
                     <h2 class="text-lg font-bold text-slate-900 dark:text-white">Sipariş özeti</h2>
                     <div class="mt-5 flex items-center justify-between text-sm text-slate-600 dark:text-slate-400"><span>{{ $summary['count'] }} ürün</span><span class="font-semibold text-slate-900 dark:text-white">₺</span></div>
                     <div class="mt-4 space-y-2 text-sm">

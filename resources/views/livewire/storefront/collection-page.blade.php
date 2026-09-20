@@ -9,7 +9,7 @@
 --}}
 <div>
     {{-- Koleksiyon başlık şeridi --}}
-    <section class="border-b border-slate-800 bg-slate-900 text-white dark:bg-slate-950">
+    <section class="border-b border-slate-800 bg-slate-900 text-white">
         <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
             <a href="{{ url('/') }}" class="inline-flex items-center text-sm text-slate-300 transition-colors hover:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">

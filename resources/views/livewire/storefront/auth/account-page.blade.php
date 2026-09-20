@@ -19,7 +19,7 @@
 
         <div class="mt-8 grid gap-6 lg:grid-cols-3">
             <div class="lg:col-span-2 space-y-6">
-                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                     <h2 class="text-lg font-bold text-slate-900 dark:text-white">Hesap Bilgileri</h2>
                     <dl class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 text-sm">
                         <div><dt class="text-slate-500 dark:text-slate-400">Ad Soyad</dt><dd class="mt-1 font-semibold text-slate-900 dark:text-white">{{ $user->name }}</dd></div>
@@ -28,7 +28,7 @@
                         <div><dt class="text-slate-500 dark:text-slate-400">Üyelik Tarihi</dt><dd class="mt-1 font-semibold text-slate-900 dark:text-white">{{ $user->created_at->format("d.m.Y") }}</dd></div>
                     </dl>
                 </div>
-                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-bold text-slate-900 dark:text-white">Son Siparişler</h2>
                         <a href="{{ url('/hesabim/siparislerim') }}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">Tümünü Göster</a>
@@ -51,14 +51,14 @@
                 </div>
             </div>
             <aside class="space-y-6">
-                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                     <h2 class="text-lg font-bold text-slate-900 dark:text-white">Hesap Özeti</h2>
                     <div class="mt-4">
                         <div class="text-3xl font-extrabold text-indigo-600 dark:text-indigo-400">{{ $totalOrders }}</div>
                         <div class="text-sm text-slate-500 dark:text-slate-400">Toplam Sipariş</div>
                     </div>
                 </div>
-                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                     <h2 class="text-lg font-bold text-slate-900 dark:text-white">Hızlı Erişim</h2>
                     <ul class="mt-4 space-y-2 text-sm">
                         <li><a href="{{ url('/hesabim/siparislerim') }}" class="font-semibold text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">Tüm Siparişlerim</a></li>
