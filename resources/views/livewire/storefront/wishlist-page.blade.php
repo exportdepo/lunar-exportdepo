@@ -43,21 +43,30 @@
                     <span class="absolute top-2 right-2 rounded-full px-2 py-1 text-xs font-semibold bg-rose-100 text-rose-800">Tükendi</span>
                     @endif
                 </div>
-                <div class="p-4 flex-1 flex flex-col">
+                <div class="p-4 pb-0 flex-1 flex flex-col">
                     <h3 class="font-semibold text-slate-900 mb-1 line-clamp-2 group-hover:text-indigo-600 transition-colors dark:text-white dark:group-hover:text-indigo-400">{{ $item['name'] }}</h3>
                     <p class="text-sm text-slate-500 mb-3 line-clamp-2 flex-1 dark:text-slate-400">{{ $item['description'] }}</p>
-                    <div class="text-lg font-bold text-slate-900 dark:text-white">{{ $item['price'] !== null ? number_format($item['price'] / 100, 2, ',', '.') . ' ₺' : '—' }}</div>
                 </div>
                 </a>
-                <div class="p-4 flex items-center gap-2">
-                    @if ($item['stock'] !== null && $item['stock'] > 0)
-                    <x-button wire:click="addToCart({{ $item['id'] }})" wire:loading.attr="disabled" variant="primary" size="sm" type="button">Sepete Ekle</x-button>
-                    @else
-                    <span class="flex-1 inline-flex items-center justify-center rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-400">Stok yok</span>
-                    @endif
-                    <x-button wire:click="remove({{ $item['id'] }})" wire:loading.attr="disabled" variant="ghost" size="sm" type="button" title="Listeden çıkar" aria-label="Listeden çıkar">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3m-4 0h14"/></svg>
-                    </x-button>
+                <div class="flex flex-wrap items-end justify-between gap-x-3 gap-y-2 border-t border-slate-100 p-4 pt-3 dark:border-slate-800">
+                    <div>
+                        <span class="text-lg font-bold text-slate-900 dark:text-white">{{ $item['price'] !== null ? number_format($item['price'] / 100, 2, ',', '.') . ' ₺' : '—' }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        @if ($item['stock'] !== null && $item['stock'] > 0)
+                        <x-button wire:click="addToCart({{ $item['id'] }})" wire:loading.attr="disabled" variant="primary" size="sm" type="button" class="shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            Sepete Ekle
+                        </x-button>
+                        @else
+                        <span class="inline-flex shrink-0 items-center justify-center rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-400">Stok yok</span>
+                        @endif
+                        <x-button wire:click="remove({{ $item['id'] }})" wire:loading.attr="disabled" variant="ghost" size="sm" type="button" title="Listeden çıkar" aria-label="Listeden çıkar" class="shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3m-4 0h14"/></svg>
+                        </x-button>
+                    </div>
                 </div>
                 @if ($addedProductId === $item['id'])
                 <div class="px-4 pb-4 -mt-1">
