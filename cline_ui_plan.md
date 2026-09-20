@@ -1,6 +1,6 @@
 # ExportDepo E-Ticaret UI Yenileme ve Geliştirme Rehberi
 
-> **Durum:** Faz 1-7 + UI Cila Turu tamamlandı · Dal: `ui-refactor` · `main`'e merge + `v1.3.0` etiketi 21.09.2026'da uygulandı (Faz 1-6 kapsamında); Phase 7 `ui-refactor` üzerinde tamamlandı, merge kararı kullanıcıda
+> **Durum:** Faz 1-7 + UI Cila Turu tamamlandı ve `main`'de · Dal: `ui-refactor` (Phase 8 çalışma dalı) · Sürümler: `v1.3.0` (Faz 1-6) + `v1.3.1` (Phase 7)
 > · Testler: 103 passed / 449 assertion · deprecation: 0 · Son güncelleme: 21.09.2026
 
 Sevgili Cline, 
@@ -91,7 +91,7 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
 ## 7. Sürüm Kararları (kullanıcı onayına bağlı)
 - `ui-refactor` 21.09.2026'da `origin/ui-refactor`'a push edildi (upstream takibi kuruldu)
 - **Uygulandı (21.09.2026):** `main`'e TEK SEFERDE merge (`3ebb38f`, `--no-ff`) +
-  `v1.3.0` annotated etiketi — Faz 1-6 kapsamında push edildi; Phase 7
-  (`ec902da` + `2e6d80e`) `ui-refactor` üzerinde tamamlandı, `main`'e ikinci merge +
-  `v1.3.1`/`v1.4.0` etiketi kararı kullanıcıya aittir
+  `v1.3.0` annotated etiketi (Faz 1-6); ardından Phase 7 için İKİNCİ merge +
+  `v1.3.1` annotated etiketi (kullanıcı tercihi) — tüm fazlar artık `main`'de;
+  Phase 8 `ui-refactor` üzerinde sürecek
 - Yedekler mevcut: `backup/pre-ui-refresh` dalı + `backup-pre-ui-phase1` etiketi
