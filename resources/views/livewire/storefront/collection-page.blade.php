@@ -29,6 +29,9 @@
                     <img src="{{ $collection['image_url'] }}"
                          alt="{{ $collection['name'] }}"
                          loading="lazy"
+                         decoding="async"
+                         width="800"
+                         height="600"
                          class="aspect-[4/3] w-full rounded-2xl object-cover shadow-2xl">
                 @endif
             </div>

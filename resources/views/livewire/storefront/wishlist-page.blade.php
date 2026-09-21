@@ -35,7 +35,7 @@
                 <a href="{{ $item['url'] ? url('/urun/' . $item['url']) : '#' }}" class="flex flex-col flex-1">
                 <div class="relative aspect-square overflow-hidden bg-slate-100 dark:bg-slate-800">
                     @if ($item['image_url'])
-                    <img src="{{ $item['image_url'] }}" alt="{{ $item['name'] }}" loading="lazy" class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <img src="{{ $item['image_url'] }}" alt="{{ $item['name'] }}" loading="lazy" decoding="async" width="800" height="800" class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500">
                     @else
                     <div class="flex h-full w-full items-center justify-center text-6xl text-slate-300 dark:text-slate-600" aria-hidden="true">📦</div>
                     @endif

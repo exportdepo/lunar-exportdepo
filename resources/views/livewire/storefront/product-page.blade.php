@@ -7,6 +7,9 @@
     submitReview, addToCart, updatedSelectedVariantId, updatedQuantity).
 --}}
 <div>
+    {{-- Yapılandırılmış veri: arama motorları için Product şeması --}}
+    <script type="application/ld+json">{!! json_encode($this->getProductSchema(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
+
     <section class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         <nav aria-label="Ürün yolu" class="mb-6">
             <ol class="flex flex-wrap items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
@@ -32,6 +35,9 @@
                         <img src="{{ $image['url'] ?? '' }}"
                              alt="{{ $product['name'] }} görsel {{ $index + 1 }}"
                              loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
+                             decoding="async"
+                             width="1200"
+                             height="1200"
                              x-cloak
                              x-show="activeIndex === {{ $index }}"
                              x-transition.opacity.duration.300ms
@@ -62,6 +68,9 @@
                                     <img src="{{ $image['url'] }}"
                                          alt="{{ $product['name'] }} görsel {{ $index + 1 }}"
                                          loading="lazy"
+                                         decoding="async"
+                                         width="200"
+                                         height="200"
                                          class="h-full w-full object-cover">
                                 </button>
                             @endif

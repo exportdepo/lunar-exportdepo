@@ -8,6 +8,7 @@ use App\Support\StorefrontPricing;
 use App\Support\StorefrontSearch;
 use App\Support\WishlistManager;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Lunar\Models\Collection;
@@ -199,6 +200,9 @@ class CollectionPage extends Component
 
     public function render()
     {
-        return view('livewire.storefront.collection-page');
+        return view('livewire.storefront.collection-page')->layoutData([
+            'title' => (string) ($this->collection['name'] ?? 'Koleksiyon'),
+            'description' => Str::limit((string) ($this->collection['description'] ?? ''), 150),
+        ]);
     }
 }

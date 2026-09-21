@@ -599,8 +599,45 @@ class ProductPage extends Component
         $this->product['variant_id'] = $variant->id;
     }
 
+    /**
+     * Arama motorları için Product şeması (JSON-LD). Fiyat, kullanıcıya
+     * gösterilen KDV dahil tutar ile tutarlıdır.
+     */
+    public function getProductSchema(): array
+    {
+        $price = $this->product['price'] ?? null;
+        $stock = $this->product['stock'] ?? null;
+
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Product',
+            'name' => (string) $this->product['name'],
+            'description' => Str::limit((string) $this->product['description'], 300) ?: null,
+            'image' => array_values(array_filter(array_column($this->images, 'url'))),
+            'url' => url()->current(),
+        ];
+
+        if (filled($price)) {
+            $schema['offers'] = [
+                '@type' => 'Offer',
+                'price' => number_format((float) $price / 100, 2, '.', ''),
+                'priceCurrency' => 'TRY',
+                'availability' => ($stock !== null && $stock <= 0)
+                    ? 'https://schema.org/OutOfStock'
+                    : 'https://schema.org/InStock',
+                'url' => url()->current(),
+            ];
+        }
+
+        return array_filter($schema, fn ($value) => $value !== null && $value !== []);
+    }
+
     public function render()
     {
-        return view('livewire.storefront.product-page');
+        return view('livewire.storefront.product-page')->layoutData([
+            'title' => (string) $this->product['name'],
+            'description' => Str::limit((string) $this->product['description'], 150),
+            'ogImage' => $this->product['image_url'] ?? null,
+        ]);
     }
 }

@@ -1,6 +1,7 @@
 @props([
     'title' => null,
     'description' => 'ExportDepo — kaliteli ürünler, uygun fiyatlar ve hızlı teslimatla yeni nesil e-ticaret deneyimi.',
+    'ogImage' => null,
 ])
 
 @php
@@ -14,6 +15,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="{{ $description }}">
+
+    {{-- Sosyal paylaşım önizlemeleri (Open Graph / Twitter) --}}
+    <meta property="og:site_name" content="{{ $appName }}">
+    <meta property="og:title" content="{{ $pageTitle }}">
+    <meta property="og:description" content="{{ $description }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    @if (filled($ogImage))
+        <meta property="og:image" content="{{ $ogImage }}">
+    @endif
+    <meta name="twitter:card" content="{{ filled($ogImage) ? 'summary_large_image' : 'summary' }}">
+
     <meta name="theme-color" content="#4f46e5">
 
     <title>{{ $pageTitle }}</title>

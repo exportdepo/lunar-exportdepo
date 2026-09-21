@@ -9,7 +9,7 @@
 
     Phase 4'te sayfa şablonları (ana sayfa, PLP, PDP) bu iskelet üzerine kurulacaktır.
 --}}
-<x-layouts.app :title="$title ?? null">
+<x-layouts.app :title="$title ?? null" :description="$description ?? null" :ogImage="$ogImage ?? null">
     <x-header />
 
     {{-- Ana içerik --}}
