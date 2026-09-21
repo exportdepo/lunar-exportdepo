@@ -1,7 +1,7 @@
 # ExportDepo E-Ticaret UI Yenileme ve Geliştirme Rehberi
 
-> **Durum:** Faz 1-9 + UI Cila Turu tamamlandı · Dal: `ui-refactor` (Phase 10 çalışma dalı) · Sürümler: `v1.3.0` (Faz 1-6) + `v1.3.1` (Phase 7) + `v1.3.2` (Phase 8) + `v1.3.3` (Phase 9 — aynı oturumda uygulanır)
-> · Testler: 113 passed / 515 assertion · deprecation: 0 · Son güncelleme: 21.09.2026
+> **Durum:** Faz 1-10 + UI Cila Turu tamamlandı · Dal: `ui-refactor` (Phase 10 uygulandı, merge+etiket bekliyor)
+> · Testler: 114 passed / 519 assertion · deprecation: 0 · Son güncelleme: 22.09.2026
 
 Sevgili Cline, 
 Bu belge, storefront arayüzü yenileme çalışmasının canlı yol haritasıdır: tamamlanan fazlar, kanıtlanmış çalışma kuralları ve sonraki fazlar burada takip edilir. Lütfen aşağıdaki kurallara ve fazlara sıkı sıkıya bağlı kalarak geliştirmeleri yap.
@@ -38,6 +38,7 @@ Bu belge, storefront arayüzü yenileme çalışmasının canlı yol haritasıd�
 | Phase 7 | `ec902da` + `2e6d80e` | Erişilebilirlik/QA: skip-link + `main` landmark (`id`/`tabindex`), global focus-visible emniyet ağı ve `prefers-reduced-motion` kuralı (app.css), sepet çekecesine `aria-labelledby`, 9 kart/bant yüzeyinde `dark:bg-slate-950`→`900` normalizasyonu, dekoratif katmanlara `aria-hidden`, wishlist "Tükendi" rozetine dark varyant; form etiketi/alt metin denetimi tam (PDP 5/5 + PLP 4/4 ilişkili) |
 | Phase 8 | `075f286` + `0447d4b` + `cd64351` | Checkout derinleştirme: 8 testli `CheckoutTest` (offline mutlu yol: sipariş + adres + stok düşümü + onay maili + sepet temizliği; misafir/girişli `customer_id` bağlama; zorunlu alan, boş sepet, yapılandırılmamış Stripe, başarısız ödeme sürücüsü, yetersiz stok hataları), yetersiz stokta 500 yerine doğrulama hatası, adres formuna autocomplete nitelikleri |
 | Phase 9 | `1c6f81a` + `a55e5a9` + `79b6944` | Performans ve SEO: 7 görsel konumunda width/height + decoding=async (CLS güvenliği), sayfa bazlı title/description (layoutData), Open Graph + Twitter meta, PDP Product JSON-LD (KDV dahil fiyat + stok durumu), /sitemap.xml + robots.txt + 2 test; build denetimi: CSS 77.86 kB / JS 52.11 kB (gzip 13/19.7) — kod bölme gereksiz kararı |
+| Phase 10 | `22981eb` | Marka tutarliligi + e-posta koyu mod: 5 noktada Lunar Shop → ExportDepo (e-posta baslik/footer, login/register aciklamalari + test guncellemesi ve kalinti guvencesi), color-scheme meta + prefers-color-scheme dark medya sorgulari, dark-mode sema testi (7 test / 20 assertion). i18n: tam migrasyon ERTELENDI |
 
 *Not: Faz 5 view'ları Python/PowerShell betikleriyle yazıldığı için Türkçe karakterler
 ASCII'ye düşmüş, bazı Tailwind sınıfları ve bir SVG path'i bozulmuştu; 5d-5e ve hotfix
@@ -68,18 +69,18 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
   `/istek-listesi`, `/checkout`, `/siparis/{reference}`, `/giris`, `/kayit`,
   `/sifremi-unuttum`, `/sifre-sifirlama/{token}`, `/hesabim`, `/hesabim/siparislerim`
   (ayrıca POST `/cikis`, POST `/stripe/webhook`)
-- **Testler:** 28 feature test dosyası / 113 test / 515 assertion — TODO-FIXME: 0
-- **Bilinen boşluklar:** `lang/` dizini yok (tüm metin view'larda gömülü);
-  `emails/order-confirmation` şablonu tasarımsız; Phase 7 artıkları: gerçek cihazda
+- **Testler:** 28 feature test dosyası / 114 test / 519 assertion — TODO-FIXME: 0
+- **Bilinen boşluklar:** `lang/` dizini yok (tüm metin view'larda gömülü — Phase 10'da tam migrasyon ERTELENDI, pilot secenegi: header/footer/auth);
+  `emails/order-confirmation` şablonu tasarimli + koyu mod destekli (Phase 10); Phase 7 artıkları: gerçek cihazda
   manuel mobil QA, ölçümlü kontrast denetimi, modal/çekmecede focus-trap (ertelendi).
   Giderilenler (21.09.2026): `welcome.blade.php` silindi + uniqid() çakışması
   giderildi (Phase 6), checkout'a özel feature test eklendi (Phase 8)
 
 ## 6. Sonraki Fazlar (her faz başlamadan kullanıcı onayı alınır)
 
-### Phase 10 (opsiyonel): i18n ve E-posta (sıradaki)
-- Çoklu dil gerekirse gömülü metinlerin `lang/` + `__()` altyapısına taşınması
-- `order-confirmation` e-postasının marka uyumlu, koyu mod dostu sade HTML'e alınması
+### Phase 10: Marka Tutarliligi ve E-posta (tamamlandi 22.09.2026)
+- 5 noktada `Lunar Shop` → `ExportDepo`; e-postada color-scheme + dark medya sorgulari
+- i18n tam migrasyonu ERTELENDI (maliyet: 28 view + ~30 test dosyasi); coklu dil ihtiyaci somutlasinca pilot (header/footer/auth) ile baslanir
 
 ## 7. Sürüm Kararları (kullanıcı onayına bağlı)
 - `ui-refactor` 21.09.2026'da `origin/ui-refactor`'a push edildi (upstream takibi kuruldu)
