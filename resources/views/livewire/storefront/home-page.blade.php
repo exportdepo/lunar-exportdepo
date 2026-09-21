@@ -95,6 +95,9 @@
                                 <img src="{{ $collection['image_url'] }}"
                                      alt="{{ $collection['name'] }}"
                                      loading="lazy"
+                                     decoding="async"
+                                     width="800"
+                                     height="600"
                                      class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
                             @else
                                 <span class="absolute inset-0 flex items-center justify-center bg-slate-100 text-5xl dark:bg-slate-800" aria-hidden="true">🗂️</span>

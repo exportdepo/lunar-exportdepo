@@ -55,6 +55,9 @@
             <img src="{{ $image }}"
                  alt="{{ $name }}"
                  loading="lazy"
+                 decoding="async"
+                 width="800"
+                 height="800"
                  class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105">
         @else
             <span class="flex h-full w-full items-center justify-center text-5xl text-slate-300 dark:text-slate-600" aria-hidden="true">📦</span>

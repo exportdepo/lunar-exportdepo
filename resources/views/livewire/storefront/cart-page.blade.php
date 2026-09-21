@@ -33,6 +33,9 @@
                                     <img src="{{ $line['image_url'] }}"
                                          alt="{{ $line['name'] }}"
                                          loading="lazy"
+                                         decoding="async"
+                                         width="200"
+                                         height="200"
                                          class="h-full w-full object-cover">
                                 @else
                                     <span class="flex h-full w-full items-center justify-center text-4xl text-slate-300 dark:text-slate-600" aria-hidden="true">📦</span>
