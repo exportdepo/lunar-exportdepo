@@ -1,6 +1,6 @@
 # ExportDepo E-Ticaret UI Yenileme ve Geliştirme Rehberi
 
-> **Durum:** Faz 1-10 + UI Cila Turu tamamlandı · Dal: `ui-refactor` (Phase 10 uygulandı, merge+etiket bekliyor)
+> **Durum:** Faz 1-10 + UI Cila Turu tamamlandı ve main'de · Sürümler: `v1.3.0` (Faz 1-6) + `v1.3.1` (Phase 7) + `v1.3.2` (Phase 8) + `v1.3.3` (Phase 9) + `v1.3.4` (Phase 10)
 > · Testler: 114 passed / 519 assertion · deprecation: 0 · Son güncelleme: 22.09.2026
 
 Sevgili Cline, 
@@ -84,10 +84,10 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
 
 ## 7. Sürüm Kararları (kullanıcı onayına bağlı)
 - `ui-refactor` 21.09.2026'da `origin/ui-refactor`'a push edildi (upstream takibi kuruldu)
-- **Uygulandı (21.09.2026):** `v1.3.0` (Faz 1-6, `3ebb38f`) + `v1.3.1` (Phase 7,
-  `fe84c44`) + `v1.3.2` (Phase 8, `9676915`) annotated etiketleri; Phase 9 sonrası
-  DÖRDÜNCÜ merge + `v1.3.3` annotated etiketi (aynı oturumda uygulanır) — her sürüm
-  Türkçe release notlarıyla GitHub Releases'te yayında
+- **Uygulandı (21-22.09.2026):** `v1.3.0` (Faz 1-6, `3ebb38f`) + `v1.3.1` (Phase 7,
+  `fe84c44`) + `v1.3.2` (Phase 8, `9676915`) + `v1.3.3` (Phase 9, `d9da379`) +
+  `v1.3.4` (Phase 10, `039e543`) annotated etiketleri — her sürüm
+  Türkçe release notlarıyla GitHub Releases'te yayında (`v1.3.4` Latest)
 - **Stripe Elements değerlendirmesi (8c, 21.09.2026):** mevcut akış Stripe Checkout
   yönlendirmesi (`redirect()->away` + webhook) — PCI yükü sıfır, webhook zaten testli,
   hızlı; Payment Element embed marka uyumu sağlar ama Stripe.js entegrasyonu,
