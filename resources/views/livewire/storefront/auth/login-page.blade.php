@@ -1,5 +1,5 @@
 <div>
-    <x-auth-card title="Hoş geldiniz" description="Lunar Shop hesabınıza giriş yapın">
+    <x-auth-card title="Hoş geldiniz" description="ExportDepo hesabınıza giriş yapın">
         <form wire:submit="login" class="space-y-5">
             <x-input name="email" type="email" label="E-posta" wire:model="email" autocomplete="email" autofocus />
             @error('email')<p class="mt-1 text-sm font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>@enderror

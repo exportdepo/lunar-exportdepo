@@ -1,5 +1,5 @@
 <div>
-    <x-auth-card title="Hesap Oluşturun" description="Lunar Shop&apos;a üye olarak siparişlerinizi takip edin">
+    <x-auth-card title="Hesap Oluşturun" description="ExportDepo&apos;ya üye olarak siparişlerinizi takip edin">
         <form wire:submit="register" class="space-y-5">
             <x-input name="name" type="text" label="Ad Soyad" wire:model="name" autocomplete="name" autofocus />
             @error('name')<p class="mt-1 text-sm font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>@enderror

@@ -51,8 +51,21 @@ class OrderConfirmationMailTest extends TestCase
         $html = $mailable->render();
 
         $this->assertStringContainsString('ORD-DEMO-9999', $html);
-        $this->assertStringContainsString('Lunar Shop', $html);
+        $this->assertStringContainsString('ExportDepo', $html);
+        $this->assertStringNotContainsString('Lunar Shop', $html);
         $this->assertStringContainsString('Siparişiniz alındı', $html);
+    }
+
+    public function test_mailable_html_supports_dark_mode_scheme(): void
+    {
+        $order = new \Lunar\Models\Order(['reference' => 'ORD-DARK-1']);
+        $order->reference = 'ORD-DARK-1';
+
+        $html = (new OrderConfirmation($order))->render();
+
+        $this->assertStringContainsString('name="color-scheme"', $html);
+        $this->assertStringContainsString('prefers-color-scheme: dark', $html);
+        $this->assertStringContainsString('email-card', $html);
     }
 
     public function test_mail_facade_can_be_faked_for_checkout_flow(): void
