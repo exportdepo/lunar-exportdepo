@@ -82,6 +82,8 @@ class OrderStatusPage extends Component
 
     public function render()
     {
-        return view('livewire.storefront.order-status-page');
+        return view('livewire.storefront.order-status-page')->layoutData([
+            'title' => 'Sipariş #'.$this->reference,
+        ]);
     }
 }

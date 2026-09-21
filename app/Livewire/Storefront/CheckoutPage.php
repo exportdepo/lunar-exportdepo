@@ -184,6 +184,8 @@ class CheckoutPage extends Component
 
     public function render()
     {
-        return view('livewire.storefront.checkout-page');
+        return view('livewire.storefront.checkout-page')->layoutData([
+            'title' => 'Siparişi Tamamla',
+        ]);
     }
 }

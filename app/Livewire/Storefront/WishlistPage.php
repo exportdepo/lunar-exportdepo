@@ -74,6 +74,8 @@ class WishlistPage extends Component
 
     public function render()
     {
-        return view('livewire.storefront.wishlist-page');
+        return view('livewire.storefront.wishlist-page')->layoutData([
+            'title' => 'İstek Listem',
+        ]);
     }
 }
