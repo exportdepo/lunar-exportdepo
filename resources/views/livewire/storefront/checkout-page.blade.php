@@ -28,16 +28,16 @@
                 <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
                     <h2 class="text-xl font-bold text-slate-900 dark:text-white">Teslimat adresi</h2>
                     <div class="mt-6 grid gap-5 sm:grid-cols-2">
-                        <x-input name="firstName" label="Ad" wire:model="firstName" required />
-                        <x-input name="lastName" label="Soyad" wire:model="lastName" required />
+                        <x-input name="firstName" label="Ad" wire:model="firstName" autocomplete="given-name" required />
+                        <x-input name="lastName" label="Soyad" wire:model="lastName" autocomplete="family-name" required />
                         <x-input name="email" type="email" label="E-posta" wire:model="email" autocomplete="email" required />
                         <x-input name="phone" type="tel" label="Telefon" wire:model="phone" autocomplete="tel" required />
                         <div class="sm:col-span-2">
-                            <x-input name="lineOne" label="Adres" wire:model="lineOne" hint="Tam adres" required />
+                            <x-input name="lineOne" label="Adres" wire:model="lineOne" autocomplete="address-line1" hint="Tam adres" required />
                         </div>
-                        <x-input name="city" label="İl" wire:model="city" required />
-                        <x-input name="state" label="İlçe" wire:model="state" hint="İsteğe bağlı" />
-                        <x-input name="postcode" label="Posta kodu" wire:model="postcode" required />
+                        <x-input name="city" label="İl" wire:model="city" autocomplete="address-level2" required />
+                        <x-input name="state" label="İlçe" wire:model="state" autocomplete="address-level3" hint="İsteğe bağlı" />
+                        <x-input name="postcode" label="Posta kodu" wire:model="postcode" autocomplete="postal-code" required />
                     </div>
                     <h2 class="mt-10 text-xl font-bold text-slate-900 dark:text-white">Ödeme</h2>
                     <div class="mt-4 space-y-3">

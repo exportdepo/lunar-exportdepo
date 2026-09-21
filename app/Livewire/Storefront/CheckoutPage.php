@@ -114,7 +114,15 @@ class CheckoutPage extends Component
         $order = Order::findOrFail($response->orderId);
 
         $this->linkOrderToUser($order);
-        app(OrderStockService::class)->decrementFor($order);
+
+        try {
+            app(OrderStockService::class)->decrementFor($order);
+        } catch (\RuntimeException $exception) {
+            // Stok düşümü başarısız olursa 500 yerine doğrulama hatası göster.
+            throw ValidationException::withMessages([
+                'paymentMethod' => $exception->getMessage(),
+            ]);
+        }
 
         $this->orderReference = $order->reference;
         $this->summary = [];
