@@ -55,6 +55,8 @@ Route::middleware('auth')->group(function () {
     })->name('logout');
 });
 
+Route::get('/sitemap.xml', \App\Http\Controllers\SitemapController::class)->name('sitemap');
+
 Route::post('/stripe/webhook', StripeWebhookController::class)
     ->withoutMiddleware([ValidateCsrfToken::class])
     ->name('stripe.webhook');
