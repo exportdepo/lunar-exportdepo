@@ -1,7 +1,7 @@
 # ExportDepo E-Ticaret UI Yenileme ve Geliştirme Rehberi
 
-> **Durum:** Faz 1-7 + UI Cila Turu tamamlandı ve `main`'de · Dal: `ui-refactor` (Phase 8 çalışma dalı) · Sürümler: `v1.3.0` (Faz 1-6) + `v1.3.1` (Phase 7)
-> · Testler: 103 passed / 449 assertion · deprecation: 0 · Son güncelleme: 21.09.2026
+> **Durum:** Faz 1-8 + UI Cila Turu tamamlandı · Dal: `ui-refactor` (Phase 9 çalışma dalı) · Sürümler: `v1.3.0` (Faz 1-6) + `v1.3.1` (Phase 7) + `v1.3.2` (Phase 8 — aynı oturumda uygulanır)
+> · Testler: 111 passed / 506 assertion · deprecation: 0 · Son güncelleme: 21.09.2026
 
 Sevgili Cline, 
 Bu belge, storefront arayüzü yenileme çalışmasının canlı yol haritasıdır: tamamlanan fazlar, kanıtlanmış çalışma kuralları ve sonraki fazlar burada takip edilir. Lütfen aşağıdaki kurallara ve fazlara sıkı sıkıya bağlı kalarak geliştirmeleri yap.
@@ -36,6 +36,7 @@ Bu belge, storefront arayüzü yenileme çalışmasının canlı yol haritasıd�
 | UI Cila Turu | `8bc3d26`→`c508d36` | Kart grid yoğunlaşması (ana sayfa + istek listesi 5, PLP 4 sütun; ikon-only "Sepete Ekle"), istek listesi kart alt satırı + çöp butonu görsel köşesine, header yeniden düzeni (nav tam ortada, sağ ikon kümesi, gereksiz "Anasayfa" menü öğesi kaldırıldı), inline arama → ikon + ekran ortası modal popup, mobil menü md:hidden→lg:hidden düzeltmesi; hepsi editör aracıyla (kural 1) |
 | Phase 6 | `bb8566d` + `eb5b484` + `e68daff` | Kalıntı temizliği: header/cart-indicator yorumlarındaki ASCII Türkçe + bayat arama yorumunun onarımı, kullanılmayan `welcome.blade.php` silindi, `LogoutTest` `#[Test]` attribute'larına taşındı (3 deprecation uyarısı bitti), `AddToCartFromListTest` uniqid() → `Str::ulid()` (çakışmaya dayanıklı üretim; 3x tekrar koşusu yeşil) |
 | Phase 7 | `ec902da` + `2e6d80e` | Erişilebilirlik/QA: skip-link + `main` landmark (`id`/`tabindex`), global focus-visible emniyet ağı ve `prefers-reduced-motion` kuralı (app.css), sepet çekecesine `aria-labelledby`, 9 kart/bant yüzeyinde `dark:bg-slate-950`→`900` normalizasyonu, dekoratif katmanlara `aria-hidden`, wishlist "Tükendi" rozetine dark varyant; form etiketi/alt metin denetimi tam (PDP 5/5 + PLP 4/4 ilişkili) |
+| Phase 8 | `075f286` + `0447d4b` + `cd64351` | Checkout derinleştirme: 8 testli `CheckoutTest` (offline mutlu yol: sipariş + adres + stok düşümü + onay maili + sepet temizliği; misafir/girişli `customer_id` bağlama; zorunlu alan, boş sepet, yapılandırılmamış Stripe, başarısız ödeme sürücüsü, yetersiz stok hataları), yetersiz stokta 500 yerine doğrulama hatası, adres formuna autocomplete nitelikleri |
 
 *Not: Faz 5 view'ları Python/PowerShell betikleriyle yazıldığı için Türkçe karakterler
 ASCII'ye düşmüş, bazı Tailwind sınıfları ve bir SVG path'i bozulmuştu; 5d-5e ve hotfix
@@ -66,20 +67,16 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
   `/istek-listesi`, `/checkout`, `/siparis/{reference}`, `/giris`, `/kayit`,
   `/sifremi-unuttum`, `/sifre-sifirlama/{token}`, `/hesabim`, `/hesabim/siparislerim`
   (ayrıca POST `/cikis`, POST `/stripe/webhook`)
-- **Testler:** 26 feature test dosyası / 103 test / 449 assertion — TODO-FIXME: 0
+- **Testler:** 27 feature test dosyası / 111 test / 506 assertion — TODO-FIXME: 0
 - **Bilinen boşluklar:** `lang/` dizini yok (tüm metin view'larda gömülü);
-  checkout'a özel feature test yok; `emails/order-confirmation` şablonu tasarımsız
-  (21.09.2026 itibarıyla `welcome.blade.php` silindi ve uniqid() çakışma riski
-  `Str::ulid()` ile giderildi — Phase 6); Phase 7 artıkları: gerçek cihazda manuel
-  mobil QA, ölçümlü kontrast denetimi, modal/çekmecede focus-trap (ertelendi)
+  `emails/order-confirmation` şablonu tasarımsız; Phase 7 artıkları: gerçek cihazda
+  manuel mobil QA, ölçümlü kontrast denetimi, modal/çekmecede focus-trap (ertelendi).
+  Giderilenler (21.09.2026): `welcome.blade.php` silindi + uniqid() çakışması
+  giderildi (Phase 6), checkout'a özel feature test eklendi (Phase 8)
 
 ## 6. Sonraki Fazlar (her faz başlamadan kullanıcı onayı alınır)
 
-### Phase 8: Checkout Derinleştirme (sıradaki)
-- `CheckoutTest` yazımı: `placeOrder` akışı, validasyon hataları, başarı ekranı, boş sepet
-- Adres formu UX iyileştirmeleri; Stripe Elements görsel entegrasyon değerlendirmesi
-
-### Phase 9: Performans ve SEO
+### Phase 9: Performans ve SEO (sıradaki)
 - Build çıktı denetimi (CSS 89.75 kB / JS 52.11 kB; gzip ~16 / ~20 kB); gerekirse kod bölme
 - Görsellerde `loading="lazy"` + `width/height` (CLS önleme) turu
 - Meta açıklamaları, OG etiketleri, ürün JSON-LD, sitemap
@@ -90,8 +87,12 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
 
 ## 7. Sürüm Kararları (kullanıcı onayına bağlı)
 - `ui-refactor` 21.09.2026'da `origin/ui-refactor`'a push edildi (upstream takibi kuruldu)
-- **Uygulandı (21.09.2026):** `main`'e TEK SEFERDE merge (`3ebb38f`, `--no-ff`) +
-  `v1.3.0` annotated etiketi (Faz 1-6); ardından Phase 7 için İKİNCİ merge +
-  `v1.3.1` annotated etiketi (kullanıcı tercihi) — tüm fazlar artık `main`'de;
-  Phase 8 `ui-refactor` üzerinde sürecek
+- **Uygulandı (21.09.2026):** `v1.3.0` (Faz 1-6, `3ebb38f`) + `v1.3.1` (Phase 7,
+  `fe84c44`) annotated etiketleri; Phase 8 sonrası ÜÇÜNCÜ merge + `v1.3.2`
+  annotated etiketi (aynı oturumda uygulanır)
+- **Stripe Elements değerlendirmesi (8c, 21.09.2026):** mevcut akış Stripe Checkout
+  yönlendirmesi (`redirect()->away` + webhook) — PCI yükü sıfır, webhook zaten testli,
+  hızlı; Payment Element embed marka uyumu sağlar ama Stripe.js entegrasyonu,
+  3DS/SAQ-A-EP yükü ve yeni testler gerektirir (~1-2 faz). **Karar: yönlendirme
+  akışı korunur;** embed Phase 9+ için opsiyonel
 - Yedekler mevcut: `backup/pre-ui-refresh` dalı + `backup-pre-ui-phase1` etiketi
