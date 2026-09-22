@@ -1,6 +1,6 @@
 # ExportDepo E-Ticaret UI Yenileme ve Geliştirme Rehberi
 
-> **Durum:** Faz 1-10 + UI Cila Turu tamamlandı ve main'de · Sürümler: `v1.3.0` (Faz 1-6) + `v1.3.1` (Phase 7) + `v1.3.2` (Phase 8) + `v1.3.3` (Phase 9) + `v1.3.4` (Phase 10)
+> **Durum:** Faz 1-11 + UI Cila Turu tamamlandı ve main'de · Sürümler: `v1.3.0` (Faz 1-6) + `v1.3.1` (Phase 7) + `v1.3.2` (Phase 8) + `v1.3.3` (Phase 9) + `v1.3.4` (Phase 10)
 > · Testler: 114 passed / 519 assertion · deprecation: 0 · Son güncelleme: 22.09.2026
 
 Sevgili Cline, 
@@ -39,6 +39,7 @@ Bu belge, storefront arayüzü yenileme çalışmasının canlı yol haritasıd�
 | Phase 8 | `075f286` + `0447d4b` + `cd64351` | Checkout derinleştirme: 8 testli `CheckoutTest` (offline mutlu yol: sipariş + adres + stok düşümü + onay maili + sepet temizliği; misafir/girişli `customer_id` bağlama; zorunlu alan, boş sepet, yapılandırılmamış Stripe, başarısız ödeme sürücüsü, yetersiz stok hataları), yetersiz stokta 500 yerine doğrulama hatası, adres formuna autocomplete nitelikleri |
 | Phase 9 | `1c6f81a` + `a55e5a9` + `79b6944` | Performans ve SEO: 7 görsel konumunda width/height + decoding=async (CLS güvenliği), sayfa bazlı title/description (layoutData), Open Graph + Twitter meta, PDP Product JSON-LD (KDV dahil fiyat + stok durumu), /sitemap.xml + robots.txt + 2 test; build denetimi: CSS 77.86 kB / JS 52.11 kB (gzip 13/19.7) — kod bölme gereksiz kararı |
 | Phase 10 | `22981eb` | Marka tutarliligi + e-posta koyu mod: 5 noktada Lunar Shop → ExportDepo (e-posta baslik/footer, login/register aciklamalari + test guncellemesi ve kalinti guvencesi), color-scheme meta + prefers-color-scheme dark medya sorgulari, dark-mode sema testi (7 test / 20 assertion). i18n: tam migrasyon ERTELENDI |
+| Phase 11 | `3e72a28` + `d71d3a5` | Müşteri yönetimi + storefront cilası: panelde `CustomerResource` (List/Create/Edit/View sayfaları), FK kısıtından düşen müşteri silmesi için `DeleteCustomers` servisi (pivot + adres temizliği; sipariş geçmişi korunup `customer_id` null'a çekilir, sepetler silinmez), `CustomerDeleteTest` ile tekli/çoklu silme doğrulaması; sepet/ürün sayfa dokunuşları, `app.css` genişlemesi, istek listesi buton metni düzeltmesi |
 
 *Not: Faz 5 view'ları Python/PowerShell betikleriyle yazıldığı için Türkçe karakterler
 ASCII'ye düşmüş, bazı Tailwind sınıfları ve bir SVG path'i bozulmuştu; 5d-5e ve hotfix
@@ -69,7 +70,10 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
   `/istek-listesi`, `/checkout`, `/siparis/{reference}`, `/giris`, `/kayit`,
   `/sifremi-unuttum`, `/sifre-sifirlama/{token}`, `/hesabim`, `/hesabim/siparislerim`
   (ayrıca POST `/cikis`, POST `/stripe/webhook`)
-- **Testler:** 28 feature test dosyası / 114 test / 519 assertion — TODO-FIXME: 0
+- **Testler:** 29 feature test dosyası / 116 test / 519 assertion — TODO-FIXME: 0
+  (22.09.2026 tam suite koşusunda `UNIQUE constraint failed: lunar_currencies.code`
+  tek seferlik flake görüldü; ilgili test tek başına yeşil — tohumlama/paralellik kaynaklı,
+  Phase 11 değişiklikleriyle ilgisiz)
 - **Bilinen boşluklar:** `lang/` dizini yok (tüm metin view'larda gömülü — Phase 10'da tam migrasyon ERTELENDI, pilot secenegi: header/footer/auth);
   `emails/order-confirmation` şablonu tasarimli + koyu mod destekli (Phase 10); Phase 7 artıkları: gerçek cihazda
   manuel mobil QA, ölçümlü kontrast denetimi, modal/çekmecede focus-trap (ertelendi).
@@ -81,6 +85,16 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
 ### Phase 10: Marka Tutarliligi ve E-posta (tamamlandi 22.09.2026)
 - 5 noktada `Lunar Shop` → `ExportDepo`; e-postada color-scheme + dark medya sorgulari
 - i18n tam migrasyonu ERTELENDI (maliyet: 28 view + ~30 test dosyasi); coklu dil ihtiyaci somutlasinca pilot (header/footer/auth) ile baslanir
+
+### Phase 11: Müşteri Yönetimi ve Storefront Cilası (tamamlandi 22.09.2026)
+- Panelde `CustomerResource`; varsayılan Filament silme akışı FK kısıtları
+  (sipariş/sepet/adres/pivot, `on delete no action`) yüzünden düşüyordu →
+  `DeleteCustomers` servisi silme öncesi pivot ve adresleri temizler,
+  sipariş/sepet referanslarını null'a çeker (sipariş geçmişi korunur)
+- `CustomerDeleteTest`: pivot + adres + sipariş + sepet içeren senaryoda
+  tekli/çoklu silme doğrulaması
+- Storefront cilası: cart/product sayfa dokunuşları, `app.css` genişlemesi,
+  wishlist buton metni düzeltmesi (`İstek Listesine Ekle` → `İstek listesine ekle`)
 
 ## 7. Sürüm Kararları (kullanıcı onayına bağlı)
 - `ui-refactor` 21.09.2026'da `origin/ui-refactor`'a push edildi (upstream takibi kuruldu)

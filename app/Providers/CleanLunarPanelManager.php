@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Filament\Resources\CollectionGroupResource;
+use App\Filament\Resources\CustomerResource;
 use App\Filament\Resources\LanguageResource;
 use App\Filament\Resources\ProductOptionResource;
 use App\Filament\Resources\ProductReviewResource;
@@ -55,6 +56,9 @@ class CleanLunarPanelManager extends BaseLunarPanelManager
             \Lunar\Admin\Filament\Resources\TaxClassResource::class => TaxClassResource::class,
             \Lunar\Admin\Filament\Resources\ProductTypeResource::class => ProductTypeResource::class,
             \Lunar\Admin\Filament\Resources\LanguageResource::class => LanguageResource::class,
+            // Silme aksiyonları FK kısıtları nedeniyle başarısız oluyordu;
+            // silme işlemini DeleteCustomers servisine devreder.
+            \Lunar\Admin\Filament\Resources\CustomerResource::class => CustomerResource::class,
             // Seçenek değerlerine renk kodu (swatch) yönetimi ekler.
             \Lunar\Admin\Filament\Resources\ProductOptionResource::class => ProductOptionResource::class,
         ];
