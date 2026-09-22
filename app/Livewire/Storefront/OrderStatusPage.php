@@ -80,6 +80,25 @@ class OrderStatusPage extends Component
     }
 
     /**
+     * Sipariş durumu rozetinin Tailwind arka plan sınıfı.
+     *
+     * `statusColor()` hex karşılığını aynen korur; gömülü CSS doğrulayıcının
+     * `style="... {{ ... }}"` içindeki Blade parantezlerine takılmaması için
+     * view bu metodu kullanır. Sınıflar tam literal yazılır ki Tailwind
+     * taramasında bulunabilsin (dinamik birleştirme yok).
+     */
+    public function statusBadgeClass(): string
+    {
+        return match ($this->order?->status) {
+            'awaiting-payment' => 'bg-amber-500',
+            'payment-offline' => 'bg-sky-500',
+            'payment-received' => 'bg-emerald-500',
+            'dispatched' => 'bg-violet-500',
+            default => 'bg-slate-500',
+        };
+    }
+
+    /**
      * Sipariş meta'sı `AsArrayObject` cast'i ile gelir (ArrayObject), bu yüzden
      * `is_array()` yerine Arrayable kontrolü gerekir. Stripe ödemeleri
      * `StripePayment::authorize()` tarafından `stripe_session_id` yazılarak

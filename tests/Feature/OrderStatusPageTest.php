@@ -104,6 +104,7 @@ class OrderStatusPageTest extends TestCase
         $instance = $component->instance();
         $this->assertSame('Manuel Ödeme', $instance->statusLabel());
         $this->assertSame('#0ea5e9', $instance->statusColor());
+        $this->assertSame('bg-sky-500', $instance->statusBadgeClass());
         $this->assertSame('Manuel ödeme', $instance->paymentMethod());
         $this->assertCount(0, $instance->lines());
     }

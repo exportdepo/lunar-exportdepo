@@ -11,7 +11,7 @@
                 <p class="text-sm font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Sipariş Takibi</p>
                 <h1 class="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">#{{ $order->reference }}</h1>
             </div>
-            <span class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white shadow-sm" style="background-color: {{ $this->statusColor() }};">
+            <span class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white shadow-sm {{ $this->statusBadgeClass() }}">
                 <span class="h-2 w-2 rounded-full bg-white/80"></span>
                 {{ $this->statusLabel() }}
             </span>

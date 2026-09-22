@@ -14,15 +14,16 @@ Sepet ve sipariş durumu düzeltmeleri (stok sınırı, ödeme etiketi, karanlı
 
 * **Sepette stok sınırı** — Adet artırma, ürün detay sayfasıyla aynı kuralı uygular: stok takibi olan varyantta adet stoğu aşamaz. Lunar doğrulayıcılarının döndürdüğü `CartException` (ör. stok/adet katı kuralları) artık 500 yerine Türkçe uyarı olarak gösterilir ve adet kutusu sunucudaki değere geri döner.
 * **Ödeme yöntemi etiketi** — Sipariş durumu sayfası `order.meta` alanını `AsArrayObject` cast'i ile okuduğu için Stripe siparişleri artık doğru şekilde "Kart ile ödeme (Stripe)" olarak etiketlenir (önceden bu dal hiç çalışmıyordu; Stripe akışı `stripe_session_id` ile tespit edilir).
-* **Sipariş durumu sayfası** — Karanlık mod sınıfları eklendi; tutarlar siparişin para birimi simgesiyle gösterilir; adres kaydı yoksa bilgilendirici boş durum çıkar.
+* **Sipariş durumu sayfası** — Karanlık mod sınıfları eklendi; tutarlar siparişin para birimi simgesiyle gösterilir; adres kaydı yoksa bilgilendirici boş durum çıkar. Durum rozeti gömülü CSS doğrulayıcısını tetikleyen `style="... {{ ... }}"` yerine statik Tailwind sınıfı (`statusBadgeClass()`) kullanır.
 * **`#[Locked]` sipariş özelliği** — Sipariş modeli istemci snapshot'ında değiştirilemez.
 * **Sepet performansı** — Ürün görseli için `purchasable.product.media` önceden yüklenir (satır başına ek sorgu kaldırıldı) ve adet güncelleme akışında gereksiz çift `refresh()`/`recalculate()` temizlendi.
 * **Bakım** — Kök dizindeki hata ayıklama artıkları (`all())`, `toArray())`) silindi; `.gitignore` deseni genişletildi. Değişen dosyalar Laravel Pint ile biçimlendirildi.
 
 ### Kalite
 
-* Tam suite: **124 test / 547 assertion** yeşil.
-* Yeni testler: stok üstü adedin reddi ve Türkçe uyarı, Lunar doğrulama hatasının uyarıya çevrilmesi, Stripe meta'sının etiketlenmesi, `#[Locked]` + typed model property'nin hydration turu.
+* Tam suite: **124 test / 548 assertion** yeşil.
+* Yeni testler: stok üstü adedin reddi ve Türkçe uyarı, Lunar doğrulama hatasının uyarıya çevrilmesi, Stripe meta'sının etiketlenmesi, `#[Locked]` + typed model property'nin hydration turu, rozet Tailwind sınıf eşleşmesi (`statusBadgeClass()`).
+* **IDE bakımı** — Livewire'ın runtime'da kaydettiği `View` makroları (`layoutData` vb.) için Intelephense yardım dosyası (`stubs/ide/livewire-view-macros.php`; çalışma zamanında yüklenmez, `composer autoload` dışında).
 
 ## [v1.3.5](https://github.com/exportdepo/lunar-exportdepo/releases/tag/v1.3.5) — 2026-09-22
 
