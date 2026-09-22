@@ -2,9 +2,12 @@
 
 namespace App\Livewire\Storefront;
 
+use App\Support\VariantOptions;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Lunar\Exceptions\Carts\CartException;
 use Lunar\Facades\CartSession;
+use Lunar\Models\ProductVariant;
 
 #[Layout('layouts.storefront')]
 class CartPage extends Component
@@ -24,10 +27,21 @@ class CartPage extends Component
         $this->refreshCart();
     }
 
+    /**
+     * Sepet satırı adedini günceller.
+     *
+     * PDP ile aynı stok kuralı burada da uygulanır: stok takibi olan varyantta
+     * adet stoğu aşamaz. (Lunar'ın `purchasable = always` kuralı stok sınırı
+     * uygulamadığı için bu kontrol uygulama tarafında yapılır.) Lunar
+     * doğrulayıcılarının ürettiği `CartException` da 500'e çevrilmek yerine
+     * kullanıcıya Türkçe uyarı olarak gösterilir; stepper sunucudaki gerçek
+     * adete geri döndürülür.
+     */
     public function updateQuantity(int $lineId, int $quantity): void
     {
         if ($quantity < 1) {
             $this->removeLine($lineId);
+
             return;
         }
 
@@ -36,10 +50,40 @@ class CartPage extends Component
             return;
         }
 
-        $cart->updateLine($lineId, $quantity);
-        $cart->refresh();
-        $cart->recalculate();
+        $line = $cart->lines->firstWhere('id', $lineId);
+
+        if (! $line) {
+            // Satır başka bir sekmede kaldırılmış olabilir.
+            $this->addError('cart', 'Bu ürün artık sepetinizde bulunmuyor.');
+            $this->refreshCart();
+            $this->dispatch('cart-updated');
+
+            return;
+        }
+
+        $stock = $line->purchasable instanceof ProductVariant ? $line->purchasable->stock : null;
+        $rejected = $stock !== null && $quantity > $stock;
+
+        if ($rejected) {
+            $this->addError('cart', $this->stockMessage($stock));
+        } else {
+            try {
+                $cart->updateLine($lineId, $quantity);
+                $this->resetErrorBag('cart');
+            } catch (CartException $exception) {
+                $rejected = true;
+                $this->addError('cart', $this->cartErrorMessage($exception));
+            }
+        }
+
         $this->refreshCart();
+
+        if ($rejected) {
+            // Alpine stepper'ı sunucudaki adete eşitler (adet reddedildiğinde
+            // istemci tarafında kalan hatalı değeri temizler).
+            $this->dispatch('cart-quantity-rejected', lineId: $lineId, quantity: $this->lineQuantity($lineId));
+        }
+
         $this->dispatch('cart-updated');
     }
 
@@ -50,11 +94,40 @@ class CartPage extends Component
             return;
         }
 
-        $cart->remove($lineId);
-        $cart->refresh();
-        $cart->recalculate();
+        try {
+            $cart->remove($lineId);
+            $this->resetErrorBag('cart');
+        } catch (CartException) {
+            $this->addError('cart', 'Ürün sepetten kaldırılamadı.');
+        }
+
         $this->refreshCart();
         $this->dispatch('cart-updated');
+    }
+
+    /** Stok üstü adet için kullanıcıya gösterilecek mesaj. */
+    protected function stockMessage(int $stock): string
+    {
+        return $stock > 0
+            ? "Stokta en fazla {$stock} adet bulunuyor."
+            : 'Bu ürün şu anda stokta yok.';
+    }
+
+    /**
+     * Lunar doğrulayıcı mesajları İngilizce üretilir (ör. `CartLineStock`);
+     * vitrinde gösterilecek Türkçe metni burada oluşturuyoruz.
+     */
+    protected function cartErrorMessage(CartException $exception): string
+    {
+        return $exception->errors()->has('purchasable')
+            ? 'Bu ürün şu anda satın alınamıyor.'
+            : 'Seçilen adet stok veya satış kurallarına uygun değil.';
+    }
+
+    /** Sepetteki satırın sunucudaki güncel adedi (satır yoksa 1). */
+    protected function lineQuantity(int $lineId): int
+    {
+        return (int) (collect($this->lines)->firstWhere('id', $lineId)['quantity'] ?? 1);
     }
 
     protected function refreshCart(): void
@@ -67,13 +140,14 @@ class CartPage extends Component
             $this->subTotal = 0;
             $this->taxTotal = 0;
             $this->shippingTotal = 0;
+
             return;
         }
 
         $cart->refresh();
         $cart->recalculate();
 
-        $this->lines = $cart->lines->map(function ($line): array {
+        $this->lines = $cart->lines->load(['purchasable.values.option', 'purchasable.product.media'])->map(function ($line): array {
             $variant = $line->purchasable;
             $product = $variant?->product;
             $image = $product?->media->first();
@@ -81,6 +155,7 @@ class CartPage extends Component
             return [
                 'id' => $line->id,
                 'name' => (string) ($product?->translateAttribute('name') ?? 'Ürün'),
+                'options' => VariantOptions::label($variant),
                 'image_url' => $image?->getUrl(),
                 'quantity' => (int) $line->quantity,
                 'unit_price' => $line->unitPriceInclTax?->value ?? ($line->unitPrice?->value ?? 0),

@@ -26,6 +26,7 @@ yarn-error.log
 # Geçici hata ayıklama dosyaları (kök)
 /_*.php
 /toArray()*
+/all())*
 
 # Tek kullanımlık scriptler
 /scripts/

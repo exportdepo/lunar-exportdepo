@@ -2,6 +2,28 @@
 
 Önemli değişiklikler bu dosyada Türkçe olarak tutulur; sürümler yeniden eskiye sıralanır. Yayın tarihleri GitHub Releases kayıtlarına göre UTC tarihidir.
 
+## [Unreleased]
+
+Sepet ve sipariş durumu düzeltmeleri (stok sınırı, ödeme etiketi, karanlık mod)
+
+### Yenilikler
+
+* **Sepette varyant seçenekleri** — Sepet sayfası ve header sepet çekmecesi eklenen varyantın seçeneklerini ("Renk: Mavi") gösterir; sipariş durumu sayfası da satır bazında seçenekleri listeler.
+
+### Düzeltmeler ve Bakım
+
+* **Sepette stok sınırı** — Adet artırma, ürün detay sayfasıyla aynı kuralı uygular: stok takibi olan varyantta adet stoğu aşamaz. Lunar doğrulayıcılarının döndürdüğü `CartException` (ör. stok/adet katı kuralları) artık 500 yerine Türkçe uyarı olarak gösterilir ve adet kutusu sunucudaki değere geri döner.
+* **Ödeme yöntemi etiketi** — Sipariş durumu sayfası `order.meta` alanını `AsArrayObject` cast'i ile okuduğu için Stripe siparişleri artık doğru şekilde "Kart ile ödeme (Stripe)" olarak etiketlenir (önceden bu dal hiç çalışmıyordu; Stripe akışı `stripe_session_id` ile tespit edilir).
+* **Sipariş durumu sayfası** — Karanlık mod sınıfları eklendi; tutarlar siparişin para birimi simgesiyle gösterilir; adres kaydı yoksa bilgilendirici boş durum çıkar.
+* **`#[Locked]` sipariş özelliği** — Sipariş modeli istemci snapshot'ında değiştirilemez.
+* **Sepet performansı** — Ürün görseli için `purchasable.product.media` önceden yüklenir (satır başına ek sorgu kaldırıldı) ve adet güncelleme akışında gereksiz çift `refresh()`/`recalculate()` temizlendi.
+* **Bakım** — Kök dizindeki hata ayıklama artıkları (`all())`, `toArray())`) silindi; `.gitignore` deseni genişletildi. Değişen dosyalar Laravel Pint ile biçimlendirildi.
+
+### Kalite
+
+* Tam suite: **124 test / 547 assertion** yeşil.
+* Yeni testler: stok üstü adedin reddi ve Türkçe uyarı, Lunar doğrulama hatasının uyarıya çevrilmesi, Stripe meta'sının etiketlenmesi, `#[Locked]` + typed model property'nin hydration turu.
+
 ## [v1.3.5](https://github.com/exportdepo/lunar-exportdepo/releases/tag/v1.3.5) — 2026-09-22
 
 Müşteri Yönetimi ve Storefront Cilası (Phase 11)

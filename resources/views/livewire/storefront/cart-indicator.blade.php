@@ -35,6 +35,9 @@
                     <li class="flex items-center gap-3 py-3">
                         <div class="min-w-0 flex-1">
                             <p class="truncate text-sm font-semibold text-slate-900 dark:text-white">{{ $line['name'] }}</p>
+                            @if (! empty($line['options']))
+                                <p class="mt-0.5 truncate text-xs font-medium text-slate-500 dark:text-slate-400">{{ $line['options'] }}</p>
+                            @endif
                             <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{{ $line['quantity'] }} adet</p>
                         </div>
                         <span class="text-sm font-semibold text-slate-900 dark:text-white">{{ number_format($line['total'] / 100, 2, ',', '.') }} ₺</span>

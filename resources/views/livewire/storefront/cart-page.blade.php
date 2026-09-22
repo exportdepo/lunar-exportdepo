@@ -4,7 +4,9 @@
     Akış: satır listesi (görsel, ad, birim fiyat, adet stepper, satır toplamı,
     kaldır) + sağ sticky sipariş özeti (ara toplam, KDV, kargo, toplam, CTA).
     Adetleme: PDP ile aynı Alpine stepper desen. `updateQuantity` ve
-    `removeLine` Livewire aksiyonları korunur.
+    `removeLine` Livewire aksiyonları korunur. Reddedilen adetlerde (stok dışı)
+    `cart` hata torbası `x-cart-alert` ile gösterilir ve stepper
+    `cart-quantity-rejected` olayıyla sunucudaki adete geri döner.
 --}}
 <div>
     <section class="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
@@ -15,6 +17,10 @@
             </div>
             <a href="{{ url('/') }}" class="text-sm font-semibold text-indigo-600 transition-colors hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">Alışverişe devam et</a>
         </div>
+
+        @error('cart')
+            <x-cart-alert :message="$message" />
+        @enderror
 
         @if (empty($lines))
             <x-empty-state icon="🛒"
@@ -44,13 +50,18 @@
 
                             <div class="min-w-0 flex-1">
                                 <h2 class="truncate font-semibold text-slate-900 dark:text-white">{{ $line['name'] }}</h2>
+                                @if (! empty($line['options']))
+                                    <p class="mt-0.5 text-xs font-medium text-slate-500 dark:text-slate-400">{{ $line['options'] }}</p>
+                                @endif
                                 <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
                                     {{ number_format($line['unit_price'] / 100, 2, ',', '.') }} ₺ / adet
                                     <span class="text-xs text-slate-400">(KDV dahil)</span>
                                 </p>
 
                                 <div class="mt-3 flex flex-wrap items-center gap-3">
-                                    <div x-data="{ qty: {{ (int) $line['quantity'] }} }" class="flex items-stretch overflow-hidden rounded-lg border border-slate-300 transition-colors focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 dark:border-slate-600 dark:focus-within:border-indigo-400 dark:focus-within:ring-indigo-400/30">
+                                    <div x-data="{ qty: {{ (int) $line['quantity'] }} }"
+                                         x-on:cart-quantity-rejected.window="if ($event.detail.lineId === {{ $line['id'] }}) qty = $event.detail.quantity"
+                                         class="flex items-stretch overflow-hidden rounded-lg border border-slate-300 transition-colors focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 dark:border-slate-600 dark:focus-within:border-indigo-400 dark:focus-within:ring-indigo-400/30">
                                         <button type="button"
                                                 @click="qty = Math.max(1, (parseInt(qty) || 1) - 1); $wire.updateQuantity({{ $line['id'] }}, qty)"
                                                 :disabled="(parseInt(qty) || 1) <= 1"

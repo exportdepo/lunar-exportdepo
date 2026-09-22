@@ -2,8 +2,11 @@
 
 namespace App\Livewire\Storefront;
 
+use App\Support\VariantOptions;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Lunar\Models\Order;
 
@@ -12,6 +15,11 @@ class OrderStatusPage extends Component
 {
     public string $reference = '';
 
+    /**
+     * Sipariş yalnızca referansla yüklenir; istemci snapshot'ında
+     * değiştirilememesi için kilitlidir.
+     */
+    #[Locked]
     public ?Order $order = null;
 
     public function mount(string $reference): void
@@ -41,6 +49,7 @@ class OrderStatusPage extends Component
 
             return [
                 'name' => $name,
+                'options' => VariantOptions::label($line->purchasable),
                 'quantity' => (int) $line->quantity,
                 'unit_price' => $line->unitPrice?->value ?? 0,
                 'total' => $line->total?->value ?? 0,
@@ -70,11 +79,19 @@ class OrderStatusPage extends Component
         };
     }
 
+    /**
+     * Sipariş meta'sı `AsArrayObject` cast'i ile gelir (ArrayObject), bu yüzden
+     * `is_array()` yerine Arrayable kontrolü gerekir. Stripe ödemeleri
+     * `StripePayment::authorize()` tarafından `stripe_session_id` yazılarak
+     * işaretlenir (offline ödemelerde `payment_method` meta'sı bulunur).
+     */
     public function paymentMethod(): string
     {
         $meta = $this->order?->meta;
-        if (is_array($meta) && isset($meta['payment_method'])) {
-            return $meta['payment_method'] === 'stripe' ? 'Kart ile ödeme (Stripe)' : 'Manuel ödeme';
+        $meta = $meta instanceof Arrayable ? $meta->toArray() : (array) $meta;
+
+        if (($meta['payment_method'] ?? null) === 'stripe' || isset($meta['stripe_session_id'])) {
+            return 'Kart ile ödeme (Stripe)';
         }
 
         return $this->order?->status === 'awaiting-payment' ? 'Ödeme Bekleniyor' : 'Manuel ödeme';

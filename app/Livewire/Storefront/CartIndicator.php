@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Storefront;
 
+use App\Support\VariantOptions;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Lunar\Facades\CartSession;
@@ -34,18 +35,20 @@ class CartIndicator extends Component
             $this->total = 0;
             $this->subTotal = 0;
             $this->taxTotal = 0;
+
             return;
         }
 
         $cart->refresh();
         $cart->recalculate();
 
-        $this->lines = $cart->lines->map(function ($line): array {
+        $this->lines = $cart->lines->load('purchasable.values.option')->map(function ($line): array {
             $product = $line->purchasable?->product;
 
             return [
                 'id' => $line->id,
                 'name' => (string) ($product?->translateAttribute('name') ?? 'Ürün'),
+                'options' => VariantOptions::label($line->purchasable),
                 'quantity' => (int) $line->quantity,
                 'total' => (int) (($line->unitPriceInclTax?->value ?? ($line->unitPrice?->value ?? 0)) * $line->quantity),
             ];

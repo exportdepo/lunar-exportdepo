@@ -40,7 +40,7 @@ class OrderStatusPageTest extends TestCase
             'channel_id' => $channel->id,
             'new_customer' => true,
             'status' => 'payment-offline',
-            'reference' => 'TESTREF' . str_pad((string) random_int(1, 999999), 6, '0', STR_PAD_LEFT),
+            'reference' => 'TESTREF'.str_pad((string) random_int(1, 999999), 6, '0', STR_PAD_LEFT),
             'sub_total' => 10000,
             'discount_total' => 0,
             'shipping_total' => 0,
@@ -60,9 +60,9 @@ class OrderStatusPageTest extends TestCase
     {
         $order = $this->createOrder();
 
-        $this->get('/siparis/' . $order->reference)
+        $this->get('/siparis/'.$order->reference)
             ->assertOk()
-            ->assertSee('#' . $order->reference)
+            ->assertSee('#'.$order->reference)
             ->assertSee('Manuel Ödeme')
             ->assertSee('Sipariş Özeti')
             ->assertSee('Teslimat Adresi');
@@ -85,7 +85,7 @@ class OrderStatusPageTest extends TestCase
 
         foreach ($cases as $status => $expectedLabel) {
             $order = $this->createOrder(['status' => $status]);
-            $this->get('/siparis/' . $order->reference)
+            $this->get('/siparis/'.$order->reference)
                 ->assertOk()
                 ->assertSee($expectedLabel);
             $this->testOrder->delete();
@@ -106,5 +106,43 @@ class OrderStatusPageTest extends TestCase
         $this->assertSame('#0ea5e9', $instance->statusColor());
         $this->assertSame('Manuel ödeme', $instance->paymentMethod());
         $this->assertCount(0, $instance->lines());
+    }
+
+    /**
+     * Ödeme yöntemi `order.meta` üzerinden okunur; bu alan `AsArrayObject`
+     * cast'i ile geldiği için ArrayObject/`stripe_session_id` kombinasyonları
+     * Stripe etiketiyle gösterilmelidir.
+     */
+    public function test_order_status_page_labels_stripe_payments_from_order_meta(): void
+    {
+        $cases = [
+            ['status' => 'awaiting-payment', 'meta' => ['payment_method' => 'stripe']],
+            ['status' => 'awaiting-payment', 'meta' => ['stripe_session_id' => 'cs_test_123']],
+        ];
+
+        foreach ($cases as $case) {
+            $order = $this->createOrder($case);
+
+            $this->get('/siparis/'.$order->reference)
+                ->assertOk()
+                ->assertSee('Kart ile ödeme (Stripe)');
+
+            $this->testOrder->delete();
+            $this->testOrder = null;
+        }
+    }
+
+    /**
+     * `order` kilidi (Locked) ve typed model property'nin Livewire
+     * hydration turunda sorun çıkarmadığını doğrular.
+     */
+    public function test_order_status_component_survives_a_hydration_round_trip(): void
+    {
+        $order = $this->createOrder(['meta' => ['stripe_session_id' => 'cs_test_456']]);
+
+        Livewire::test(OrderStatusPage::class, ['reference' => $order->reference])
+            ->call('$refresh')
+            ->assertSee('Kart ile ödeme (Stripe)')
+            ->assertSet('reference', $order->reference);
     }
 }
