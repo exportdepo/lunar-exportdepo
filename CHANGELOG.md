@@ -2,12 +2,25 @@
 
 Önemli değişiklikler bu dosyada Türkçe olarak tutulur; sürümler yeniden eskiye sıralanır. Yayın tarihleri GitHub Releases kayıtlarına göre UTC tarihidir.
 
-## Yayımlanmamış
+## [v1.3.5](https://github.com/exportdepo/lunar-exportdepo/releases/tag/v1.3.5) — 2026-09-22
 
-### Dokümantasyon
+Müşteri Yönetimi ve Storefront Cilası (Phase 11)
 
-- Ayrı sürüm notları bu dosyada birleştirildi; README güncel özellikler, kurulum ve sürümleme yönergesiyle güncellendi.
-- Değişiklik geçmişinin gelecekteki kaynak arşivlerine dahil edilmesi sağlandı.
+### Yenilikler
+
+* **Panelde müşteri yönetimi** — Filament paneline `CustomerResource` eklendi: müşteriler listelenebilir, oluşturulabilir, düzenlenebilir ve görüntülenebilir (List/Create/Edit/View sayfaları).
+* **Güvenli müşteri silme** — Varsayılan silme akışı, sipariş/sepet/adres/pivot tablolarındaki `on delete no action` yabancı anahtar kısıtları nedeniyle düşüyordu. Yeni `DeleteCustomers` servisi silme öncesi pivot ve adres kayıtlarını temizler; sipariş ve sepet referanslarını null'a çeker. **Sipariş geçmişi korunur.**
+* **Test güvencesi** — `CustomerDeleteTest`: pivot bağlantılar + adres + sipariş + sepet içeren senaryoda tekli ve çoklu silme doğrulanır.
+
+### Düzeltmeler ve Bakım
+
+* **Storefront cilası** — Sepet ve ürün sayfalarında görsel/işlevsel dokunuşlar; `app.css` genişletmesi.
+* **İstek listesi buton metni** — `İstek Listesine Ekle` → `İstek listesine ekle` (test güvencesiyle).
+
+### Kalite
+
+* İlgili test paketleri yeşil: Checkout + CustomerDelete + Wishlist + Stripe → 18 test / 97 assertion.
+* Tam suite: 116 test / 519 assertion (tek seferlik tohumlama flake'i hariç; `UNIQUE constraint failed: lunar_currencies.code` ilgisiz, tek başına yeşil).
 
 ## [v1.2.0](https://github.com/exportdepo/lunar-exportdepo/releases/tag/v1.2.0) — 2026-09-17
 

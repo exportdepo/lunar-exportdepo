@@ -104,6 +104,11 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
   Türkçe release notlarıyla GitHub Releases'te yayında (`v1.3.4` Latest)
 - `v1.3.5` (Phase 11, `f80e071`) 22.09.2026'da eklendi: müşteri yönetimi
   (`CustomerResource` + `DeleteCustomers` servisi) ve storefront cilası
+- **Release yayını otomatikleşti (22.09.2026):** `v*` tag push'unda
+  `.github/workflows/release.yml` çalışır; Türkçe notları CHANGELOG.md'deki
+  sürüm bölümünden alır (yoksa tag mesajı, o da yoksa otomatik notlar) ve
+  GitHub Release'i açar. Yeni sürüm akışı: CHANGELOG'a bölüm yaz →
+  `git tag -a vX.Y.Z` → push (`main` + tag)
 - **Stripe Elements değerlendirmesi (8c, 21.09.2026):** mevcut akış Stripe Checkout
   yönlendirmesi (`redirect()->away` + webhook) — PCI yükü sıfır, webhook zaten testli,
   hızlı; Payment Element embed marka uyumu sağlar ama Stripe.js entegrasyonu,

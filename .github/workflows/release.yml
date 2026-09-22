@@ -1,0 +1,72 @@
+name: Release
+
+# v* biçimli bir tag push edildiğinde, notlarını CHANGELOG.md'deki
+# eşleşen sürüm bölümünden alarak GitHub Release'i otomatik yayımlar.
+# Öncelik sırası: CHANGELOG bölümü > tag mesajı > GitHub otomatik notları.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Annotated tag mesajını okuyabilmek için tüm geçmiş gerekir
+          fetch-depth: 0
+
+      - name: Extract release notes
+        id: notes
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          # CHANGELOG.md içindeki "## [<TAG>]" bölümünü ve satır başlığını çıkar
+          # (ilk kural CRLF satır sonlarını normalize eder; boş CRLF satırları
+          #  aksi halde NF=1 sayılır ve başlık boş bir satırı yakalar)
+          awk -v tag="$TAG" '
+            { sub(/\r$/, "") }
+            $0 ~ "^## \\[" tag "\\]" { found=1; next }
+            found && desc == "" && NF { desc=$0 }
+            found && /^## \[/ { exit }
+            found { print }
+            END {
+              if (desc != "") { print desc > "release-title.txt" }
+            }
+          ' CHANGELOG.md > release-notes.md
+
+          # CHANGELOG'da bölüm yoksa yedek: annotated tag mesajının gövdesi
+          if [ ! -s release-notes.md ]; then
+            git tag -l --format='%(contents:body)' "$TAG" > release-notes.md
+          fi
+
+          if [ -s release-notes.md ]; then
+            if [ -s release-title.txt ]; then
+              echo "title=$TAG — $(cat release-title.txt)" >> "$GITHUB_OUTPUT"
+            else
+              echo "title=$TAG" >> "$GITHUB_OUTPUT"
+            fi
+            echo "has_notes=true" >> "$GITHUB_OUTPUT"
+          else
+            # Son yedek: GitHub otomatik notları (--generate-notes)
+            echo "title=$TAG" >> "$GITHUB_OUTPUT"
+            echo "has_notes=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ARGS=("$GITHUB_REF_NAME" --title "${{ steps.notes.outputs.title }}" --latest)
+          if [ "${{ steps.notes.outputs.has_notes }}" = "true" ]; then
+            ARGS+=(--notes-file release-notes.md)
+          else
+            ARGS+=(--generate-notes)
+          fi
+          gh release create "${ARGS[@]}"
