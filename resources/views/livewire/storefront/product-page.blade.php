@@ -2,7 +2,7 @@
     Ürün detay sayfası (PDP) — Phase 4c.
 
     Akış: galeri (Alpine aktif görsel) + sağ panel (başlık, puan, fiyat, stok,
-    varyant seçici, adet, CTA, istek listesi) -> özellikler -> sekmeler.
+    varyant seçici, tek satırda adet + istek listesi kalbi + CTA) -> özellikler -> sekmeler.
     Tüm Livewire aksiyon imzaları korunur (selectOptionValue, selectTab,
     submitReview, addToCart, updatedSelectedVariantId, updatedQuantity).
 --}}
@@ -225,9 +225,11 @@
                         </p>
                     @endif
 
+                    @php $inWishlist = $this->inWishlist($product['id']); @endphp
+
                     @if (($product['stock'] ?? 0) > 0)
                         <form wire:submit="addToCart" class="flex flex-wrap items-stretch gap-3">
-                            <div x-data="{ qty: @entangle('quantity') }" class="flex items-stretch overflow-hidden rounded-lg border border-slate-300 dark:border-slate-600">
+                            <div x-data="{ qty: @entangle('quantity') }" class="flex items-stretch overflow-hidden rounded-lg border border-slate-300 transition-colors focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 dark:border-slate-600 dark:focus-within:border-indigo-400 dark:focus-within:ring-indigo-400/30">
                                 <button type="button"
                                         @click="qty = Math.max(1, (parseInt(qty) || 1) - 1)"
                                         :disabled="(parseInt(qty) || 1) <= 1"
@@ -239,14 +241,31 @@
                                        min="1"
                                        @if ($product['stock'] !== null) max="{{ $product['stock'] }}" @endif
                                        aria-label="Adet"
-                                       class="w-14 border-x border-slate-300 py-3 text-center text-sm font-semibold text-slate-900 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100" />
+                                       class="qty-input w-14 py-3 text-center text-sm font-semibold text-slate-900 dark:bg-slate-800 dark:text-slate-100" />
                                 <button type="button"
                                         @click="qty = Math.min({{ $product['stock'] ?? 999 }}, (parseInt(qty) || 1) + 1)"
                                         aria-label="Adedi artır"
                                         class="px-3 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">+</button>
                             </div>
 
-                            <x-button type="submit" size="lg" class="flex-1" wire:loading.attr="disabled">
+                            {{-- İkon-only istek listesi düğmesi: etiket yerine title/aria-label, --}}
+                            {{-- durum için aria-pressed (product-card kalp butonu deseni). --}}
+                            <button type="button"
+                                    wire:click="toggle({{ $product['id'] }})"
+                                    wire:key="wishlist-pdp-{{ $product['id'] }}"
+                                    title="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}"
+                                    aria-label="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}"
+                                    aria-pressed="{{ $inWishlist ? 'true' : 'false' }}"
+                                    class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border shadow-sm transition-colors
+                                           {{ $inWishlist
+                                              ? 'border-rose-200 bg-rose-50 text-rose-600 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-400'
+                                              : 'border-slate-300 bg-white text-slate-500 hover:border-rose-200 hover:text-rose-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:text-rose-400' }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="{{ $inWishlist ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 10-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                            </button>
+
+                            <x-button type="submit" size="lg" wire:loading.attr="disabled">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                 </svg>
@@ -265,18 +284,25 @@
                         @endif
                     @else
                         <p class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300">Bu ürün şu anda stokta yok.</p>
+
+                        <div class="mt-3">
+                            <button type="button"
+                                    wire:click="toggle({{ $product['id'] }})"
+                                    wire:key="wishlist-pdp-{{ $product['id'] }}"
+                                    title="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}"
+                                    aria-label="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}"
+                                    aria-pressed="{{ $inWishlist ? 'true' : 'false' }}"
+                                    class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border shadow-sm transition-colors
+                                           {{ $inWishlist
+                                              ? 'border-rose-200 bg-rose-50 text-rose-600 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-400'
+                                              : 'border-slate-300 bg-white text-slate-500 hover:border-rose-200 hover:text-rose-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:text-rose-400' }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="{{ $inWishlist ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 10-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                            </button>
+                        </div>
                     @endif
 
-                    <div class="mt-4">
-                        <x-button variant="outline"
-                                  wire:click="toggle({{ $product['id'] }})"
-                                  class="w-full sm:w-auto">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="{{ $this->inWishlist($product['id']) ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 10-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                            </svg>
-                            {{ $this->inWishlist($product['id']) ? 'İstek Listesinde' : 'İstek Listesine Ekle' }}
-                        </x-button>
-                    </div>
                 </div>
             </div>
         </div>

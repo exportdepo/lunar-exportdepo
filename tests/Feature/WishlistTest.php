@@ -90,7 +90,7 @@ class WishlistTest extends TestCase
 
         $this->get('/urun/lunarbook-pro-14')
             ->assertOk()
-            ->assertSee('İstek Listesine Ekle');
+            ->assertSee('İstek listesine ekle');
     }
 
     public function test_authenticated_wishlist_is_persisted_in_the_database(): void

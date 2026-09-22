@@ -5,7 +5,6 @@
 @source '../../storage/framework/views/*.php';
 @source "../**/*.blade.php";
 @source "../**/*.js";
-@source "../**/*.vue";
 
 /* ============================================================================
    Karanlık Mod (Dark Mode)
@@ -72,5 +71,62 @@
             animation-duration: 0.01ms !important;
             animation-iteration-count: 1 !important;
         }
+    }
+}
+
+/* ============================================================================
+   Adet (Quantity) Stepper Girdisi
+   ---------------------------------------------------------------------------
+   Ürün sayfası ve sepet sayfasındaki ortak adet stepper deseninde kullanılır.
+   `@tailwindcss/forms` eklentisi [type='number'] girdilere dört taraflı
+   kenarlık, yatay padding ve odakta mavi halka uyguladığı için stepper
+   kabuğunun kenarıyla üst üste biniyordu; hover'da beliren tarayıcı spinner
+   okları da − / + düğmeleriyle gereksiz şekilde çakışıyordu.
+
+   Bu sınıf girdiyi sıfırlar: yalnızca − / + düğmelerini girdiden ayıran
+   dikey ayraç çizgileri (border-inline) kalır; dış kenarlık ve odak
+   göstergesini stepper kabuğu (focus-within) üstlenir.
+   ============================================================================*/
+@layer components {
+    .qty-input {
+        /* Tarayıcı spinner oklarını gizle (WebKit + Firefox). */
+        appearance: textfield;
+        -moz-appearance: textfield;
+
+        /* Eklentinin dört taraflı kenarlığını sıfırla; yalnızca yatay
+           ayraç çizgileri kalsın (kabuğun üst/alt kenarıyla bitişmesin). */
+        border-style: solid;
+        border-width: 0;
+        border-inline-width: 1px;
+        border-color: var(--color-slate-300);
+        border-radius: 0;
+
+        /* Eklentinin yatay padding'ini sıfırla; rakamlar tam ortalanır. */
+        padding-inline: 0;
+    }
+
+    .qty-input::-webkit-inner-spin-button,
+    .qty-input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        appearance: none;
+        margin: 0;
+    }
+
+    /* Odakta eklenti halkası + global outline birikimini temizle;
+       görünürlük kabuk üzerindeki focus-within stilinden gelir. */
+    .qty-input:focus {
+        outline: none;
+        box-shadow: none;
+        border-color: var(--color-slate-300);
+    }
+
+    .dark .qty-input {
+        border-color: var(--color-slate-600);
+    }
+
+    .dark .qty-input:focus {
+        outline: none;
+        box-shadow: none;
+        border-color: var(--color-slate-600);
     }
 }

@@ -50,7 +50,7 @@
                                 </p>
 
                                 <div class="mt-3 flex flex-wrap items-center gap-3">
-                                    <div x-data="{ qty: {{ (int) $line['quantity'] }} }" class="flex items-stretch overflow-hidden rounded-lg border border-slate-300 dark:border-slate-600">
+                                    <div x-data="{ qty: {{ (int) $line['quantity'] }} }" class="flex items-stretch overflow-hidden rounded-lg border border-slate-300 transition-colors focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 dark:border-slate-600 dark:focus-within:border-indigo-400 dark:focus-within:ring-indigo-400/30">
                                         <button type="button"
                                                 @click="qty = Math.max(1, (parseInt(qty) || 1) - 1); $wire.updateQuantity({{ $line['id'] }}, qty)"
                                                 :disabled="(parseInt(qty) || 1) <= 1"
@@ -61,7 +61,7 @@
                                                :value="qty"
                                                @change="$wire.updateQuantity({{ $line['id'] }}, $event.target.value)"
                                                aria-label="{{ $line['name'] }} adet"
-                                               class="w-14 border-x border-slate-300 py-1.5 text-center text-sm font-semibold text-slate-900 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100" />
+                                               class="qty-input w-14 py-1.5 text-center text-sm font-semibold text-slate-900 dark:bg-slate-800 dark:text-slate-100" />
                                         <button type="button"
                                                 @click="qty = Math.min(99, (parseInt(qty) || 1) + 1); $wire.updateQuantity({{ $line['id'] }}, qty)"
                                                 aria-label="{{ $line['name'] }} adet artır"
