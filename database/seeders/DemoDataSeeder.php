@@ -29,6 +29,7 @@ use Lunar\Models\ProductOption;
 use Lunar\Models\ProductOptionValue;
 use Lunar\Models\ProductType;
 use Lunar\Models\ProductVariant;
+use Lunar\Models\Tag;
 use Lunar\Models\TaxClass;
 use Lunar\Models\TaxRate;
 use Lunar\Models\TaxRateAmount;
@@ -284,7 +285,7 @@ class DemoDataSeeder extends Seeder
             $customerGroup = $this->ensureDefaultCustomerGroup();
             $productType = $this->ensureDefaultProductType();
             $collectionGroup = $this->ensureDefaultCollectionGroup();
-            $brand = $this->ensureBrand();
+            $brands = $this->ensureBrands();
             $this->ensureFeaturesAttribute();
 
             $this->command->info('  ✓ Kanal, para birimi, dil, KDV, marka hazır');
@@ -292,7 +293,7 @@ class DemoDataSeeder extends Seeder
             $collections = $this->createCollections($collectionGroup, $language);
             $this->command->info('  ✓ 3 koleksiyon oluşturuldu');
 
-            $count = $this->createProducts($productType, $brand, $taxClass, $currency, $customerGroup, $channel, $language, $collections);
+            $count = $this->createProducts($productType, $brands, $taxClass, $currency, $customerGroup, $channel, $language, $collections);
             $this->command->info("  ✓ {$count} ürün + varyant + fiyat + stok + görsel eklendi");
 
             $this->createAdminUser();
@@ -498,9 +499,22 @@ class DemoDataSeeder extends Seeder
         );
     }
 
-    protected function ensureBrand(): Brand
+    protected function ensureBrands(): array
     {
-        return Brand::firstOrCreate(['name' => 'Lunar']);
+        return collect(['Lunar', 'Aurora', 'Nordika'])
+            ->map(fn (string $name) => Brand::firstOrCreate(['name' => $name]))
+            ->keyBy('name')
+            ->all();
+    }
+
+    /**
+     * Slug üzerinden deterministik marka dağılımı (idempotent seed).
+     */
+    protected function brandForSlug(array $brands, string $slug): Brand
+    {
+        $names = array_keys($brands);
+
+        return $brands[$names[crc32($slug) % count($names)]];
     }
 
     // ────────────────────────────────────────────────────────────
@@ -712,7 +726,7 @@ class DemoDataSeeder extends Seeder
      */
     protected function createProducts(
         ProductType $productType,
-        Brand $brand,
+        array $brands,
         TaxClass $taxClass,
         Currency $currency,
         CustomerGroup $customerGroup,
@@ -723,6 +737,7 @@ class DemoDataSeeder extends Seeder
         $count = 0;
 
         foreach ($this->products as $p) {
+            $brand = $this->brandForSlug($brands, $p['slug']);
             // Slug ile bak, varsa geç (idempotent)
             // Not: DB'de morph alias saklanır ('product'), FQCN (Product::class) değil!
             // FQCN ile sorgulamak kontrolü her zaman başarısız yapar ve tekrar seed'de
@@ -738,7 +753,14 @@ class DemoDataSeeder extends Seeder
                 $seeded = Product::find($exists->element_id);
 
                 if ($seeded) {
+                    if ($seeded->brand_id !== $brand->id) {
+                        $seeded->update(['brand_id' => $brand->id]);
+                    }
                     $this->applyProductVariations($seeded, $p);
+
+                    // Top-up yolunda da etiketler üretilir; aksi halde mevcut
+                    // ürünlerde (continue) seedTags hiç çalışmaz ve tags 0 kalır.
+                    $this->seedTags($seeded, $p);
                 }
 
                 continue;
@@ -767,6 +789,7 @@ class DemoDataSeeder extends Seeder
                 ]);
             } else {
                 $product->update([
+                    'brand_id' => $brand->id,
                     'status' => 'published',
                     'attribute_data' => collect([
                         'name' => new Text($p['name']),
@@ -868,6 +891,9 @@ class DemoDataSeeder extends Seeder
             // 8) Demo yorumlar
             $this->createProductReviews($product);
 
+            // 8b) Demo etiketler (idempotent)
+            $this->seedTags($product, $p);
+
             // 9) Varyasyonlar (renk / beden / model) — tanımlı ürünlerde
             // kombinasyon başına bir varyant + fiyat + stok üretir.
             $this->applyProductVariations($product, $p);
@@ -876,6 +902,38 @@ class DemoDataSeeder extends Seeder
         }
 
         return $count;
+    }
+
+    /**
+     * Urun ozellik satirindan demo etiketlerini idempotent uretir.
+     * Str::upper ile normalize edip Tag::firstOrCreate yapar (MySQL ve SQLite
+     * buyuk-kucuk harf tutarsizligini onler); syncWithoutDetaching mevcut
+     * manuel etiketlere dokunmaz.
+     *
+     * @param  array<string, mixed>  $p
+     */
+    protected function seedTags(Product $product, array $p): void
+    {
+        // Ürün tanımında 'tags' yoksa koleksiyona göre varsayılan demo
+        // etiketleri atanır (aşağıdaki fallback idempotent çalışır).
+        $tags = $p['tags'] ?? match ($p['collection'] ?? '') {
+            'elektronik' => ['YENİ', 'ÇOK SATAN'],
+            'giyim' => ['İNDİRİM', 'ORGANİK'],
+            'ev-yasam' => ['YENİ', 'EV DEKOR'],
+            default => ['YENİ'],
+        };
+
+        if ($tags === []) {
+            return;
+        }
+
+        $tagIds = [];
+
+        foreach ($tags as $tagValue) {
+            $tagIds[] = Tag::firstOrCreate(['value' => Str::upper($tagValue)])->id;
+        }
+
+        $product->tags()->syncWithoutDetaching($tagIds);
     }
 
     /**
@@ -1367,7 +1425,10 @@ class DemoDataSeeder extends Seeder
             throw new \RuntimeException('EXPORTDEPO_ADMIN_PASSWORD is required to seed the panel admin.');
         }
 
-        $staff = Staff::updateOrCreate(
+        // SoftDeletes global scope nedeniyle updateOrCreate soft-deleted satırı
+        // bulamaz ve email UNIQUE ihlaliyle kırılır; withTrashed + restore ile
+        // mevcut hesabı yeniden kullan.
+        $staff = Staff::withTrashed()->updateOrCreate(
             ['email' => 'admin@exportdepo.test'],
             [
                 'first_name' => 'ExportDepo',
@@ -1377,6 +1438,10 @@ class DemoDataSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        if ($staff->trashed()) {
+            $staff->restore();
+        }
 
         try {
             $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'staff']);
@@ -1473,7 +1538,8 @@ class DemoDataSeeder extends Seeder
             return;
         }
 
-        $staff = Staff::updateOrCreate(
+        // Aynı UNIQUE tuzağı: soft-deleted satır updateOrCreate'ten gizlenir.
+        $staff = Staff::withTrashed()->updateOrCreate(
             ['email' => 'admin@lunar.shop'],
             [
                 'first_name' => 'Legacy',
@@ -1483,6 +1549,10 @@ class DemoDataSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        if ($staff->trashed()) {
+            $staff->restore();
+        }
 
         try {
             $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'staff']);
