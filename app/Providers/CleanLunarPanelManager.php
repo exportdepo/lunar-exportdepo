@@ -6,6 +6,7 @@ use App\Filament\Resources\CollectionGroupResource;
 use App\Filament\Resources\CustomerResource;
 use App\Filament\Resources\LanguageResource;
 use App\Filament\Resources\ProductOptionResource;
+use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\ProductReviewResource;
 use App\Filament\Resources\ProductTypeResource;
 use App\Filament\Resources\TaxClassResource;
@@ -61,6 +62,8 @@ class CleanLunarPanelManager extends BaseLunarPanelManager
             \Lunar\Admin\Filament\Resources\CustomerResource::class => CustomerResource::class,
             // Seçenek değerlerine renk kodu (swatch) yönetimi ekler.
             \Lunar\Admin\Filament\Resources\ProductOptionResource::class => ProductOptionResource::class,
+            // Ürün listesine "Etiketler" kolonu + etiket filtresi ekler.
+            \Lunar\Admin\Filament\Resources\ProductResource::class => ProductResource::class,
         ];
 
         $mapped = array_map(
