@@ -16,7 +16,7 @@
     'gridClasses' => 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
 ])
 
-<div class="{{ $gridClasses }}">
+<div class="stagger-in {{ $gridClasses }}">
     @foreach ($gridProducts as $product)
         <x-product-card :product="$product"
                         :show-wishlist="true"

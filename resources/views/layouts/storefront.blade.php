@@ -23,7 +23,7 @@
             <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
                 <div>
                     <div class="mb-3 flex items-center gap-2">
-                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-sm text-white">🌙</span>
+                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 text-sm text-white">🌙</span>
                         <span class="font-semibold text-white">ExportDepo</span>
                     </div>
                     <p class="text-sm text-slate-400">Türkiye'nin yeni nesil e-ticaret deneyimi.</p>

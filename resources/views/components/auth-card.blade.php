@@ -29,7 +29,7 @@
 
 <section class="mx-auto max-w-md px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
     <div class="mb-8 text-center">
-        <span class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-3xl text-white shadow-md">{{ $iconGlyph }}</span>
+        <span class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 text-3xl text-white shadow-md">{{ $iconGlyph }}</span>
         <h1 class="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">{{ $title }}</h1>
         @if (filled($description))
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">{{ $description }}</p>

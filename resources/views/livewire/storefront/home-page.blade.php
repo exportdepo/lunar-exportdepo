@@ -14,11 +14,11 @@
 
     @unless (filled($q))
         {{-- Hero: tam ekran banner --}}
-        <section class="relative isolate overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white">
+        <section class="relative isolate overflow-hidden bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500 text-white">
             <div class="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-white/20 blur-3xl" aria-hidden="true"></div>
             <div class="pointer-events-none absolute -bottom-32 -right-16 h-80 w-80 rounded-full bg-indigo-300/30 blur-3xl" aria-hidden="true"></div>
 
-            <div class="relative mx-auto flex min-h-[78vh] max-w-7xl flex-col items-center justify-center px-4 py-20 text-center sm:px-6 sm:py-24 lg:px-8">
+            <div class="anim-fade-up relative mx-auto flex min-h-[78vh] max-w-7xl flex-col items-center justify-center px-4 py-20 text-center sm:px-6 sm:py-24 lg:px-8">
                 <span class="mb-6 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-widest text-white/90">
                     🇹🇷 Türkiye'nin yeni nesil e-ticaret deneyimi
                 </span>
@@ -87,10 +87,10 @@
                     <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">İlgilendiğiniz alana göz atın</p>
                 </div>
 
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div class="stagger-in grid grid-cols-1 gap-4 sm:grid-cols-3">
                     @foreach ($collections as $collection)
                         <a href="{{ url('/koleksiyon/' . ($collection['url'] ?? $collection['id'])) }}"
-                           class="group relative aspect-[4/3] overflow-hidden rounded-2xl border border-slate-200 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-slate-800">
+                           class="group relative aspect-4/3 overflow-hidden rounded-2xl border border-slate-200 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-slate-800">
                             @if ($collection['image_url'])
                                 <img src="{{ $collection['image_url'] }}"
                                      alt="{{ $collection['name'] }}"
@@ -103,7 +103,7 @@
                                 <span class="absolute inset-0 flex items-center justify-center bg-slate-100 text-5xl dark:bg-slate-800" aria-hidden="true">🗂️</span>
                             @endif
 
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/20 to-transparent" aria-hidden="true"></div>
+                            <div class="absolute inset-0 bg-linear-to-t from-slate-950/80 via-slate-900/20 to-transparent" aria-hidden="true"></div>
 
                             <div class="absolute inset-x-0 bottom-0 p-5 text-white">
                                 <h3 class="text-xl font-bold">{{ $collection['name'] }}</h3>

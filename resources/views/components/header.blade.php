@@ -17,15 +17,15 @@
 
             {{-- Logo --}}
             <a href="{{ url('/') }}" aria-label="ExportDepo ana sayfa" class="group flex shrink-0 items-center gap-2">
-                <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-lg font-bold text-white shadow-sm transition-transform group-hover:scale-105">🌙</span>
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 text-lg font-bold text-white shadow-sm transition-transform group-hover:scale-105">🌙</span>
                 <span class="text-lg font-semibold text-slate-900 dark:text-white">ExportDepo</span>
             </a>
 
             {{-- Masaüstü navigasyon --}}
             <nav aria-label="Ana menü" class="absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-5 whitespace-nowrap text-sm font-medium text-slate-600 dark:text-slate-300 lg:flex">
-                <a href="{{ url('/koleksiyon/elektronik') }}" class="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Elektronik</a>
-                <a href="{{ url('/koleksiyon/giyim') }}" class="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Giyim</a>
-                <a href="{{ url('/koleksiyon/ev-yasam') }}" class="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Ev &amp; Yaşam</a>
+                <a href="{{ url('/koleksiyon/elektronik') }}" class="nav-underline transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Elektronik</a>
+                <a href="{{ url('/koleksiyon/giyim') }}" class="nav-underline transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Giyim</a>
+                <a href="{{ url('/koleksiyon/ev-yasam') }}" class="nav-underline transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">Ev &amp; Yaşam</a>
             </nav>
 
             {{-- Aksiyonlar --}}
@@ -72,7 +72,7 @@
                                 aria-controls="user-dropdown"
                                 :aria-expanded="open"
                                 class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-indigo-400">
-                            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-xs font-bold text-white">
+                            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-linear-to-br from-indigo-500 to-purple-600 text-xs font-bold text-white">
                                 {{ mb_substr(auth()->user()->firstName() ?: auth()->user()->name, 0, 1) }}
                             </span>
                             <span class="hidden text-sm font-semibold xl:inline">{{ auth()->user()->firstName() ?: auth()->user()->name }}</span>
