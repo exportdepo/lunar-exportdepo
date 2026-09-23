@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\WishlistItem;
+use App\Support\StorefrontRatings;
 use Illuminate\Support\Facades\Auth;
 use Lunar\Models\Product;
 
@@ -137,14 +138,17 @@ class WishlistManager
             'media',
             'variants.prices.currency',
             'urls',
+            'tags',
         ])
             ->where('status', 'published')
             ->whereIn('id', $ids)
             ->get()
             ->keyBy('id');
 
+        $ratings = StorefrontRatings::forProducts($products->keys()->all());
+
         return collect($ids)
-            ->map(function (int $id) use ($products): ?array {
+            ->map(function (int $id) use ($products, $ratings): ?array {
                 $product = $products->get($id);
 
                 if (! $product) {
@@ -164,6 +168,9 @@ class WishlistManager
                     'stock' => $variant?->stock,
                     'price' => $variant ? StorefrontPricing::forVariantInclTax($variant) : null,
                     'variant_id' => $variant?->id,
+                    'tags' => $product->tags->pluck('value')->all(),
+                    'rating' => $ratings[$id]['rating'] ?? null,
+                    'reviews_count' => $ratings[$id]['reviews_count'] ?? 0,
                 ];
             })
             ->filter()

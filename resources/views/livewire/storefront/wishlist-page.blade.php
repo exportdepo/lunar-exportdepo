@@ -1,6 +1,6 @@
 <div>
     <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-        <div class="flex flex-wrap items-end justify-between gap-4 mb-8">
+        <div class="anim-fade-up flex flex-wrap items-end justify-between gap-4 mb-8">
             <div>
                 <a href="{{ url('/') }}" class="inline-flex items-center text-sm text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 mb-3 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
@@ -10,7 +10,7 @@
                 <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Beğendiğiniz ürünleri burada saklayın.</p>
             </div>
             @if (count($items) > 0)
-                <span class="inline-flex items-center gap-2 rounded-full bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-600 dark:bg-rose-900/20 dark:text-rose-400">
+                <span class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-rose-600 shadow-md ring-1 ring-rose-200 dark:text-rose-500">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 10-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
                     {{ count($items) }} ürün
                 </span>
@@ -29,7 +29,7 @@
             <x-button href="{{ url('/') }}">Ürünleri keşfet</x-button>
         </x-empty-state>
         @else
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+        <div class="stagger-in grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             @foreach ($items as $item)
             <div wire:key="wishlist-item-{{ $item['id'] }}" class="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-xl dark:border-slate-800 dark:bg-slate-900">
                 <a href="{{ $item['url'] ? url('/urun/' . $item['url']) : '#' }}" class="flex flex-col flex-1">
@@ -40,12 +40,40 @@
                     <div class="flex h-full w-full items-center justify-center text-6xl text-slate-300 dark:text-slate-600" aria-hidden="true">📦</div>
                     @endif
                     @if ($item['stock'] !== null && $item['stock'] <= 0)
-                    <span class="absolute top-2 right-2 rounded-full px-2 py-1 text-xs font-semibold bg-rose-100 text-rose-800 dark:bg-rose-500/20 dark:text-rose-300">Tükendi</span>
+                    <span class="absolute top-2 right-2 rounded-full bg-white px-2 py-1 text-xs font-semibold text-rose-700 shadow-md ring-1 ring-rose-200 dark:text-rose-700">Tükendi</span>
                     @endif
                 </div>
                 <div class="p-4 pb-0 flex-1 flex flex-col">
-                    <h3 class="font-semibold text-slate-900 mb-1 line-clamp-2 group-hover:text-indigo-600 transition-colors dark:text-white dark:group-hover:text-indigo-400">{{ $item['name'] }}</h3>
-                    <p class="text-sm text-slate-500 mb-3 line-clamp-2 flex-1 dark:text-slate-400">{{ $item['description'] }}</p>
+                    <h3 class="text-sm font-semibold text-slate-900 mb-1 line-clamp-2 group-hover:text-indigo-600 transition-colors dark:text-white dark:group-hover:text-indigo-400">{{ $item['name'] }}</h3>
+
+                    {{-- Değerlendirme özeti (etiket rozetlerinin hemen üstünde) --}}
+                    @php
+                        $wishlistRatingCount = (int) ($item['reviews_count'] ?? 0);
+                        $wishlistRatingValue = isset($item['rating']) && $item['rating'] !== null ? (float) $item['rating'] : null;
+                    @endphp
+                    @if ($wishlistRatingCount > 0 && $wishlistRatingValue !== null)
+                    <div class="mb-1 flex flex-wrap items-center gap-1" data-testid="wishlist-rating" aria-label="Değerlendirme: {{ number_format($wishlistRatingValue, 1, '.', '') }} / 5, {{ $wishlistRatingCount }} değerlendirme">
+                        <span class="flex items-center" aria-hidden="true">
+                            @for ($i = 1; $i <= 5; $i++)
+                                <svg class="h-3.5 w-3.5 {{ $i <= (int) round($wishlistRatingValue) ? 'text-amber-400' : 'text-slate-300 dark:text-slate-600' }}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.363-1.118l-2.8-2.034c-.784-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                            @endfor
+                        </span>
+                        <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">{{ number_format($wishlistRatingValue, 1, '.', '') }}</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">({{ $wishlistRatingCount }})</span>
+                    </div>
+                    @endif
+
+                    {{-- Etiket rozetleri (ürün adının altında, minimalist küçük harf) --}}
+                    @php
+                        $tagBadges = collect($item['tags'] ?? [])->filter()->take(3)->values();
+                    @endphp
+                    @if ($tagBadges->isNotEmpty())
+                    <div class="mb-1.5 flex flex-wrap gap-1" data-testid="wishlist-tags">
+                        @foreach ($tagBadges as $tag)
+                        <span class="rounded bg-white px-1.5 py-0.5 text-[10px] font-medium lowercase tracking-wide text-slate-600 shadow-md ring-1 ring-slate-200 dark:text-slate-700">{{ $tag }}</span>
+                        @endforeach
+                    </div>
+                    @endif
                 </div>
                 </a>
 
@@ -62,7 +90,7 @@
 
                 <div class="flex flex-wrap items-end justify-between gap-x-3 gap-y-2 border-t border-slate-100 p-4 pt-3 dark:border-slate-800">
                     <div>
-                        <span class="text-lg font-bold text-slate-900 dark:text-white">{{ $item['price'] !== null ? number_format($item['price'] / 100, 2, ',', '.') . ' ₺' : '—' }}</span>
+                        <span class="text-sm font-bold text-slate-900 dark:text-white">{{ $item['price'] !== null ? number_format($item['price'] / 100, 2, ',', '.') . ' ₺' : '—' }}</span>
                     </div>
                     <button type="button"
                             wire:click="addToCart({{ $item['id'] }})"

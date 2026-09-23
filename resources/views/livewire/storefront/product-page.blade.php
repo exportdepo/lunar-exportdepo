@@ -90,6 +90,18 @@
 
                 <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">{{ $product['name'] }}</h1>
 
+{{-- Etiket rozetleri (başlığın altında) --}}
+@php
+    $productTags = collect($product['tags'] ?? [])->filter()->values();
+@endphp
+@if ($productTags->isNotEmpty())
+    <div class="mt-3 flex flex-wrap gap-1.5" data-testid="product-tags">
+        @foreach ($productTags as $tag)
+            <span class="rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-300">{{ $tag }}</span>
+        @endforeach
+    </div>
+@endif
+
                 @if ($reviewsCount > 0)
                     <div class="mt-3 flex flex-wrap items-center gap-2">
                         <div class="flex items-center" aria-hidden="true">
@@ -186,7 +198,7 @@
                                                         class="flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all
                                                                {{ $selected ? 'border-indigo-600 ring-2 ring-indigo-500/40' : 'border-slate-200 hover:border-indigo-400 dark:border-slate-600' }}
                                                                {{ $available ? '' : 'cursor-not-allowed opacity-40' }}">
-                                                    <span class="h-7 w-7 rounded-full border border-slate-300 dark:border-slate-600" style="background-color: {{ $value['hex'] ?: '#e2e8f0' }}" aria-hidden="true"></span>
+                                                    <span class="h-7 w-7 rounded-full border border-slate-300 dark:border-slate-600" data-hex="{{ $value['hex'] ?: '#e2e8f0' }}" :style="'background-color: ' + $el.dataset.hex" aria-hidden="true"></span>
                                                 </button>
                                             @else
                                                 <button type="button"
@@ -194,7 +206,7 @@
                                                         @disabled(! $available)
                                                         title="{{ $value['name'] }}{{ $available ? '' : ' (stokta yok)' }}"
                                                         aria-pressed="{{ $selected ? 'true' : 'false' }}"
-                                                        class="min-w-[3rem] rounded-lg border px-4 py-2 text-sm font-medium transition-colors
+                                                        class="min-w-12 rounded-lg border px-4 py-2 text-sm font-medium transition-colors
                                                                {{ $selected ? 'border-indigo-600 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-500/15 dark:text-indigo-300' : 'border-slate-300 bg-white text-slate-700 hover:border-indigo-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200' }}
                                                                {{ $available ? '' : 'cursor-not-allowed border-slate-200 text-slate-300 line-through dark:border-slate-700 dark:text-slate-600' }}">
                                                     {{ $value['name'] }}

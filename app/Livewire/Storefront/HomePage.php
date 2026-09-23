@@ -5,6 +5,7 @@ namespace App\Livewire\Storefront;
 use App\Livewire\Storefront\Concerns\InteractsWithCart;
 use App\Livewire\Storefront\Concerns\InteractsWithWishlist;
 use App\Support\StorefrontPricing;
+use App\Support\StorefrontRatings;
 use App\Support\StorefrontSearch;
 use App\Support\WishlistManager;
 use Livewire\Attributes\Layout;
@@ -36,6 +37,7 @@ class HomePage extends Component
             'media',
             'variants.prices.currency',
             'urls',
+            'tags',
         ])
             ->where('status', 'published')
             ->get();
@@ -54,10 +56,17 @@ class HomePage extends Component
                 'image_url' => $image?->getUrl(),
                 'stock' => $variant?->stock,
                 'price' => $price,
+                'tags' => $product->tags->pluck('value')->all(),
             ];
         })->all();
 
         $this->applySearchFilter();
+
+        $ratings = StorefrontRatings::forProducts(array_column($this->products, 'id'));
+        foreach ($this->products as $index => $product) {
+            $this->products[$index]['rating'] = $ratings[$product['id']]['rating'] ?? null;
+            $this->products[$index]['reviews_count'] = $ratings[$product['id']]['reviews_count'] ?? 0;
+        }
 
         $collections = Collection::with(['media', 'urls'])
             ->orderBy('created_at')

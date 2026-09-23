@@ -24,7 +24,6 @@
 
 @php
     $name = $product['name'] ?? '';
-    $description = $product['description'] ?? '';
     $productId = $product['id'] ?? null;
     $slug = $product['url'] ?? ($product['slug'] ?? null);
     $href = filled($slug) ? url('/urun/'.$slug) : ($productId ? url('/urun/'.$productId) : '#');
@@ -64,9 +63,9 @@
         @endif
 
         @if ($soldOut)
-            <span class="absolute top-2 right-2 rounded-full bg-rose-100 px-2.5 py-1 text-xs font-semibold text-rose-800 dark:bg-rose-500/20 dark:text-rose-300">Tükendi</span>
+            <span class="absolute top-2 right-2 rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-rose-700 shadow-md ring-1 ring-rose-200 dark:text-rose-700">Tükendi</span>
         @elseif ($lowStock)
-            <span class="absolute top-2 right-2 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-500/20 dark:text-amber-300">Son {{ $stock }}</span>
+            <span class="absolute top-2 right-2 rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-amber-700 shadow-md ring-1 ring-amber-200 dark:text-amber-700">Son {{ $stock }}</span>
         @endif
     </a>
 
@@ -90,18 +89,43 @@
     {{-- Kart içeriği --}}
     <div class="flex flex-1 flex-col p-4 sm:p-5">
         <a href="{{ $href }}" class="mb-1">
-            <h3 class="line-clamp-2 font-semibold text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-slate-100 dark:group-hover:text-indigo-400">
+            <h3 class="line-clamp-2 text-sm font-semibold text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-slate-100 dark:group-hover:text-indigo-400">
                 {{ $name }}
             </h3>
         </a>
 
-        <p class="mb-4 line-clamp-2 flex-1 text-sm text-slate-500 dark:text-slate-400">
-            {{ $description }}
-        </p>
+        {{-- Değerlendirme özeti (etiket rozetlerinin hemen üstünde) --}}
+        @php
+            $ratingCount = (int) ($product['reviews_count'] ?? 0);
+            $ratingValue = isset($product['rating']) && $product['rating'] !== null ? (float) $product['rating'] : null;
+        @endphp
+        @if ($ratingCount > 0 && $ratingValue !== null)
+            <div class="mb-1 flex flex-wrap items-center gap-1" data-testid="card-rating" aria-label="Değerlendirme: {{ number_format($ratingValue, 1, '.', '') }} / 5, {{ $ratingCount }} değerlendirme">
+                <span class="flex items-center" aria-hidden="true">
+                    @for ($i = 1; $i <= 5; $i++)
+                        <svg class="h-3.5 w-3.5 {{ $i <= (int) round($ratingValue) ? 'text-amber-400' : 'text-slate-300 dark:text-slate-600' }}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.363-1.118l-2.8-2.034c-.784-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                    @endfor
+                </span>
+                <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">{{ number_format($ratingValue, 1, '.', '') }}</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400">({{ $ratingCount }})</span>
+            </div>
+        @endif
+
+        {{-- Etiket rozetleri (ürün adının altında, minimalist küçük harf) --}}
+        @php
+            $tagBadges = collect($product['tags'] ?? [])->filter()->take(3)->values();
+        @endphp
+        @if ($tagBadges->isNotEmpty())
+            <div class="mb-1.5 flex flex-wrap gap-1" data-testid="card-tags">
+                @foreach ($tagBadges as $tag)
+                    <span class="rounded bg-white px-1.5 py-0.5 text-[10px] font-medium lowercase tracking-wide text-slate-600 shadow-md ring-1 ring-slate-200 dark:text-slate-700">{{ $tag }}</span>
+                @endforeach
+            </div>
+        @endif
 
         <div class="mt-auto flex flex-wrap items-end justify-between gap-x-3 gap-y-2 border-t border-slate-100 pt-3 dark:border-slate-800">
             <div>
-                <span class="text-lg font-bold text-slate-900 dark:text-white">{{ $price ?? '—' }}</span>
+                <span class="text-sm font-bold text-slate-900 dark:text-white">{{ $price ?? '—' }}</span>
                 <span class="block text-xs text-slate-500 dark:text-slate-400">{{ $stockLabel }}</span>
             </div>
 

@@ -93,6 +93,7 @@ class ProductPage extends Component
             'variants.prices.currency',
             'urls',
             'collections.urls',
+            'tags',
         ])
             ->where('status', 'published')
             ->whereHas('urls', fn ($query) => $query->where('slug', $slug))
@@ -109,6 +110,7 @@ class ProductPage extends Component
             'name' => (string) ($product->translateAttribute('name') ?? ''),
             'description' => (string) ($product->translateAttribute('description') ?? ''),
             'image_url' => $media->first()?->getUrl(),
+            'tags' => $product->tags->pluck('value')->all(),
             'price' => null,
             'stock' => null,
             'variant_id' => null,
