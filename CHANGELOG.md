@@ -4,7 +4,30 @@
 
 ## [Unreleased]
 
-Sepet ve sipariş durumu düzeltmeleri (stok sınırı, ödeme etiketi, karanlık mod)
+## [v1.4.0](https://github.com/exportdepo/lunar-exportdepo/releases/tag/v1.4.0) — 2026-09-23
+
+Gelişmiş Koleksiyon Filtreleri, Etiketler ve Ürün Değerlendirmeleri (Phase 12)
+
+### Yenilikler
+
+* **Gelişmiş koleksiyon filtreleri** — Aynı ada sahip ürün seçenekleri (Renk, Beden) tek checkbox grubunda birleşir: grup içinde seçilenler OR, gruplar arası AND uygulanır. Marka ve etiket filtreleri çoklu seçimli (OR); koleksiyonda hiç eşleşmesi olmayan filtre grubu gizlenir. Fiyat/yenilik sıralaması ve filterable öznitelik filtresi eklenir; tüm filtreler başlangıçta kapalı açılır menü (accordion) grupları olarak sunulur ve okunabilir URL parametreleriyle paylaşılabilir (`q`, `brand`, `tags`, `options`, `attrs`, `sort`).
+* **Ürün kartlarında etiket ve değerlendirme özeti** — Ürün kartlarında, istek listesinde ve ürün detay sayfasında ürün etiketleri rozet olarak; onaylanmış yorumlardan hesaplanan ortalama puan yıldız ve adetle gösterilir (yeni `StorefrontRatings` desteği).
+* **Panelde etiket yönetimi** — Filament panelindeki ürün listesine "Etiketler" kolonu (renk kodlu rozetler) ve etiket filtresi eklenir (`ProductResource`).
+* **Demo verisi** — Ürünler üç markaya (Lunar, Aurora, Nordika) deterministik dağıtılır; koleksiyon bazlı demo etiketleri idempotent biçimde eklenir.
+
+### Düzeltmeler ve Bakım
+
+* **Storefront animasyonları** — `anim-fade-up`/`stagger-in` belirme efektleri (`prefers-reduced-motion` emniyetiyle) ve navigasyonda soldan sağa açılan alt çizgi (`nav-underline`) eklenir; `bg-gradient-to-*` → `bg-linear-to-*` ve `aspect-[4/3]` → `aspect-4/3` (Tailwind v4).
+* **IDE bakımı** — Laravel yardımcı stub'ı eklenir (`stubs/ide/laravel-helpers.php`; çalışma zamanına etkisi yoktur).
+
+### Kalite
+
+* Tam suite: **153 test / 714 assertion** yeşil.
+* Filtre sistemi 14 senaryoyla güvence altında: seçenek gruplarının birleştirilmesi, çoklu seçim (OR/AND), marka/etiket/öznitelik filtreleri, sıralama, `#[Url]` hydration ve `clearFilters` davranışı.
+
+## [v1.3.6](https://github.com/exportdepo/lunar-exportdepo/releases/tag/v1.3.6) — 2026-09-23
+
+Sepet ve Sipariş Düzeltmeleri
 
 ### Yenilikler
 

@@ -1,7 +1,7 @@
 # ExportDepo E-Ticaret UI Yenileme ve Geliştirme Rehberi
 
-> **Durum:** Faz 1-11 + UI Cila Turu tamamlandı ve main'de · Sürümler: `v1.3.0` (Faz 1-6) + `v1.3.1` (Phase 7) + `v1.3.2` (Phase 8) + `v1.3.3` (Phase 9) + `v1.3.4` (Phase 10) + `v1.3.5` (Phase 11)
-> · Testler: 114 passed / 519 assertion · deprecation: 0 · Son güncelleme: 22.09.2026
+> **Durum:** Faz 1-12 + UI Cila Turu tamamlandı ve main'de · Sürümler: `v1.3.0` (Faz 1-6) + `v1.3.1` (Phase 7) + `v1.3.2` (Phase 8) + `v1.3.3` (Phase 9) + `v1.3.4` (Phase 10) + `v1.3.5` (Phase 11) + `v1.3.6` (sepet/sipariş düzeltmeleri) + `v1.4.0` (Phase 12)
+> · Testler: 153 passed / 714 assertion · deprecation: 0 · Son güncelleme: 23.09.2026
 
 Sevgili Cline, 
 Bu belge, storefront arayüzü yenileme çalışmasının canlı yol haritasıdır: tamamlanan fazlar, kanıtlanmış çalışma kuralları ve sonraki fazlar burada takip edilir. Lütfen aşağıdaki kurallara ve fazlara sıkı sıkıya bağlı kalarak geliştirmeleri yap.
@@ -40,6 +40,7 @@ Bu belge, storefront arayüzü yenileme çalışmasının canlı yol haritasıd�
 | Phase 9 | `1c6f81a` + `a55e5a9` + `79b6944` | Performans ve SEO: 7 görsel konumunda width/height + decoding=async (CLS güvenliği), sayfa bazlı title/description (layoutData), Open Graph + Twitter meta, PDP Product JSON-LD (KDV dahil fiyat + stok durumu), /sitemap.xml + robots.txt + 2 test; build denetimi: CSS 77.86 kB / JS 52.11 kB (gzip 13/19.7) — kod bölme gereksiz kararı |
 | Phase 10 | `22981eb` | Marka tutarliligi + e-posta koyu mod: 5 noktada Lunar Shop → ExportDepo (e-posta baslik/footer, login/register aciklamalari + test guncellemesi ve kalinti guvencesi), color-scheme meta + prefers-color-scheme dark medya sorgulari, dark-mode sema testi (7 test / 20 assertion). i18n: tam migrasyon ERTELENDI |
 | Phase 11 | `3e72a28` + `d71d3a5` | Müşteri yönetimi + storefront cilası: panelde `CustomerResource` (List/Create/Edit/View sayfaları), FK kısıtından düşen müşteri silmesi için `DeleteCustomers` servisi (pivot + adres temizliği; sipariş geçmişi korunup `customer_id` null'a çekilir, sepetler silinmez), `CustomerDeleteTest` ile tekli/çoklu silme doğrulaması; sepet/ürün sayfa dokunuşları, `app.css` genişlemesi, istek listesi buton metni düzeltmesi |
+| Phase 12 | `e6b8db3`→`c91bfe0` | Gelişmiş PLP filtreleri: aynı adlı option'ların tek grupta birleşmesi (grup içi OR, gruplar arası AND), çoklu seçim marka/etiket filtreleri, fiyat/yenilik sıralaması, filterable öznitelik filtresi, başlangıçta kapalı accordion grupları, okunabilir URL senkronu; ürün kartlarında etiket + değerlendirme özeti (`StorefrontRatings`); panelde etiket kolonu/filtresi (`ProductResource`); 3 markalı + etiketli idempotent demo verisi; storefront belirme animasyonları + Tailwind v4 gradient rename |
 
 *Not: Faz 5 view'ları Python/PowerShell betikleriyle yazıldığı için Türkçe karakterler
 ASCII'ye düşmüş, bazı Tailwind sınıfları ve bir SVG path'i bozulmuştu; 5d-5e ve hotfix
@@ -96,6 +97,17 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
 - Storefront cilası: cart/product sayfa dokunuşları, `app.css` genişlemesi,
   wishlist buton metni düzeltmesi (`İstek Listesine Ekle` → `İstek listesine ekle`)
 
+### Phase 12: Gelişmiş Filtreler, Etiketler ve Değerlendirmeler (tamamlandı 23.09.2026)
+- PLP filtre sistemi: aynı ada sahip option'lar (ürün başına yaratılan "Renk"/"Beden"
+  tanımları) tek checkbox grubunda birleşir — grup içi OR, gruplar arası AND;
+  marka ve etiket filtreleri çoklu seçimli; koleksiyonda eşleşmesi olmayan grup
+  gizlenir; fiyat/yenilik sıralaması ve filterable öznitelik filtresi; tüm gruplar
+  başlangıçta kapalı accordion; filtre durumu okunabilir URL parametreleriyle
+  paylaşılır (`q`, `brand`, `tags`, `options`, `attrs`, `sort`)
+- Vitrin genelinde ürün etiketleri + onaylı yorumlardan hesaplanan puan özeti
+  (`StorefrontRatings`); panelde ürün listesine etiket kolonu ve filtresi
+- Demo verisi: 3 markaya deterministik dağıtım + koleksiyon bazlı etiketler
+
 ## 7. Sürüm Kararları (kullanıcı onayına bağlı)
 - `ui-refactor` 21.09.2026'da `origin/ui-refactor`'a push edildi (upstream takibi kuruldu)
 - **Uygulandı (21-22.09.2026):** `v1.3.0` (Faz 1-6, `3ebb38f`) + `v1.3.1` (Phase 7,
@@ -104,6 +116,9 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
   Türkçe release notlarıyla GitHub Releases'te yayında (`v1.3.4` Latest)
 - `v1.3.5` (Phase 11, `f80e071`) 22.09.2026'da eklendi: müşteri yönetimi
   (`CustomerResource` + `DeleteCustomers` servisi) ve storefront cilası
+- `v1.3.6` (sepet/sipariş düzeltmeleri) ve `v1.4.0` (Phase 12, `c91bfe0`)
+  23.09.2026'da eklendi: gelişmiş koleksiyon filtreleri, etiketler ve
+  ürün değerlendirmeleri
 - **Release yayını otomatikleşti (22.09.2026):** `v*` tag push'unda
   `.github/workflows/release.yml` çalışır; Türkçe notları CHANGELOG.md'deki
   sürüm bölümünden alır (yoksa tag mesajı, o da yoksa otomatik notlar) ve
