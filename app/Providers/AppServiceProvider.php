@@ -3,12 +3,15 @@
 namespace App\Providers;
 
 use App\PaymentTypes\StripePayment;
+use App\Support\RelationManagers\MediaRelationManager;
 use App\Support\WishlistManager;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
+use Livewire\Mechanisms\ComponentRegistry;
 use Lunar\Admin\LunarPanelManager;
 use Lunar\Facades\Payments;
 
@@ -62,6 +65,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->registerMediaRelationManagerComponent();
+
         Payments::extend('stripe', fn ($app) => $app->make(StripePayment::class));
 
         // Misafirken oturumda oluşturulan istek listesini, kullanıcı giriş
@@ -86,6 +91,32 @@ class AppServiceProvider extends ServiceProvider
                 $this->safeRegister(app(LunarPanelManager::class));
             });
         }
+    }
+
+    /**
+     * Ürün medya sekmesindeki ilişki yöneticisi bileşenini Livewire'a kaydeder.
+     *
+     * Filament, panel kurulurken ilişki yöneticilerini
+     * `Resource::getRelations()` listesinden kaydeder (Panel\Concerns\HasComponents
+     * -> registerLivewireComponents). Lunar'ın ProductResource'ı bu metodu
+     * override etmediği için taban sınıfın `[]` değeri kullanılır ve hiçbir ürün
+     * ilişki yöneticisi kaydedilmez. Sayfa ilk render'da bileşeni çözebildiği
+     * için hata görünmez; ancak "Düzenle"/"Oluştur" gibi tablo eylemleri
+     * `livewire/update` isteğinde gönderildiğinde ComponentNotFoundException
+     * -> LivewireReleaseTokenMismatchException -> 419 Page Expired dönüyor.
+     *
+     * Bileşen adı Livewire'ın kendi türetmesiyle alınır; ad kayması olmaz.
+     */
+    private function registerMediaRelationManagerComponent(): void
+    {
+        if (! class_exists(MediaRelationManager::class)) {
+            return;
+        }
+
+        Livewire::component(
+            app(ComponentRegistry::class)->getName(MediaRelationManager::class),
+            MediaRelationManager::class,
+        );
     }
 
     private function safeRegister(LunarPanelManager $manager): void

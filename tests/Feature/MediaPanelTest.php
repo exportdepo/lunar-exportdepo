@@ -119,6 +119,72 @@ class MediaPanelTest extends TestCase
         );
     }
 
+    public function test_media_table_action_survives_a_real_livewire_update_request(): void
+    {
+        // Filament, tablo eylemlerini (Düzenle / Oluştur) ilişki yöneticisinin
+        // Livewire bileşeni üzerinden çalıştırır. Bileşen panel kurulurken
+        // Resource::getRelations() listesinden kaydedilir; Lunar'ın
+        // ProductResource'ı bu metodu override etmediği için kayıt yapılmaz ve
+        // livewire/update isteğinde ComponentNotFoundException ->
+        // LivewireReleaseTokenMismatchException -> 419 döner.
+        //
+        // Bu test kasıtlı olarak Livewire::test() YERİNE gerçek HTTP
+        // /livewire/update isteği atar; test kütüphanesi bileşen kaydını
+        // atlattığı için 419 yalnızca bu yolla yakalanabiliyor.
+        $this->seed(DemoDataSeeder::class);
+
+        $product = $this->productBySlug('lunarbook-pro-14');
+        $media = $product->media()->orderBy('order_column')->first();
+
+        $this->actingAs($this->staff(), 'staff');
+
+        $html = $this->get('/exportdepo/products/'.$product->id.'/media')
+            ->assertOk()
+            ->getContent();
+
+        // İlişki yöneticisi bileşeninin snapshot'ını çıkar.
+        $snapshot = null;
+        preg_match_all('/wire:snapshot="([^"]+)"/', $html, $matches);
+
+        foreach ($matches[1] as $raw) {
+            $decoded = json_decode(html_entity_decode($raw, ENT_QUOTES), true);
+
+            if (is_array($decoded) && str_contains((string) ($decoded['memo']['name'] ?? ''), 'media-relation-manager')) {
+                $snapshot = $decoded;
+            }
+        }
+
+        $this->assertNotNull($snapshot, 'Medya ilişki yöneticisi bileşeni sayfada bulunamadı.');
+
+        // Filament v4, tablo eylem wire:key'ini md5(recordKey) olarak üretir.
+        preg_match('/actions\.edit\.([0-9a-f]{32})/', $html, $keyMatch);
+        $this->assertNotEmpty($keyMatch[1] ?? null, 'Medya tablosunda düzenleme eylemi bulunamadı.');
+
+        $response = $this->post('/livewire/update', [
+            '_token' => csrf_token(),
+            'components' => [[
+                'snapshot' => json_encode($snapshot),
+                'updates' => [],
+                'calls' => [[
+                    'path' => '',
+                    'method' => 'mountTableAction',
+                    'params' => ['edit', $keyMatch[1]],
+                ]],
+            ]],
+        ], [
+            'X-Livewire' => 'true',
+            'Referer' => '/exportdepo/products/'.$product->id.'/media',
+        ]);
+
+        $this->assertNotSame(
+            419,
+            $response->getStatusCode(),
+            'Medya düzenleme modalı 419 (Page Expired) döndü; ilişki yöneticisi bileşeni Livewire\'a kayıtlı değil.'
+        );
+
+        $response->assertOk();
+    }
+
     private function staff(): Staff
     {
         return Staff::factory()->create(['admin' => true]);
