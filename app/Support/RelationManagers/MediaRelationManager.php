@@ -41,7 +41,6 @@ class MediaRelationManager extends LunarMediaRelationManager
                 ->storeFiles(false)
                 ->imageEditor()
                 // Yeni medya eklerken zorunlu, düzenleme sırasında isteğe bağlı.
-                ->required(fn (string $operation): bool => $operation === 'create')
                 ->imageEditorAspectRatios([
                     null,
                     '16:9',
@@ -56,26 +55,46 @@ class MediaRelationManager extends LunarMediaRelationManager
         $table = parent::getDefaultTable($table);
 
         // Conversion üretilmemişse orijinal görsele düş (boş kolon yerine görsel).
-        $table->columns(array_map(function ($column) {
-            if ($column instanceof ImageColumn && $column->getName() === 'image') {
-                $column->state(fn (Media $record): string => $record->getAvailableUrl(['small']));
-            }
+        $columns = $table->getColumns();
 
-            return $column;
-        }, $table->getColumns()));
+        $columns['image'] = ImageColumn::make('image')
+            ->state(fn (Media $record): string => $record->getAvailableUrl(['small']))
+            ->label(__('lunarpanel::relationmanagers.medias.table.image.label'));
+
+        $table->columns($columns);
 
         // Düzenleme aksiyonu: yeni dosya seçildiyse mevcut görseli değiştir.
-        $table->recordActions(array_map(function ($action) {
-            if (! $action instanceof EditAction) {
-                return $action;
-            }
+        // Filament v4'te `recordActions()` ikinci çağrıda aksiyonları sıfırlar;
+        // bu yüzden mevcut liste korunarak yalnızca `edit` değiştirilir.
+        $actions = $table->getRecordActions();
 
-            return $action->after(function (array $data, Media $record) {
-                if ($this->replaceMediaFile($data, $record)) {
+        $actions['edit'] = EditAction::make()
+            ->mutateDataUsing(function (array $data, Media $record): array {
+                $data['custom_properties'] = array_merge(
+                    $record->custom_properties ?? [],
+                    $data['custom_properties'] ?? [],
+                );
+
+                return $data;
+            })
+            ->using(function (array $data, Media $record) {
+                $replaced = $this->replaceMediaFile($data, $record);
+
+                // Lunar varsayılan düzenleme davranışını koru (model güncelleme;
+                // dosya alanı Media modelinde kolon olmadığı için hariç tutulur).
+                $record->update(collect($data)->except('media')->all());
+
+                if ($replaced) {
                     ModelMediaUpdated::dispatch($this->getOwnerRecord());
                 }
-            });
-        }, $table->getRecordActions()));
+            })
+            ->after(
+                fn () => ModelMediaUpdated::dispatch(
+                    $this->getOwnerRecord()
+                )
+            );
+
+        $table->recordActions($actions);
 
         return $table;
     }
