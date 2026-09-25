@@ -2,19 +2,45 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\ProductResource\Pages\ManageProductMedia;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Lunar\Admin\Filament\Resources\ProductResource as LunarProductResource;
+use Lunar\Admin\Filament\Resources\ProductResource\Pages\ManageProductMedia as LunarManageProductMedia;
 use Lunar\Models\Tag;
 
 /**
  * Lunar ProductResource override'ı: panel ürün listesine "Etiketler"
- * kolonu ve etiket filtresi ekler. Diğer tüm davranış Lunar varsayılanıdır.
+ * kolonu ve etiket filtresi ekler; medya sayfasında düzenleme sırasında
+ * görsel değiştirmeye izin veren kendi sayfamızı kullanır.
  */
 class ProductResource extends LunarProductResource
 {
+    /**
+     * Medya sayfasını kendi sayfamızla değiştirir (edit modunda dosya değiştirme).
+     */
+    public static function getDefaultPages(): array
+    {
+        $pages = parent::getDefaultPages();
+
+        $pages['media'] = ManageProductMedia::route('/{record}/media');
+
+        return $pages;
+    }
+
+    /**
+     * Alt navigasyondaki medya sekmesi kendi sayfamıza işaret etsin.
+     */
+    public static function getDefaultSubNavigation(): array
+    {
+        return array_map(
+            fn (string $page): string => $page === LunarManageProductMedia::class ? ManageProductMedia::class : $page,
+            parent::getDefaultSubNavigation(),
+        );
+    }
+
     public static function getLunarTableColumns(): array
     {
         return LunarProductResource::getTableColumns();

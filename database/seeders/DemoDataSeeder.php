@@ -586,9 +586,27 @@ class DemoDataSeeder extends Seeder
                 ['slug' => $col['handle'], 'default' => true]
             );
 
-            // Koleksiyona ilk ürünün svg'sini kapak görseli olarak ekle
+            // Kapak görseli: gerçek fotoğraf (photos/koleksiyon-{handle}.jpg) varsa
+            // önceliklidir; eski SVG kapak kaldırılır. JPG yoksa ilk ürünün SVG'si
+            // fallback olarak eklenir (her ikisi de idempotent).
+            $coverPath = public_path("images/demo/photos/koleksiyon-{$col['handle']}.jpg");
+            $coverName = basename($coverPath);
             $firstProduct = collect($this->products)->firstWhere('collection', $col['handle']);
-            if ($firstProduct) {
+
+            if (file_exists($coverPath)) {
+                if ($firstProduct) {
+                    $collection->media()
+                        ->where('file_name', "{$firstProduct['slug']}.svg")
+                        ->delete();
+                }
+
+                if (! $collection->media()->where('file_name', $coverName)->exists()) {
+                    $collection->addMedia($coverPath)
+                        ->preservingOriginal()
+                        ->usingName($col['name'])
+                        ->toMediaCollection('images');
+                }
+            } elseif ($firstProduct) {
                 $imgPath = public_path("images/demo/{$firstProduct['slug']}.svg");
                 if (file_exists($imgPath) && $collection->media()->count() === 0) {
                     $collection->addMedia($imgPath)
@@ -1044,12 +1062,54 @@ class DemoDataSeeder extends Seeder
     }
 
     /**
-     * Ürüne tüm demo görsellerini (ana + 2 varyant) ekler; var olanları tekrar eklemez.
+     * Ürüne demo görselini ekler; var olan medyayı tekrar eklemez (idempotent).
+     *
+     * Öncelik: `images/demo/photos/{slug}.jpg` (+ `.jpg` uzantılı `-gorsel-2`,
+     * `-gorsel-3` varyantları) gerçek fotoğraflar varsa galeri 3 JPG'den kurulur
+     * ve SVG placeholder medyaları kaldırılır. Hiç JPG yoksa eski SVG galerisi
+     * (ana + 2 varyant) fallback olarak korunur.
+     *
+     * @param  array<string, mixed>  $p
      */
     protected function attachProductMedia(Product $product, array $p): void
     {
+        $photoPath = public_path("images/demo/photos/{$p['slug']}.jpg");
+
+        if (file_exists($photoPath)) {
+            // Gerçek fotoğraf mevcut: placeholder medyaları temizle ve
+            // ana görsel + varsa 2 JPG varyantı galeri olarak ekle.
+            $product->media()
+                ->whereIn('file_name', [
+                    "{$p['slug']}.svg",
+                    "{$p['slug']}-gorsel-2.svg",
+                    "{$p['slug']}-gorsel-3.svg",
+                ])
+                ->delete();
+
+            foreach (['', '-gorsel-2', '-gorsel-3'] as $suffix) {
+                $variantPath = public_path("images/demo/photos/{$p['slug']}{$suffix}.jpg");
+
+                if (! file_exists($variantPath)) {
+                    continue;
+                }
+
+                $fileName = "{$p['slug']}{$suffix}.jpg";
+
+                if ($product->media()->where('file_name', $fileName)->exists()) {
+                    continue;
+                }
+
+                $product->addMedia($variantPath)
+                    ->preservingOriginal()
+                    ->usingName($p['name'].($suffix !== '' ? ' '.trim(str_replace('-', ' ', $suffix)) : ''))
+                    ->toMediaCollection('images');
+            }
+
+            return;
+        }
+
+        // Fallback: eski SVG placeholder galerisi (ana + 2 varyant).
         $variants = ['', '-gorsel-2', '-gorsel-3'];
-        $added = 0;
 
         foreach ($variants as $suffix) {
             $imgPath = public_path("images/demo/{$p['slug']}{$suffix}.svg");
@@ -1071,7 +1131,6 @@ class DemoDataSeeder extends Seeder
                 ->preservingOriginal()
                 ->usingName($p['name'].($suffix !== '' ? ' '.trim(str_replace('-', ' ', $suffix)) : ''))
                 ->toMediaCollection('images');
-            $added++;
         }
     }
 

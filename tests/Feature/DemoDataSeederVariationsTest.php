@@ -2,11 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Livewire\Storefront\ProductPage;
 use Database\Seeders\DemoDataSeeder;
+use Illuminate\Support\Facades\DB;
+use Livewire\Livewire;
+use Lunar\Models\Collection as ProductCollection;
 use Lunar\Models\Product;
 use Lunar\Models\ProductOption;
 use Lunar\Models\ProductOptionValue;
 use Lunar\Models\ProductVariant;
+use Lunar\Models\Url;
 use Tests\TestCase;
 
 /**
@@ -94,6 +99,139 @@ class DemoDataSeederVariationsTest extends TestCase
         $this->assertNotNull($product);
         $this->assertSame(0, $product->productOptions()->count());
         $this->assertSame(1, $product->variants()->count());
+    }
+
+    public function test_seeder_attaches_real_photos_instead_of_svg_placeholders(): void
+    {
+        $this->seed(DemoDataSeeder::class);
+
+        $slugs = [
+            'lunarbook-pro-14', 'kablosuz-mouse', 'mekanik-klavye', 'bluetooth-kulaklik', 'akilli-saat',
+            'premium-pamuk-tisort', 'yaz-elbisesi', 'slim-fit-kot', 'spor-ayakkabi', 'yun-kazak',
+            'otomatik-kahve-makinesi', 'seramik-tava-seti', 'bel-yastigi', 'led-masa-lambasi', 'seramik-saksi',
+        ];
+
+        foreach ($slugs as $slug) {
+            $product = $this->productBySlug($slug);
+            $this->assertNotNull($product, "{$slug} ürünu seed edilmemiş.");
+
+            // Galeri 3 gerçek fotoğraftan oluşur (thumbnail şeridi için şart).
+            foreach (['', '-gorsel-2', '-gorsel-3'] as $suffix) {
+                $this->assertFileExists(
+                    public_path("images/demo/photos/{$slug}{$suffix}.jpg"),
+                    "{$slug} için photos/ varyant fotoğrafı olmalı."
+                );
+                $this->assertContains(
+                    "{$slug}{$suffix}.jpg",
+                    $product->media()->pluck('file_name')->all(),
+                    "{$slug} için photos/{$slug}{$suffix}.jpg medyası eklenmemiş."
+                );
+            }
+
+            // Placeholder medya kalmamış olmalı.
+            $this->assertNotContains(
+                "{$slug}.svg",
+                $product->media()->pluck('file_name')->all(),
+                "{$slug} için SVG placeholder medyası kaldırılmamış."
+            );
+        }
+    }
+
+    public function test_seeder_photos_meet_minimum_resolution(): void
+    {
+        $this->seed(DemoDataSeeder::class);
+
+        $slugs = [
+            'lunarbook-pro-14', 'kablosuz-mouse', 'mekanik-klavye', 'bluetooth-kulaklik', 'akilli-saat',
+            'premium-pamuk-tisort', 'yaz-elbisesi', 'slim-fit-kot', 'spor-ayakkabi', 'yun-kazak',
+            'otomatik-kahve-makinesi', 'seramik-tava-seti', 'bel-yastigi', 'led-masa-lambasi', 'seramik-saksi',
+        ];
+
+        foreach ($slugs as $slug) {
+            // Ana görsel PDP galerisinde büyük gösterilir: en az 1000px olmalı.
+            $main = getimagesize(public_path("images/demo/photos/{$slug}.jpg"));
+            $this->assertGreaterThanOrEqual(
+                1000,
+                $main[0],
+                "{$slug} ana fotoğrafı en az 1000px genişliğinde olmalı (ölçülen: {$main[0]}px)."
+            );
+
+            // Thumbnail varyantları en az 800px olmalı.
+            foreach (['-gorsel-2', '-gorsel-3'] as $suffix) {
+                $variant = getimagesize(public_path("images/demo/photos/{$slug}{$suffix}.jpg"));
+                $this->assertGreaterThanOrEqual(
+                    800,
+                    $variant[0],
+                    "{$slug}{$suffix} fotoğrafı en az 800px genişliğinde olmalı (ölçülen: {$variant[0]}px)."
+                );
+            }
+
+            // Vitrine servis edilen storage kopyası da güncel çözünürlükte olmalı
+            // (kaynak dosya büyütülüp yeniden seed edilmezse mağaza bulanık kalır).
+            $media = $this->productBySlug($slug)->media()->where('file_name', "{$slug}.jpg")->first();
+            $this->assertNotNull($media, "{$slug} için ana medya kaydı bulunamadı.");
+
+            $storedPath = $media->getPath();
+            $this->assertFileExists($storedPath, "{$slug} için storage kopyası bulunamadı.");
+
+            $stored = getimagesize($storedPath);
+            $this->assertNotFalse($stored, "{$slug} için medya dosyası okunamadı.");
+            $this->assertGreaterThanOrEqual(
+                1000,
+                $stored[0],
+                "{$slug} için storage'daki ana görsel düşük çözünürlüklü (ölçülen: {$stored[0]}px)."
+            );
+        }
+    }
+
+    public function test_product_page_gallery_exposes_three_images_for_thumbnails(): void
+    {
+        $this->seed(DemoDataSeeder::class);
+
+        $component = Livewire::test(ProductPage::class, ['slug' => 'premium-pamuk-tisort']);
+
+        $images = array_filter($component->get('images'), fn ($image) => ! empty($image['url']));
+
+        // Blade thumbnail şeridini count($images) > 1 iken gösterir.
+        $this->assertGreaterThanOrEqual(3, count($images), 'PDP galerisi thumbnail için en az 3 görsel sunmalı.');
+    }
+
+    public function test_seeder_attaches_photo_covers_to_collections(): void
+    {
+        $this->seed(DemoDataSeeder::class);
+
+        $collectionMorph = (new ProductCollection)->getMorphClass();
+
+        foreach (['elektronik', 'giyim', 'ev-yasam'] as $handle) {
+            $this->assertFileExists(
+                public_path("images/demo/photos/koleksiyon-{$handle}.jpg"),
+                "{$handle} koleksiyonu için kapak fotoğrafı olmalı."
+            );
+
+            $collectionId = Url::where('element_type', $collectionMorph)
+                ->where('slug', $handle)
+                ->value('element_id');
+
+            $this->assertNotNull($collectionId, "{$handle} koleksiyonu seed edilmemiş.");
+
+            $collection = ProductCollection::find($collectionId);
+            $this->assertContains(
+                "koleksiyon-{$handle}.jpg",
+                $collection->media()->pluck('file_name')->all(),
+                "{$handle} koleksiyonu için JPG kapak medyası eklenmemiş."
+            );
+        }
+    }
+
+    public function test_seeder_media_is_idempotent_across_runs(): void
+    {
+        $this->seed(DemoDataSeeder::class);
+
+        $mediaCount = DB::table('media')->count();
+
+        $this->seed(DemoDataSeeder::class);
+
+        $this->assertSame($mediaCount, DB::table('media')->count(), 'Tekrar seed medya çoğaltmamalı.');
     }
 
     private function productBySlug(string $slug): ?Product
