@@ -64,11 +64,9 @@ class MediaRelationManager extends LunarMediaRelationManager
         $table->columns($columns);
 
         // Düzenleme aksiyonu: yeni dosya seçildiyse mevcut görseli değiştir.
-        // Filament v4'te `recordActions()` ikinci çağrıda aksiyonları sıfırlar;
-        // bu yüzden mevcut liste korunarak yalnızca `edit` değiştirilir.
-        $actions = $table->getRecordActions();
-
-        $actions['edit'] = EditAction::make()
+        // Lunar'ın listesindeki 'edit' eylemini kendi EditAction'ımızla değiştiriyoruz
+        // (böylece tabloda çift 'Düzenle' oluşmaz, tek ve doğru eylem kalır).
+        $editAction = EditAction::make()
             ->mutateDataUsing(function (array $data, Media $record): array {
                 $data['custom_properties'] = array_merge(
                     $record->custom_properties ?? [],
@@ -94,7 +92,15 @@ class MediaRelationManager extends LunarMediaRelationManager
                 )
             );
 
-        $table->recordActions($actions);
+        $actions = array_map(function ($action) use ($editAction) {
+            if ($action instanceof EditAction || (is_object($action) && method_exists($action, 'getName') && $action->getName() === 'edit')) {
+                return $editAction;
+            }
+
+            return $action;
+        }, $table->getRecordActions());
+
+        $table->recordActions(array_values($actions));
 
         return $table;
     }
