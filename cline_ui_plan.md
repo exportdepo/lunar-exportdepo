@@ -47,6 +47,8 @@ ASCII'ye düşmüş, bazı Tailwind sınıfları ve bir SVG path'i bozulmuştu; 
 bunları temizledi. 20.09.2026 taraması: görünen metinlerde 0 bozuk Türkçe;
 Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
 
+| Sıcak Düzeltme | `f333e6a` | Header misafir üyelik menüsü: misafirde yan yana duran "Giriş Yap" + "Üye Ol" butonları kaldırıldı; yerine giriş yapmış menüyle aynı Alpine desenli (ikon + chevron, `open` durumu) tek kullanıcı ikonu açılır menüsü geldi. Panelde "Kayıt ol" başlığı altında `x-button` ile iki tam genişlik buton; `Esc`/dış tıklama ile kapanma, `aria-controls`/`aria-expanded`, `sm:` altı gizli. Mobil hamburger'de aynı başlık + buton hiyerarşisi. `HeaderGuestMenuTest` (2 test) + tam suite 178 test / 1145 assertion yeşil; editör aracıyla yazıldı (kural 1), Pint temiz |
+
 ## 4. Çalışma Kuralları (kanıtlanmış dersler)
 
 1. **View/blade metin değişiklikleri yalnızca editör aracıyla yapılır.** Shell betikleri
