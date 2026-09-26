@@ -5,6 +5,10 @@
       arama ikonla açılır ve ekran ortasında modal (popup) olarak belirir.
     - Masaüstü yerleşim: logo solda, nav ortada (absolute ortalama), aksiyonlar
       sağda; ikon sırası: arama, tema, istek listesi, sepet, kullanıcı en sağda.
+    - Üyelik menüsü: giriş yapmışken avatar + ad, misafirken kullanıcı ikonu
+      tetikler; her iki hâlde de aynı Alpine `open` deseni kullanılır. Misafir
+      menüsünde "Giriş Yap" ve "Üye Ol" butonları "Kayıt ol" başlığının
+      altında toplanır (mobil hamburger'da da aynı başlık + buton düzeni).
     - Mobilde hamburger menü (Alpine `mobileOpen` durumu) ile açılır panel.
     - Sepet düğmesi ve çekmece `livewire:storefront.cart-indicator` bileşenindedir;
       açılıp kapanma `$store.cartDrawer` Alpine store'u ile yönetilir.
@@ -97,8 +101,40 @@
                         </div>
                     </div>
                 @else
-                    <a href="{{ url('/giris') }}" class="hidden shrink-0 items-center rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-indigo-400 lg:inline-flex">Giriş Yap</a>
-                    <x-button size="sm" href="{{ url('/kayit') }}" class="hidden shrink-0 sm:inline-flex">Üye Ol</x-button>
+                    {{-- Misafir: kullanıcı ikonu açılır menüsü.
+                         Giriş/üyelik butonları "Kayıt ol" başlığının altında
+                         toplanır; tetikleyici giriş yapmış durumdaki menüyle
+                         aynı ikon + chevron dilini kullanır. --}}
+                    <div class="relative hidden shrink-0 sm:block" x-data="{ open: false }">
+                        <button type="button"
+                                @click="open = !open"
+                                @keydown.escape.window="open = false"
+                                aria-controls="guest-auth-dropdown"
+                                :aria-expanded="open"
+                                aria-label="Giriş ve üyelik seçenekleri"
+                                title="Giriş ve üyelik seçenekleri"
+                                class="inline-flex h-9 shrink-0 items-center gap-0.5 rounded-lg py-0 pl-2.5 pr-1.5 text-slate-600 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-indigo-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div id="guest-auth-dropdown"
+                             x-show="open"
+                             x-transition.opacity.duration.150ms
+                             @click.outside="open = false"
+                             x-cloak
+                             class="absolute right-0 mt-3 w-64 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl dark:border-slate-700 dark:bg-slate-800">
+                            <p class="text-sm font-semibold text-slate-900 dark:text-white">Kayıt ol</p>
+                            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Üyelik ol, siparişlerinizi ve favorilerinizi takip edin.</p>
+                            <div class="mt-3 flex flex-col gap-2">
+                                <x-button block href="{{ url('/kayit') }}">Üye Ol</x-button>
+                                <x-button block variant="outline" href="{{ url('/giris') }}">Giriş Yap</x-button>
+                            </div>
+                        </div>
+                    </div>
                 @endauth
 
                 {{-- Hamburger (mobil) --}}
@@ -195,8 +231,12 @@
                         <button type="submit" class="w-full rounded-lg px-3 py-2 text-left text-rose-600 transition-colors hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/10">🚪 Çıkış Yap</button>
                     </form>
                 @else
-                    <a href="{{ url('/giris') }}" class="rounded-lg px-3 py-2 text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800">Giriş Yap</a>
-                    <x-button block href="{{ url('/kayit') }}" class="mt-1">Üye Ol</x-button>
+                    <p class="px-3 pt-1 text-sm font-semibold text-slate-900 dark:text-white">Kayıt ol</p>
+                    <p class="px-3 pb-1 text-xs text-slate-500 dark:text-slate-400">Üyelik ol, siparişlerinizi ve favorilerinizi takip edin.</p>
+                    <div class="mt-1 flex flex-col gap-2">
+                        <x-button block href="{{ url('/kayit') }}">Üye Ol</x-button>
+                        <x-button block variant="outline" href="{{ url('/giris') }}">Giriş Yap</x-button>
+                    </div>
                 @endauth
             </div>
         </div>

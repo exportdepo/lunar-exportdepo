@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 
+### Yenilikler
+
+* **Header misafir üyelik menüsü** — Misafir ziyaretçide header'da yan yana duran "Giriş Yap" ve "Üye Ol" butonları kaldırıldı; yerine giriş yapmış kullanıcı menüsüyle aynı Alpine desenini kullanan tek bir kullanıcı ikonu açılır menüsü geldi. Panelin **"Kayıt ol"** başlığı altında "Üye Ol" (primary) ve "Giriş Yap" (outline) butonları tam genişlikte toplanır. Menü `Esc` ve dışarı tıklama ile kapanır, `aria-controls`/`aria-expanded` ile duyurulur, `sm:` altında gizlenir (mobilde hamburger devrede). Mobil hamburger menüsünde de aynı başlık + buton hiyerarşisi uygulandı.
+
+### Kalite
+
+* Yeni `HeaderGuestMenuTest`: misafirde "Kayıt ol" başlığı ile `/kayit` ve `/giris` bağlantıları görünür, giriş yapıldığında menü render edilmez (2 test / 8 assertion).
+* Tam suite yeşil: **178 test / 1145 assertion**.
+
 ## [v1.4.0](https://github.com/exportdepo/lunar-exportdepo/releases/tag/v1.4.0) — 2026-09-23
 
 Gelişmiş Koleksiyon Filtreleri, Etiketler ve Ürün Değerlendirmeleri (Phase 12)
