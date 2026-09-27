@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+## [v1.5.0](https://github.com/exportdepo/lunar-exportdepo/releases/tag/v1.5.0) — 2026-09-28
+
+Kurumsal Sayfalar, Zengin Footer ve Panel Medya Düzeltmeleri
+
 ### Yenilikler
 
 * **Header misafir üyelik menüsü** — Misafir ziyaretçide header'da yan yana duran "Giriş Yap" ve "Üye Ol" butonları kaldırıldı; yerine giriş yapmış kullanıcı menüsüyle aynı Alpine desenini kullanan tek bir kullanıcı ikonu açılır menüsü geldi. Panelin **"Kayıt ol"** başlığı altında "Üye Ol" (primary) ve "Giriş Yap" (outline) butonları tam genişlikte toplanır. Menü `Esc` ve dışarı tıklama ile kapanır, `aria-controls`/`aria-expanded` ile duyurulur, `sm:` altında gizlenir (mobilde hamburger devrede). Mobil hamburger menüsünde de aynı başlık + buton hiyerarşisi uygulandı.
