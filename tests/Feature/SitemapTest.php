@@ -41,6 +41,11 @@ class SitemapTest extends TestCase
             ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
             ->assertSee('<urlset', false)
             ->assertSee(url('/'), false)
+            ->assertSee(url('/hakkimizda'), false)
+            ->assertSee(url('/iletisim'), false)
+            ->assertSee(url('/gizlilik'), false)
+            ->assertSee(url('/iade-degisim'), false)
+            ->assertSee(url('/sss'), false)
             ->assertSee(url('/urun/'.$product->urls->first()->slug), false)
             ->assertSee(url('/koleksiyon/'.$collection->urls->first()->slug), false);
     }

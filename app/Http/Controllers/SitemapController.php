@@ -14,6 +14,20 @@ class SitemapController extends Controller
             ['loc' => url('/'), 'lastmod' => null],
         ]);
 
+        // Kurumsal statik sayfalar
+        foreach ([
+            '/hakkimizda',
+            '/iletisim',
+            '/gizlilik',
+            '/iade-degisim',
+            '/sss',
+        ] as $path) {
+            $entries->push([
+                'loc' => url($path),
+                'lastmod' => null,
+            ]);
+        }
+
         Collection::query()
             ->with('urls')
             ->orderBy('id')

@@ -2,7 +2,12 @@
 @plugin "@tailwindcss/forms";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+
+/* Derlenmis view'lar (storage/framework/views) KASTEN taranmiyor.
+   2026-09-27 build karsilastirmasinda bu kaynak eklenince/eklenmedikce uretilen
+   CSS SHA-256 olarak birebir ayni cikti; satir hicbir sinfi katmiyor, yalnizca
+   test kosularindan biriken derlenmis view'larla CSS'i sisiriyordu.
+   Kaynak Blade'ler zaten asagida taranir. */
 @source "../**/*.blade.php";
 @source "../**/*.js";
 

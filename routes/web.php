@@ -13,6 +13,11 @@ use App\Livewire\Storefront\CollectionPage;
 use App\Livewire\Storefront\HomePage;
 use App\Livewire\Storefront\OrderStatusPage;
 use App\Livewire\Storefront\ProductPage;
+use App\Livewire\Storefront\AboutPage;
+use App\Livewire\Storefront\ContactPage;
+use App\Livewire\Storefront\FaqPage;
+use App\Livewire\Storefront\PrivacyPage;
+use App\Livewire\Storefront\ReturnsPage;
 use App\Livewire\Storefront\WishlistPage;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Http\Request;
@@ -25,6 +30,13 @@ Route::get('/koleksiyon/{slug}', CollectionPage::class)->name('collection.show')
 Route::get('/urun/{slug}', ProductPage::class)->name('product.show');
 Route::get('/sepet', CartPage::class)->name('cart');
 Route::get('/istek-listesi', WishlistPage::class)->name('wishlist');
+
+// Kurumsal sayfalar
+Route::get('/hakkimizda', AboutPage::class)->name('about');
+Route::get('/iletisim', ContactPage::class)->name('contact');
+Route::get('/gizlilik', PrivacyPage::class)->name('privacy');
+Route::get('/iade-degisim', ReturnsPage::class)->name('returns');
+Route::get('/sss', FaqPage::class)->name('faq');
 Route::get('/checkout', CheckoutPage::class)->name('checkout');
 Route::get('/siparis/{reference}', OrderStatusPage::class)
     ->name('order.show')

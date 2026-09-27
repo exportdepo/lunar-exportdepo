@@ -11,11 +11,13 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Livewire;
 use Lunar\Models\Language;
 use Lunar\Models\Product;
+use Tests\Concerns\CreatesStorefrontProduct;
 use Tests\Concerns\SeedsLunarDefaults;
 use Tests\TestCase;
 
 class WishlistTest extends TestCase
 {
+    use CreatesStorefrontProduct;
     use SeedsLunarDefaults;
 
     protected int $productId;
@@ -135,5 +137,31 @@ class WishlistTest extends TestCase
         // Taşıma sonrası oturum listesi temizlenir.
         $this->assertNull(session(WishlistManager::SESSION_KEY));
         $this->assertSame(1, WishlistManager::count());
+    }
+
+    public function test_adding_the_same_product_twice_still_refreshes_the_cart_notice(): void
+    {
+        // addToCart satın alma zincirine bağlıdır: vergi sınıfı, fiyat satırı,
+        // kanal ve müşteri grubu olmadan sessizce başarısız olur.
+        $product = $this->publishedProductWithVariant(stock: 5);
+        $this->productId = $product->id;
+
+        session([WishlistManager::SESSION_KEY => [$this->productId]]);
+
+        $component = Livewire::test(WishlistPage::class)
+            ->assertSet('addedCount', 0)
+            ->assertDontSee('Ürün sepete eklendi.');
+
+        $component->call('addToCart', $this->productId)
+            ->assertSet('addedCount', 1)
+            ->assertSee('Ürün sepete eklendi.');
+
+        // Aynı ürüne ikinci kez basmak da durumu değiştirmeli: sayaç 1'den
+        // 2'ye çıkıp wire:key'i değiştirdiği için Livewire düğümü yeniden
+        // kurar ve bildirim her seferinde yeniden işlenir.
+        $component->call('addToCart', $this->productId)
+            ->assertSet('addedCount', 2)
+            ->assertSee('Ürün sepete eklendi.')
+            ->assertSeeHtml('wire:key="wishlist-cart-alert-2"');
     }
 }

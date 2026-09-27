@@ -66,6 +66,25 @@ class StorefrontRoutesTest extends TestCase
             ->assertSee('cart-badge');
     }
 
+    public function test_homepage_footer_renders_rich_content(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Hızlı Teslimat')
+            ->assertSee('Güvenli Ödeme')
+            ->assertSee('14 Gün İade')
+            ->assertSee('7/24 Destek')
+            ->assertSee('Fırsatlardan ilk siz haberdar olun')
+            ->assertSee('Sepetim')
+            ->assertSee('Sipariş Takibi')
+            ->assertSee('newsletter-email')
+            ->assertSee('Kurumsal')
+            ->assertSee('Hakkımızda')
+            ->assertSee('Gizlilik ve KVKK')
+            ->assertSee('İade ve Değişim')
+            ->assertSee('Sıkça Sorulan Sorular');
+    }
+
     public function test_product_page_shows_enriched_sections(): void
     {
         $this->get('/urun/lunarbook-pro-14')

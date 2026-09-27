@@ -7,6 +7,13 @@
 ### Yenilikler
 
 * **Header misafir üyelik menüsü** — Misafir ziyaretçide header'da yan yana duran "Giriş Yap" ve "Üye Ol" butonları kaldırıldı; yerine giriş yapmış kullanıcı menüsüyle aynı Alpine desenini kullanan tek bir kullanıcı ikonu açılır menüsü geldi. Panelin **"Kayıt ol"** başlığı altında "Üye Ol" (primary) ve "Giriş Yap" (outline) butonları tam genişlikte toplanır. Menü `Esc` ve dışarı tıklama ile kapanır, `aria-controls`/`aria-expanded` ile duyurulur, `sm:` altında gizlenir (mobilde hamburger devrede). Mobil hamburger menüsünde de aynı başlık + buton hiyerarşisi uygulandı.
+* **Kurumsal sayfalar** — Hakkımızda, İletişim, Gizlilik (KVKK), İade & Değişim ve Sıkça Sorulan Sorular sayfaları eklendi; `/hakkimizda`, `/iletisim`, `/gizlilik`, `/iade-degisim`, `/sss` rotalarıyla sunulur. SSS sayfasında sorular Alpine accordion olarak açılıp kapanır (`aria-expanded` senkron). Tümü mobil öncelikli, koyu mod uyumlu ve atlama bağlantısına uyar.
+* **İletişim formu** — Ad, e-posta, konu ve mesaj alanlarıyla çalışan form; sunucu taraflı doğrulama, **honeypot** (bot koruması) ve 5 denemede bir **rate limit** içerir. Başarılı gönderimde form temizlenir ve onay gösterilir. Mesajlar `contact_messages` tablosuna `ip_address` ve `is_read` ile kaydedilir.
+* **Bülten aboneliği** — Footer'da e-posta abonelik formu; doğrulama, honeypot, rate limit ve `firstOrCreate` ile **çift kayıt engelleme** içerir. Aboneler `newsletter_subscribers` tablosunda tutulur.
+* **Zengin footer** — Güven bandı (4 hizmet rozeti), bülten bandı, marka/kategoriler/hesabım/sipariş takibi grid'i (sipariş takibi Alpine mini formu, backend gerektirmez) ve telif + ödeme yöntemi alt bandı. Stripe rozeti checkout ile aynı yapılandırma anahtarlarıyla denetlenir; yapılandırma yoksa yalnızca "Kapıda Ödeme" gösterilir. Zemin her temada koyu tutulur.
+* **Sepet çekmecesi otomatik açılmıyor** — Listeden/ürün sayfasından sepete eklemede çekmece artık otomatik açılmaz (`cart-added` olayı ve `app.js` köprüsü kaldırıldı); yalnızca sepet rozeti güncellenir. Kullanıcı çekmeceyi kendisi açar; bu, `header`'daki mouse-over durumunu ve kazara açılmaları giderir.
+* **Sitemap** — Kurumsal statik sayfalar (`/hakkimizda`, `/iletisim`, `/gizlilik`, `/iade-degisim`, `/sss`) sitemap'e eklendi.
+* **CSS tarama kaynağı** — `storage/framework/views` `@source` satırı kaldırıldı: derlenmiş view'lar üretilen CSS'e sınıf katmıyor, yalnızca test koşularından biriken dosyalarla CSS'i şişiriyordu (build karşılaştırmasında SHA-256 birebir aynıydı).
 
 ### Kalite
 

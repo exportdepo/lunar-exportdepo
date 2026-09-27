@@ -12,8 +12,10 @@ use Lunar\Models\ProductVariant;
  *
  * Ürün detay sayfasındaki (ProductPage::addToCart) akış ile aynı kuralları
  * izler: yalnızca yayında olan ürünün stokta olan ilk varyantı sepete eklenir.
- * Başarılı eklemede `cart-added` olayı yayılır; header'daki Alpine store bu
- * olayla sepet çekmecesini otomatik açar.
+ * Başarılı eklemede `cart-updated` olayı yayılır; header'daki sepet rozeti
+ * (CartIndicator) yeni adet ve tutarla güncellenir. Sepet yüzeyleri (hover
+ * popup kartı ve sağ çekmece) otomatik açılmaz; kullanıcı bunları hover/tıklama
+ * ile kendisi açar.
  */
 trait InteractsWithCart
 {
@@ -43,7 +45,6 @@ trait InteractsWithCart
         CartSession::manager()->add($variant, 1);
 
         $this->dispatch('cart-updated')->to(CartIndicator::class);
-        $this->dispatch('cart-added');
     }
 
     /**

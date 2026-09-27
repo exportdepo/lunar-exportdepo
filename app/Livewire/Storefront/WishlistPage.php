@@ -18,7 +18,16 @@ class WishlistPage extends Component
 
     public bool $isAuthenticated = false;
 
+    /** Son eklenen ürünün id'si (bildirim koşulunu besler). */
     public ?int $addedProductId = null;
+
+    /**
+     * Sepete ekleme sayacı. Aynı ürüne tekrar basıldığında Livewire
+     * $addedProductId değerini değiştirmediği için DOM diff'i boş
+     * kalır ve bildirim yeniden işlenmez; bu sayaç her eklemede
+     * arttığı için durum her zaman "değişti" sayılır.
+     */
+    public int $addedCount = 0;
 
     public function mount(): void
     {
@@ -69,6 +78,7 @@ class WishlistPage extends Component
         CartSession::manager()->add($variant, 1);
 
         $this->addedProductId = $productId;
+        $this->addedCount++;
         $this->dispatch('cart-updated');
     }
 

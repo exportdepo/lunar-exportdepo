@@ -565,7 +565,6 @@ class ProductPage extends Component
 
         $this->added = true;
         $this->dispatch('cart-updated')->to(CartIndicator::class);
-        $this->dispatch('cart-added');
     }
 
     protected function productVariant()

@@ -1,7 +1,8 @@
 # ExportDepo E-Ticaret UI Yenileme ve Geliştirme Rehberi
 
 > **Durum:** Faz 1-12 + UI Cila Turu tamamlandı ve main'de · Sürümler: `v1.3.0` (Faz 1-6) + `v1.3.1` (Phase 7) + `v1.3.2` (Phase 8) + `v1.3.3` (Phase 9) + `v1.3.4` (Phase 10) + `v1.3.5` (Phase 11) + `v1.3.6` (sepet/sipariş düzeltmeleri) + `v1.4.0` (Phase 12)
-> · Testler: 153 passed / 714 assertion · deprecation: 0 · Son güncelleme: 23.09.2026
+> · Testler: 178 test / 1145 assertion yeşil · deprecation: 0 · Son güncelleme: 27.09.2026
+> · Faz 13 (ürün kartı yenilemesi + slider) PLANLANDI — ayrıntı §6
 
 Sevgili Cline, 
 Bu belge, storefront arayüzü yenileme çalışmasının canlı yol haritasıdır: tamamlanan fazlar, kanıtlanmış çalışma kuralları ve sonraki fazlar burada takip edilir. Lütfen aşağıdaki kurallara ve fazlara sıkı sıkıya bağlı kalarak geliştirmeleri yap.
@@ -11,7 +12,7 @@ Bu belge, storefront arayüzü yenileme çalışmasının canlı yol haritasıd�
 - **Frontend Mimarisi:** Blade + Livewire (tam sayfa bileşenleri) + Alpine.js — React/Vue KULLANILMIYOR
 - **Stil Motoru:** Tailwind CSS v4 (Vite ile derleniyor; sınıf tabanlı dark mode)
 - **Gösterim standartları:** Heroicons (inline SVG) ikonlar; fiyatlar ₺ simgesiyle; URL slug'ları ASCII (`/giris`, `/hesabim`), görünen metinler düzgün Türkçe
-- **Kalite tabanı:** 103 test / 449 assertion — her faz sonunda yeşil kalmalı
+- **Kalite tabanı:** 178 test / 1145 assertion (güncel: `cline_ui_plan.md:4`) — her faz sonunda yeşil kalmalı
 
 ## 2. Tasarım Prensipleri (Modern & Dönüşüm Odaklı)
 - **Minimalizm:** Bol beyaz alan (whitespace) bırakılacak, içerik nefes alacak.
@@ -48,6 +49,8 @@ bunları temizledi. 20.09.2026 taraması: görünen metinlerde 0 bozuk Türkçe;
 Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
 
 | Sıcak Düzeltme | `f333e6a` | Header misafir üyelik menüsü: misafirde yan yana duran "Giriş Yap" + "Üye Ol" butonları kaldırıldı; yerine giriş yapmış menüyle aynı Alpine desenli (ikon + chevron, `open` durumu) tek kullanıcı ikonu açılır menüsü geldi. Panelde "Kayıt ol" başlığı altında `x-button` ile iki tam genişlik buton; `Esc`/dış tıklama ile kapanma, `aria-controls`/`aria-expanded`, `sm:` altı gizli. Mobil hamburger'de aynı başlık + buton hiyerarşisi. `HeaderGuestMenuTest` (2 test) + tam suite 178 test / 1145 assertion yeşil; editör aracıyla yazıldı (kural 1), Pint temiz |
+| Phase 13 | *bekliyor* | **Ürün kartı yenilemesi + slider (TÜM sayfalar)**: istek listesindeki elle yazılmış kart ortak `x-product-card`'a bağlandı (test kancaları `testid` prefix prop'u ile korundu); `compare_price` KDV dahil okuma (`StorefrontPricing::comparePriceForVariantInclTax`); marka rozeti + kupon bandı + eski fiyat/indirim bloğu; `config/storefront.php`; Alpine + CSS scroll-snap slider (`product-grid` `mode="grid|rail"`, `Alpine.data('productRail')`); Faz B = gerçek `lunar_discounts` kampanya altyapısı (ayrı onay). Detay: §6 |
+
 
 ## 4. Çalışma Kuralları (kanıtlanmış dersler)
 
@@ -65,7 +68,7 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
 7. **Faz geçişi kullanıcı onayına bağlıdır**; ertelenen kararlar kayda geçer (ör. checkout
    `has-[:checked]` ödeme vurgusu — "şimdilik ekleme" kararı alındı).
 
-## 5. Mevcut Envanter (21.09.2026 doğrulaması)
+## 5. Mevcut Envanter (27.09.2026 doğrulaması)
 
 - **Bileşenler (10):** auth-card, button, cart-alert, cart-drawer, empty-state, header,
   input, product-card, textarea, layouts/app
@@ -73,15 +76,21 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
   `/istek-listesi`, `/checkout`, `/siparis/{reference}`, `/giris`, `/kayit`,
   `/sifremi-unuttum`, `/sifre-sifirlama/{token}`, `/hesabim`, `/hesabim/siparislerim`
   (ayrıca POST `/cikis`, POST `/stripe/webhook`)
-- **Testler:** 29 feature test dosyası / 116 test / 519 assertion — TODO-FIXME: 0
-  (22.09.2026 tam suite koşusunda `UNIQUE constraint failed: lunar_currencies.code`
-  tek seferlik flake görüldü; ilgili test tek başına yeşil — tohumlama/paralellik kaynaklı,
-  Phase 11 değişiklikleriyle ilgisiz)
+- **Testler:** 36 feature test dosyası / 178 test / 1145 assertion — TODO-FIXME: 0
+  (geçmişte `UNIQUE constraint failed: lunar_currencies.code` tek seferlik flake
+  görüldü; tohumlama/paralellik kaynaklı, Phase 11 değişiklikleriyle ilgisiz)
 - **Bilinen boşluklar:** `lang/` dizini yok (tüm metin view'larda gömülü — Phase 10'da tam migrasyon ERTELENDI, pilot secenegi: header/footer/auth);
   `emails/order-confirmation` şablonu tasarimli + koyu mod destekli (Phase 10); Phase 7 artıkları: gerçek cihazda
   manuel mobil QA, ölçümlü kontrast denetimi, modal/çekmecede focus-trap (ertelendi).
   Giderilenler (21.09.2026): `welcome.blade.php` silindi + uniqid() çakışması
   giderildi (Phase 6), checkout'a özel feature test eklendi (Phase 8)
+- **Faz 13 öncesi bilinen tekrarlar:** `wishlist-page.blade.php:50-134` kendi ürün
+  kartını elle yazıyordu (`x-product-card` kullanmıyor) — Phase 13 A1'de ortak
+  bileşene bağlanacak
+- **Faz 13 öncesi eksik altyapı:** `config/storefront.php` yok (A4'te oluşturulur);
+  `lunar_discounts` tablosu mevcut ama projede hiç kullanılmıyor (Faz B);
+  `compare_price` kolonu mevcut ama hep `null` ve hiç okunmuyor (A2'de bağlanır);
+  vitrinde slider/carousel kütüphanesi yok — Alpine + CSS scroll-snap (A5)
 
 ## 6. Sonraki Fazlar (her faz başlamadan kullanıcı onayı alınır)
 
@@ -109,6 +118,159 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
 - Vitrin genelinde ürün etiketleri + onaylı yorumlardan hesaplanan puan özeti
   (`StorefrontRatings`); panelde ürün listesine etiket kolonu ve filtresi
 - Demo verisi: 3 markaya deterministik dağıtım + koleksiyon bazlı etiketler
+
+### Phase 13: Ürün Kartı Yenilemesi ve Slider (PLANLANDI 27.09.2026)
+
+**Kullanıcı kararı:** Kart görseldeki düzene göre yenilenecek ve **slider** olacak.
+Kapsam: kart **TÜM sayfalarda** geçerli (vitrin + istek listesi). Önce **(A) UI katmanı**,
+sonra **(B) gerçek Lunar kampanya altyapısı** (ayrı faz, ayrı onay).
+
+**Yeni sohbete tek satır yeterli:**
+`cline_ui_plan.md` dosyasındaki **Phase 13** bölümünü oku ve uygula.
+
+#### A. UI Katmanı (bu faz)
+
+**A1 — Ortak kartın tek kaynağa indirilmesi**
+`resources/views/components/product-card.blade.php` içine iki prop eklenir:
+- `testid` (string, varsayılan `''`) — `data-testid` prefix'i; istek listesinde
+  `'wishlist-'` verilerek `wishlist-tags` / `wishlist-rating` kancaları korunur
+- `removeFromList` (bool, varsayılan `false`) — true → sol üstte çöp kutusu
+  (`wire:click="remove(...)"`), false → mevcut kalp (`wire:click="toggle(...)"`)
+
+`resources/views/livewire/storefront/wishlist-page.blade.php` → satır **50-134**
+arası elle yazılmış kart **silinir**, yerine `<x-product-card>` çağrılır.
+- `wire:key="wishlist-item-{{ $item['id'] }}"` korunur (Livewire diff)
+- Kart dışındaki `wire:key="wishlist-remove-..."` düğmesi de kaldırılır (bileşene taşınır)
+- **Gerekçe:** İstek listesi bugün `x-product-card` **kullanmıyor**; 85 satırlık
+  duplikasyon kaldırılırsa "tüm sayfalarda aynı kart" hedefi gerçekleşir.
+
+**A2 — `compare_price` desteği (altyapı zaten mevcut)**
+`app/Support/StorefrontPricing.php` → `comparePriceForVariantInclTax(ProductVariant): ?int`
+eklenir; mevcut `resolve()` kalıbı, `MissingCurrencyPriceException` / `Throwable`
+yakalaması **aynen korunur**. Kritik: `compare_price` Lunar'da **yalnızca `Price`
+modelinde** vardır; `PricingResponse.matched` zaten `Lunar\Models\Price` tipindedir
+→ `$matched->comparePriceIncTax($taxZone)` doğrudan çağrılabilir. **KDV dahil
+okunur** (`forVariantInclTax` ile aynı sözleşme), `->value` değil.
+
+Dört map noktasına alan düşer:
+- `app/Livewire/Storefront/HomePage.php:45` (mount)
+- `app/Livewire/Storefront/CollectionPage.php:428` (loadProducts)
+- `app/Support/WishlistManager.php:162` (products)
+- `app/Livewire/Storefront/ProductPage.php:113` (PDP — kart kullanmaz, dokunulmaz)
+
+İndirim yüzdesi **kart içinde** hesaplanır: `round((compare - price) / compare * 100)`.
+**A3 — Kartın görsele göre yeniden düzenlenmesi**
+Sıra: 1) sol üst marka rozeti (amber/orange, yuvarlak) · 2) sağ üst kalp
+(mevcut `left-2` → `right-2`) · 3) görsel (`aspect-square`) · 4) görsel altı
+kupon bandı (amber/orange) · 5) başlık `line-clamp-2` · 6) yıldız + puan + adet
+· 7) etiket rozetleri · 8) fiyat bloğu: eski fiyat `line-through` + yeşil `%30`
+etiketi + büyük yeni fiyat · 9) sepete ekle (ikon-only).
+
+Tüm yeni bloklar **`@if` koşullu** — veri yoksa render edilmez, mevcut düzen bozulmaz.
+`data-testid` kancaları **korunur**.
+
+Marka verisi: `Product::brand()` ilişkisi mevcut; seeder'da 3 marka var
+(`DemoDataSeeder.php:502-517`). Eksik olan yalnızca `with()` + map'e eklemek.
+
+**Renk kararı:** Kupon bandı ve marka rozeti amber/orange; fiyat vurgusu
+emerald/indigo; geri kalan **slate/indigo** mevcut sistemde kalır (§2 md:19
+kuralı: indigo primary, rose yalnızca istek listesi ve uyarıda).
+
+**A4 — `config/storefront.php` (yeni dosya; şu an YOK)**
+Kupon bandı / kampanya metinlerinin tek kaynağı. `cards.coupon_badge` ve
+`cards.campaign_line` anahtarları `enabled` / `text` / `tone` taşır.
+A fazında kart buradan okur; **B fazında okuma yeri yalnızca değişir** —
+kademeli geçiş ve geriye dönük uyum sağlanır.
+
+**A5 — Slider (Alpine + CSS scroll-snap, YENİ BAĞIMLILIK YOK)**
+`resources/views/livewire/storefront/partials/product-grid.blade.php` →
+`@props(['gridClasses' => ..., 'mode' => 'grid'])`; `grid` mevcut davranış,
+`rail` yatay kaydırma + oklar.
+`resources/js/app.js` → `Alpine.data('productRail', ...)`: `scrollBy(dir)`,
+`scrollLeft` takibi, `atStart`/`atEnd` → disabled, `prefers-reduced-motion`
+kontrolü. Mevcut `alpine:init` desenine eklenir (bkz. `app.js:10-15` ve `:29`/`:51`
+store'ları) — **ikinci Alpine örneği başlatılmaz**.
+`resources/css/app.css` → `.product-rail`: `scroll-snap-type: x mandatory`,
+kart `snap-start`, gizlenmiş scrollbar, kenar fade'i.
+`prefers-reduced-motion` emniyet ağı `app.css:70-79`'da **zaten var**.
+
+Kullanım: `home-page.blade.php:77` (Öne Çıkan) ve `:133` (Tüm Ürünler) → `rail`;
+`collection-page.blade.php:329` → `grid` kalır.
+
+**A6 — Doğrulama zinciri (kural 4, değiştirilemez)**
+`npm run build` → `php artisan view:clear` → `php artisan test`
+(178 test / 1145 assertion yeşil) → ASCII-artifact grepi (`grid-cols=`,
+`col-span=`, `chr(`, literal `icon="..."`, bozuk Türkçe kalıpları).
+
+**A7 — Yeni test:** `tests/Feature/ProductCardTest.php` — kartın 4 yerde aynı
+yapıyı render ettiği; `card-tags` / `card-rating` konum sırası korunuyor;
+`wishlist-` prefix kancaları çalışıyor; `compare_price` varsa eski fiyat + %
+etiketi, yoksa render edilmiyor; `mode="rail"` slider kabuğu + ok butonları,
+`mode="grid"` ızgara sınıfları.
+
+#### B. Gerçek Kampanya Altyapısı (ayrı faz, ayrı onay)
+
+B fazında A'nın kart yapısı korunur; **yalnızca `config/storefront.php` okuma
+yeri** değişir.
+
+- **B1 —** `app/Support/StorefrontCampaigns.php` (yeni) — `StorefrontRatings`
+  deseninde **N+1'siz** toplu okuma: tek sorguda aktif `lunar_discounts` +
+  `lunar_discountables` pivot (`discountable_type = product`).
+  `Discount::active()` scope'u; `AmountOff` için `data['percentage']` (yüzde)
+  ve `data['fixed_values']` (sabit tutar). Çıktı:
+  `['label' => 'Ek 50 TL Kupon', 'percent' => 10, 'coupon' => 'EK50TL', 'type' => ...]`
+- **B2 —** Kartta gösterilen indirim ile **sepete uygulanan indirim aynı
+  kaynaktan** gelmeli (`DiscountManager::getDiscounts()` ile aynı filtre).
+  Aksi halde kart "30% indirim" der, sepette başka rakam çıkar — **yasal risk**.
+- **B3 —** A2'deki üç map noktasına `campaign` alanı (tüm sayfalar kapsamı).
+- **B4 —** Sepet kupon akışı: `Cart::coupon_code` hazır (`Cart.php:59`, cast `:212`),
+  `DiscountManager::validateCoupon()` (`:274`). Kupon değişiminden sonra
+  **`Discounts::resetDiscounts()`** çağrılmalı (Lunar SKILL.md: "Discounts are
+  cached per request").
+- **B5 —** Panel için **kod yazılmaz**: `DiscountResource` Lunar ile geliyor
+  (`vendor/lunarphp/lunar/src/Filament/Resources/DiscountResource.php` +
+  `ManageDiscountAvailability/Limitations` + `ProductConditionRelationManager`).
+  Yalnızca `/lunar/discounts` listesinden kampanya oluşturma + ürüne bağlama
+  doğrulanır. Erişim reddedilirse `AppServiceProvider.php:46-60` desenine bakılır.
+- **B6 —** `DemoDataSeeder` → 2-3 gerçek `lunar_discounts` kaydı (yüzdesel +
+  kuponlu), `lunar_discountables` pivot ile ürünlere bağlı, idempotent.
+- **B7 —** A6 doğrulaması + `StorefrontCampaignsTest`: aktif/pasif filtresi,
+  yüzde hesabının sepetteki gerçek indirimle **eşleşmesi**, kupon görünürlüğü,
+  süresi dolmuş kampanya gösterilmiyor.
+
+#### Phase 13 Kritik Uyarıları
+
+1. **Test kancaları kırılabilir.** `tests/Feature/StorefrontTagsTest.php`
+   konum sırası iddiaları içerir: etiket rozeti başlıktan SONRA (`:42-46`),
+   puan satırı etiketlerinin ÜSTÜNDE (`:132-136`), aynısı wishlist varyantı
+   için (`:106`, `:181-190`). Kart DOM'u yeniden düzenlenirken bu sıra korunur;
+   `testid` prefix prop'u bu yüzden zorunludur.
+2. **Kural 1 ihlali sessiz bozulma yaratır** — Türkçe karakterler (₺, ş, ğ, ı)
+   ve SVG path'leri bozulur (Faz 5'te iki kez kanıtlandı). View metinleri
+   **yalnızca editör aracıyla** yazılır.
+3. **`compare_price` KDV dahil okunur** — `comparePriceIncTax()`; mevcut
+   `forVariantInclTax` sözleşmesiyle tutarlı olmalı.
+4. **N+1 tuzağı** — `StorefrontRatings.php:21` toplu sorgu deseni örnek alınır;
+   kart başına sorgu yasaktır.
+5. **Slider okları `overflow` tarafından kesilir** — mutlaka kaydırma sarmalayıcısının
+   **dışında** konumlanır (aksi halde ilk kartın üstüne biner).
+6. **Livewire nested component kullanılmaz** — `InteractsWithWishlist.php:10-14`
+   bunu mimari gereklilik olarak belgeliyor; kart düğmeleri ana sayfa bileşenine
+   bağlı kalır.
+7. **A ve B ayrı commit'lerde** — B fazı kendi onayıyla başlar.
+
+
+**A8 — Kayıt:** `CHANGELOG.md` `[Unreleased]` altına · bu tabloya Faz 13 satırı
+· §5 envanter · commit mesajı **ASCII** (kural 2); bileşen kullanıma girer girmez
+commit (kural 3).
+
+
+
+`database/seeders/DemoDataSeeder.php:860` ve `:1372` → `'compare_price' => null`
+yerine belirli ürünlerde gerçek oran (deterministik; `updateOrCreate` ve
+idempotency deseni korunur).
+
+
 
 ## 7. Sürüm Kararları (kullanıcı onayına bağlı)
 - `ui-refactor` 21.09.2026'da `origin/ui-refactor`'a push edildi (upstream takibi kuruldu)

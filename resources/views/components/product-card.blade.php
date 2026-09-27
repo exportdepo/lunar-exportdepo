@@ -49,8 +49,11 @@
 
 <article class="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900">
     {{-- Ürün görseli: hover'da hafifçe büyür --}}
-    <a href="{{ $href }}" class="relative block aspect-square overflow-hidden bg-slate-100 dark:bg-slate-800" aria-label="{{ $name }}">
-        @if (filled($image))
+    <a href="{{ $href }}" class="relative block overflow-hidden" aria-label="{{ $name }}">
+        {{-- Görsel kart kenarına yapışmasın: üstte ve yanda 6px nefes payı, altta yok.
+             Köşeler kartın rounded-2xl'ine uyumlu olsun diye rounded-xl. --}}
+        <div class="mx-1.5 mt-1.5 aspect-square overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800">
+            @if (filled($image))
             <img src="{{ $image }}"
                  alt="{{ $name }}"
                  loading="lazy"
@@ -58,10 +61,11 @@
                  width="800"
                  height="800"
                  class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105">
-        @else
+            @else
             <span class="flex h-full w-full items-center justify-center text-5xl text-slate-300 dark:text-slate-600" aria-hidden="true">📦</span>
-        @endif
+            @endif
 
+        </div>
         @if ($soldOut)
             <span class="absolute top-2 right-2 rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-rose-700 shadow-md ring-1 ring-rose-200 dark:text-rose-700">Tükendi</span>
         @elseif ($lowStock)
@@ -86,8 +90,8 @@
         </button>
     @endif
 
-    {{-- Kart içeriği --}}
-    <div class="flex flex-1 flex-col p-4 sm:p-5">
+    {{-- Kart içeriği — yanal boşluk istek listesi kartıyla aynı ölçüde (p-4) tutulur --}}
+    <div class="flex flex-1 flex-col p-3">
         <a href="{{ $href }}" class="mb-1">
             <h3 class="line-clamp-2 text-sm font-semibold text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-slate-100 dark:group-hover:text-indigo-400">
                 {{ $name }}
@@ -123,7 +127,7 @@
             </div>
         @endif
 
-        <div class="mt-auto flex flex-wrap items-end justify-between gap-x-3 gap-y-2 border-t border-slate-100 pt-3 dark:border-slate-800">
+        <div class="mt-auto flex flex-wrap items-end justify-between gap-x-2 gap-y-2 border-t border-slate-100 pt-2.5 dark:border-slate-800">
             <div>
                 <span class="text-sm font-bold text-slate-900 dark:text-white">{{ $price ?? '—' }}</span>
                 <span class="block text-xs text-slate-500 dark:text-slate-400">{{ $stockLabel }}</span>
