@@ -2,7 +2,7 @@
 
 > **Durum:** Faz 1-12 + UI Cila Turu tamamlandı ve main'de · Sürümler: `v1.3.0` (Faz 1-6) + `v1.3.1` (Phase 7) + `v1.3.2` (Phase 8) + `v1.3.3` (Phase 9) + `v1.3.4` (Phase 10) + `v1.3.5` (Phase 11) + `v1.3.6` (sepet/sipariş düzeltmeleri) + `v1.4.0` (Phase 12)
 > · Testler: 178 test / 1145 assertion yeşil · deprecation: 0 · Son güncelleme: 27.09.2026
-> · Faz 13 (ürün kartı yenilemesi + slider) PLANLANDI — ayrıntı §6
+> · Faz 13 (ürün kartı yenilemesi + slider) + Faz 14 (panel yönetim yüzeyleri) PLANLANDI — ayrıntı §6
 
 Sevgili Cline, 
 Bu belge, storefront arayüzü yenileme çalışmasının canlı yol haritasıdır: tamamlanan fazlar, kanıtlanmış çalışma kuralları ve sonraki fazlar burada takip edilir. Lütfen aşağıdaki kurallara ve fazlara sıkı sıkıya bağlı kalarak geliştirmeleri yap.
@@ -50,6 +50,7 @@ Phase 6 (21.09.2026) ile yorumlardaki son ASCII kalıntılar da onarıldı.*
 
 | Sıcak Düzeltme | `f333e6a` | Header misafir üyelik menüsü: misafirde yan yana duran "Giriş Yap" + "Üye Ol" butonları kaldırıldı; yerine giriş yapmış menüyle aynı Alpine desenli (ikon + chevron, `open` durumu) tek kullanıcı ikonu açılır menüsü geldi. Panelde "Kayıt ol" başlığı altında `x-button` ile iki tam genişlik buton; `Esc`/dış tıklama ile kapanma, `aria-controls`/`aria-expanded`, `sm:` altı gizli. Mobil hamburger'de aynı başlık + buton hiyerarşisi. `HeaderGuestMenuTest` (2 test) + tam suite 178 test / 1145 assertion yeşil; editör aracıyla yazıldı (kural 1), Pint temiz |
 | Phase 13 | *bekliyor* | **Ürün kartı yenilemesi + slider (TÜM sayfalar)**: istek listesindeki elle yazılmış kart ortak `x-product-card`'a bağlandı (test kancaları `testid` prefix prop'u ile korundu); `compare_price` KDV dahil okuma (`StorefrontPricing::comparePriceForVariantInclTax`); marka rozeti + kupon bandı + eski fiyat/indirim bloğu; `config/storefront.php`; Alpine + CSS scroll-snap slider (`product-grid` `mode="grid|rail"`, `Alpine.data('productRail')`); Faz B = gerçek `lunar_discounts` kampanya altyapısı (ayrı onay). Detay: §6 |
+| Phase 14 | *bekliyor* | **Panel yönetim yüzeyleri** — `ContactMessageResource` (mesaj silinemez, KVKK saklama) ve `NewsletterSubscriberResource` (abonelikten çıkma = silme); `is_read` işaretleme, okundu filtresi, arama, varsayılan sıralama. Faz B = kurumsal sayfa içeriklerinin DB'ye taşınması (ayrı onay). Detay: §6 |
 
 
 ## 4. Çalışma Kuralları (kanıtlanmış dersler)
@@ -270,6 +271,119 @@ commit (kural 3).
 yerine belirli ürünlerde gerçek oran (deterministik; `updateOrCreate` ve
 idempotency deseni korunur).
 
+
+### Phase 14: Panel Yönetim Yüzeyleri — İletişim ve Bülten (PLANLANDI 27.09.2026)
+
+**Kullanıcı kararı:** Vitrinden gelen veriler panelden görüntülenebilir olsun.
+Bağımsız iş; Phase 13'ten (ürün kartı + slider) **bağımsızdır**, sırayla da
+uygulanabilir.
+
+**Yeni sohbete tek satır yeterli:**
+`cline_ui_plan.md` dosyasındaki **Phase 14** bölümünü oku ve uygula.
+
+#### Teşhis (27.09.2026 doğrulaması)
+
+Panel yalnızca **veritabanı kayıtlarını** gösteren Filament ekranlarıdır; içerik
+koda gömülüyse panelde görünmez. Doğrulanan tablo:
+
+| Yüzey | Veritabanında | Panel ekranı |
+|-------|---------------|--------------|
+| Hakkımızda / Gizlilik / İade / SSS | **yok** (view'e gömülü) | yok |
+| İletişim mesajları | **var** (`contact_messages`) | **yok** |
+| Bülten aboneleri | **var** (`newsletter_subscribers`) | **yok** |
+
+**Kritik ayrım:** İkinci satır canlı bir sorundur — form veriyi kaydediyor ama
+mesaj yalnızca veritabanında kalıyor; panelden görünmüyor, mail de gitmiyor.
+Üçüncü satır aynı şekilde abone listesi panelden görülemiyor. Birinci satır ise
+daha zayıf bir eksiktir (sayfalar çalışıyor, yalnızca metin değiştirmek için
+kod düzenlemek gerekiyor).
+
+Panelde kayıtlı kaynaklar: 21 Lunar + 8 uygulama (`app/Filament/Resources/`).
+`ContactMessage` ve `NewsletterSubscriber` **modelleri ve migration'ları hazır**,
+yalnızca resource sınıfları eksik.
+
+
+#### A. Mesaj ve abone ekranları (bu faz — küçük ve öncelikli)
+
+**A1 — `ContactMessageResource`**
+`app/Filament/Resources/ContactMessageResource.php` (yeni) +
+`ContactMessageResource/Pages/{ListContactMessages,ViewContactMessage}.php`
+`ProductReviewResource` deseni birebir izlenir (`BaseResource`, `getDefaultForm`,
+`getDefaultTable`, `getDefaultPages`; Türkçe `getLabel`/`getPluralLabel`/
+`getNavigationLabel`; `navigationGroup` = `'Katalog'` ile tutarlı veya yeni
+`'İletişim'` grubu).
+- Kolonlar: konu (`subject`, aranabilir), gönderen (`name`), e-posta
+  (`email`, aranabilir), okundu durumu (`IconColumn is_read`, `boolean`),
+  tarih (`created_at`, `dateTime('d.m.Y')`, sıralanabilir)
+- Filtre: `TernaryFilter` ile okundu/okunmadı
+- Varsayılan sıralama: `created_at desc` (en yeni mesaj üstte)
+- **Kayıt aksiyonları:** "Okundu işaretle" / "Okunmadı işaretle" —
+  `Action` + `requiresConfirmation()` yalnızca okunma durumunu değiştirir
+- **Silme YASAK** — iletişim mesajları KVKK kapsamında saklama yükümlülüğü
+  doğurur; `DeleteAction` **eklenmez**, `DeleteBulkAction` da eklenmez
+- Detay sayfası mesaj gövdesini tam gösterir, `ip_address` bilgi olarak listelenir
+
+**A2 — `NewsletterSubscriberResource`**
+`app/Filament/Resources/NewsletterSubscriberResource.php` (yeni) +
+`Pages/ListNewsletterSubscribers.php`
+- Kolonlar: e-posta (aranabilir), IP (`ip_address`), tarih
+- Kayıt aksiyonu: `DeleteAction` (abonelikten çıkma KVKK gereğidir, silinmeli)
+- Toplu silme: `DeleteBulkAction` mevcut
+- `defaultSort('created_at', 'desc')`
+- Kayıt oluşturma/düzenleme yok: abone yalnızca vitrin formundan gelir → sadece
+  `index` sayfası (`getDefaultPages`), `create`/`edit` route'ları tanımlanmaz
+
+**A3 — Kayıt ve doğrulama**
+- `npm run build` → `php artisan view:clear` → `php artisan test` (kural 4)
+- `vendor/bin/pint` (PHP dosyaları)
+- **Panel testi:** `tests/Feature/PanelContactResourceTest.php` (yeni) — iki
+  resource'ın `getLabel`/`getPluralLabel`/tablo kolonları ve sayfa route'ları
+  gerçekten kayıtlı mı doğrulanır; mesaj `is_read` işaretleme ve abone silme
+  davranışı test edilir
+- ASCII-artifact grepi (kural 4)
+- `CHANGELOG.md` `[Unreleased]` altına kayıt
+- Bu tabloya Faz 14 satırı (commit hash'i uygulama sonrası doldurulur)
+- Commit mesajı **ASCII** (kural 2); bileşen kullanıma girer girmez commit (kural 3)
+
+#### B. Kurumsal sayfa içeriklerini yönetilebilir yapma (AYRI FAZ, ayrı onay)
+
+A fazından bağımsız; canlı bir sorun çözmediği için sonraya bırakılabilir.
+
+- Yeni tablo `page_contents`: `slug` (unique: `about`/`contact`/`privacy`/
+  `returns`/`faq`), `title`, `subtitle`, `body` (uzun metin), `meta_title`,
+  `meta_description`, `timestamps`; ayrı migration
+- Yeni model `App\Models\PageContent`
+- Yeni `PageContentResource` (list + edit, **delete yok** — sayfa kaydı
+  silinirse rota 404 döner)
+- **Geriye dönük uyum zorunlu:** 5 kurumsal view DB'den okur; **veri yoksa
+  mevcut statik içerik render edilir.** Aksi halde boş sayfa/404 ile karşılaşılır
+- SSS için ayrı tablolama: soru-cevap çiftleri `page_faq_items`
+  (`page_content_id`, `question`, `answer`, `position`) — view'daki
+  `@foreach` dizisi DB'den beslenir
+- `CorporatePagesTest` beklentileri (`assertSee('Misyonumuz')`,
+  `assertSee('Veri Sorumlusu')`, `assertSee('İade Süreci')`,
+  `assertSee('Siparişimi nasıl takip edebilirim?')` — `:46-49`) **bozulmamalı**;
+  fallback bu testleri yeşil tutar
+- `layoutData()` meta başlıkları da DB'den okunmalı (`AboutPage::render()` vb.)
+
+#### Phase 14 Kritik Uyarıları
+
+1. **Silme yetkisi kararı farklıdır.** İletişim mesajları **silinmez** (KVKK
+   saklama yükümlülüğü); bülten aboneleri **silinebilir** (abonelikten çıkma
+   hakkı). Bu ayrım A1/A2'de korunmalı.
+2. **Mesaj gövdesi hiçbir listede kesilmemeli** — `limit()` uygulanmamalı,
+   tam metin detay sayfasında görünmeli.
+3. **`ProductReviewResource` deseni birebir uygulanmalı** — Filament v4 API'si
+   (`Filament\Schemas\Components\Section`, `->recordActions()`,
+   `->toolbarActions()`) eski API ile karışmamalı; proje Filament 4 + Lunar 1.x
+   shim'i kullanıyor (`AppServiceProvider.php:23-61`).
+4. **Livewire relation manager 419 tuzağı** — yeni resource'larda ilişki yöneticisi
+   kullanılacaksa `AppServiceProvider::registerMediaRelationManagerComponent()`
+   desenine bakılmalı (bkz. commit `1b7cfb4`); basit list/edit sayfaları bu
+   tuzağa girmez.
+5. **A ve B ayrı commit'lerde** — B fazı kendi onayıyla başlar.
+6. **Phase 13 ile çakışma yoktur** — Phase 13 ürün kartı/slider, Phase 14 panel
+   ekranları; ortak dosya yok.
 
 
 ## 7. Sürüm Kararları (kullanıcı onayına bağlı)
