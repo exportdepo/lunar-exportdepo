@@ -16,7 +16,7 @@
       içindeki `fixed` çekmeceyi viewport yerine header'a göre konumlandırır.
 --}}
 <header class="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-    <div x-data="{ mobileOpen: false, searchOpen: false }" @keydown.escape.window="mobileOpen = false; searchOpen = false" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div x-data="header" @keydown.escape.window="mobileOpen = false; searchOpen = false" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="relative flex h-16 items-center gap-4">
 
             {{-- Logo --}}
@@ -37,7 +37,9 @@
 
                 {{-- Arama: ikon ekran ortasındaki modal popup'ı açar --}}
                 <button type="button"
-                        @click="searchOpen = !searchOpen; mobileOpen = false; $nextTick(() => $refs.searchInput.focus())"
+                        id="search-trigger-button"
+                        x-ref="searchTrigger"
+                        @click="searchOpen = !searchOpen; mobileOpen = false"
                         :aria-expanded="searchOpen"
                         aria-controls="header-search-modal"
                         aria-label="Arama yap"
@@ -139,6 +141,8 @@
 
                 {{-- Hamburger (mobil) --}}
                 <button type="button"
+                        id="mobile-menu-trigger"
+                        x-ref="mobileTrigger"
                         @click="mobileOpen = !mobileOpen; searchOpen = false"
                         :aria-expanded="mobileOpen"
                         aria-controls="mobile-menu"
@@ -158,6 +162,7 @@
         <div id="header-search-modal"
              x-show="searchOpen"
              x-cloak
+             x-ref="searchModal"
              x-transition.opacity.duration.200ms
              @click.self="searchOpen = false"
              role="dialog"
@@ -192,6 +197,7 @@
         <div id="mobile-menu"
              x-show="mobileOpen"
              x-cloak
+             x-ref="mobileMenu"
              x-transition.opacity.duration.200ms
              class="border-t border-slate-100 py-4 dark:border-slate-800 lg:hidden">
 
@@ -239,6 +245,12 @@
                     </div>
                 @endauth
             </div>
+
+            {{-- Klavye ipucu: menü açıkken odak menü içinde tutulur (odak tuzağı).
+                 Escape ile kapatılabilir ve odak hamburger düğmesine döner. --}}
+            <p class="mt-4 border-t border-slate-100 pt-3 text-xs text-slate-400 dark:border-slate-800 dark:text-slate-500">
+                Kapatmak için <span class="font-semibold">Esc</span>'e basın
+            </p>
         </div>
     </div>
 </header>

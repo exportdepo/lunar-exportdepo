@@ -23,7 +23,8 @@
     'title' => 'Sepetim',
 ])
 
-<div id="cart-drawer" x-data
+<div id="cart-drawer"
+     x-data="cartDrawer"
      x-show="$store.cartDrawer.open"
      x-cloak
      @keydown.escape.window="$store.cartDrawer.hide()"
@@ -41,15 +42,18 @@
          class="absolute inset-0 bg-slate-900/50"
          aria-hidden="true"></div>
 
-    {{-- Sağdan kayan panel --}}
+    {{-- Sağdan kayan panel — `tabindex="-1"` odak tuzağının panele
+         odaklanabilmesini ve ekran okuyucunun diyalog adını duyurmasını sağlar. --}}
     <div x-show="$store.cartDrawer.open"
+         x-ref="panel"
+         tabindex="-1"
          x-transition:enter="ease-out duration-300"
          x-transition:enter-start="translate-x-full"
          x-transition:enter-end="translate-x-0"
          x-transition:leave="ease-in duration-200"
          x-transition:leave-start="translate-x-0"
          x-transition:leave-end="translate-x-full"
-         class="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-2xl dark:bg-slate-900">
+         class="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-2xl focus:outline-none dark:bg-slate-900">
 
         {{-- Başlık --}}
         <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
@@ -57,7 +61,7 @@
             <button type="button"
                     @click="$store.cartDrawer.hide()"
                     aria-label="Sepeti kapat"
-                    class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white">
+                    class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white dark:focus-visible:ring-indigo-400 dark:focus-visible:ring-offset-slate-950">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>

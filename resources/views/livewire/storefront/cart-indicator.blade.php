@@ -29,7 +29,9 @@
      @click.outside="open = false"
      x-effect="if ($store.cartDrawer.open) { open = false; }">
     <button type="button"
-            @click="$store.cartDrawer.toggle(); open = false"
+            id="cart-trigger-button"
+            x-ref="cartTrigger"
+            @click="$store.cartDrawer.toggle($refs.cartTrigger); open = false"
             :aria-expanded="open"
             aria-haspopup="true"
             aria-controls="header-cart-popup"

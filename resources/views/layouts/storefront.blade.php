@@ -11,8 +11,9 @@
 <x-layouts.app :title="$title ?? null" :description="$description ?? null" :ogImage="$ogImage ?? null">
     <x-header />
 
-    {{-- Ana içerik --}}
-    <main id="main-content" tabindex="-1" class="flex-1 focus:outline-none">
+    {{-- Ana içerik — `scroll-mt-20` yapışkan header'ın (h-16) altında kalan
+         kısımların gizlenmesini engeller (WCAG 2.4.11 Focus Not Obscured). --}}
+    <main id="main-content" tabindex="-1" class="flex-1 scroll-mt-20 focus:outline-none">
         {{ $slot }}
     </main>
 
