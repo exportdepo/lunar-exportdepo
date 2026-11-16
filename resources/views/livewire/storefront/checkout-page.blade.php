@@ -40,7 +40,8 @@
                         <x-input name="postcode" label="Posta kodu" wire:model="postcode" autocomplete="postal-code" required />
                     </div>
                     <h2 class="mt-10 text-xl font-bold text-slate-900 dark:text-white">Ödeme</h2>
-                    <div class="mt-4 space-y-3">
+                    <fieldset class="mt-4 space-y-3">
+                        <legend class="sr-only">Ödeme Yöntemi</legend>
                         <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-800/60 dark:bg-indigo-900/20">
                             <input type="radio" wire:model="paymentMethod" value="offline" class="mt-1 h-4 w-4 accent-indigo-600 focus:ring-indigo-500">
                             <span><strong class="block text-slate-900 dark:text-white">Manuel ödeme</strong><span class="text-sm text-slate-600 dark:text-slate-400">Sipariş oluşturulur</span></span>
@@ -51,7 +52,7 @@
                                 <span><strong class="block text-slate-900 dark:text-white">Kart ile ödeme</strong><span class="text-sm text-slate-600 dark:text-slate-400">Stripe</span></span>
                             </label>
                         @endif
-                    </div>
+                    </fieldset>
                     @error('paymentMethod')
                         <p class="mt-2 text-sm text-rose-600 dark:text-rose-400">{{ $message }}</p>
                     @enderror

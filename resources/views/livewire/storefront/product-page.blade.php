@@ -23,7 +23,7 @@
                     </li>
                     <li aria-hidden="true">/</li>
                 @endif
-                <li class="max-w-full truncate font-medium text-slate-700 dark:text-slate-200">{{ $product['name'] }}</li>
+                <li aria-current="page" class="max-w-full truncate font-medium text-slate-700 dark:text-slate-200">{{ $product['name'] }}</li>
             </ol>
         </nav>
 
@@ -171,21 +171,22 @@
                         <fieldset class="mb-6 space-y-5">
                             <legend class="sr-only">Ürün seçenekleri</legend>
                             @foreach ($optionGroups as $group)
-                                <div>
-                                    <p class="mb-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                                <fieldset class="min-w-0">
+                                    <legend class="mb-2 text-sm font-medium text-slate-700 dark:text-slate-300">
                                         {{ $group['name'] }}
                                         @foreach ($group['values'] as $value)
                                             @if ($this->isValueSelected($group['id'], $value['id']))
                                                 <span class="font-normal text-slate-400 dark:text-slate-500">: {{ $value['name'] }}</span>
                                             @endif
                                         @endforeach
-                                    </p>
+                                    </legend>
 
                                     <div class="flex flex-wrap gap-2">
                                         @foreach ($group['values'] as $value)
                                             @php
                                                 $selected = $this->isValueSelected($group['id'], $value['id']);
                                                 $available = $this->isValueAvailable($group['id'], $value['id']);
+                                                $hexLabel = filled($value['hex'] ?? null) ? $value['hex'] : '#e2e8f0';
                                             @endphp
 
                                             @if ($group['is_colour'])
@@ -193,7 +194,7 @@
                                                         wire:click="selectOptionValue({{ $group['id'] }}, {{ $value['id'] }})"
                                                         @disabled(! $available)
                                                         title="{{ $value['name'] }}{{ $available ? '' : ' (stokta yok)' }}"
-                                                        aria-label="{{ $value['name'] }}"
+                                                        aria-label="Renk: {{ $value['name'] }} ({{ $hexLabel }}){{ $available ? '' : ' (stokta yok)' }}"
                                                         aria-pressed="{{ $selected ? 'true' : 'false' }}"
                                                         class="flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all
                                                                {{ $selected ? 'border-indigo-600 ring-2 ring-indigo-500/40' : 'border-slate-200 hover:border-indigo-400 dark:border-slate-600' }}
@@ -214,7 +215,7 @@
                                             @endif
                                         @endforeach
                                     </div>
-                                </div>
+                                </fieldset>
                             @endforeach
                         </fieldset>
                     @elseif (count($variants) > 1)
@@ -265,8 +266,8 @@
                             <button type="button"
                                     wire:click="toggle({{ $product['id'] }})"
                                     wire:key="wishlist-pdp-{{ $product['id'] }}"
-                                    title="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}"
-                                    aria-label="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}"
+                                    title="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}: {{ $product['name'] }}"
+                                    aria-label="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}: {{ $product['name'] }}"
                                     aria-pressed="{{ $inWishlist ? 'true' : 'false' }}"
                                     class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border shadow-sm transition-colors
                                            {{ $inWishlist
@@ -290,7 +291,7 @@
                         @enderror
 
                         @if ($added)
-                            <div class="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
+                            <div role="status" aria-live="polite" class="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
                                 ✅ Ürün sepete eklendi. <a href="{{ url('/sepet') }}" class="font-semibold underline underline-offset-2">Sepete git</a>
                             </div>
                         @endif
@@ -301,8 +302,8 @@
                             <button type="button"
                                     wire:click="toggle({{ $product['id'] }})"
                                     wire:key="wishlist-pdp-{{ $product['id'] }}"
-                                    title="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}"
-                                    aria-label="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}"
+                                    title="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}: {{ $product['name'] }}"
+                                    aria-label="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}: {{ $product['name'] }}"
                                     aria-pressed="{{ $inWishlist ? 'true' : 'false' }}"
                                     class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border shadow-sm transition-colors
                                            {{ $inWishlist
@@ -407,7 +408,7 @@
                         <div id="yorum-formu" class="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
                             <h3 class="text-lg font-bold text-slate-900 dark:text-white">Değerlendirme Yaz</h3>
                             @if ($reviewSubmitted)
-                                <div class="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
+                                <div role="status" aria-live="polite" class="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
                                     Değerlendirmeniz alındı. Onaylandıktan sonra bu sayfada listelenecek.
                                 </div>
                             @endif
