@@ -3,7 +3,9 @@
 
     - Popup kart: masaüstünde (lg+) sepet düğmesinin üzerine fare ile gelince
       açılır; imleç çekilince ~200ms gecikmeyle kapanır (düğme ile kart arasındaki
-      geçiş payı). Mobilde hover olmadığından popup hiç görünmez; tıklama çekmeceyi açar.
+      geçiş payı). Klavye kullanıcıları için düğmeye odaklanıldığında da açılır
+      (`@focusin`); odak karttan çıkınca aynı gecikmeyle kapanır. Mobilde hover
+      olmadığından popup hiç görünmez; tıklama çekmeceyi açar.
     - Çekmece: düğme tıklaması Alpine `$store.cartDrawer.toggle()` ile açar/kapatır;
       kabuk `components/cart-drawer.blade.php` bileşenidir. Çekmece açıldığında
       popup kapatılır (`x-effect`) — iki yüzey aynı anda açık kalmaz.
@@ -25,6 +27,8 @@
      }"
      @mouseenter="showPopup()"
      @mouseleave="scheduleHidePopup()"
+     @focusin="showPopup()"
+     @focusout="scheduleHidePopup()"
      @keydown.escape.window="clearTimeout(closeTimer); open = false"
      @click.outside="open = false"
      x-effect="if ($store.cartDrawer.open) { open = false; }">

@@ -78,8 +78,8 @@
         <button type="button"
                 wire:click="toggle({{ $productId }})"
                 wire:key="wishlist-{{ $productId }}"
-                title="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}"
-                aria-label="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}"
+                title="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}: {{ $name }}"
+                aria-label="{{ $inWishlist ? 'İstek listesinden çıkar' : 'İstek listesine ekle' }}: {{ $name }}"
                 class="absolute top-2 left-2 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border shadow-sm backdrop-blur-sm transition-colors
                        {{ $inWishlist
                            ? 'border-rose-200 bg-white text-rose-500 dark:border-rose-500/40 dark:bg-slate-900/90 dark:text-rose-400'

@@ -36,7 +36,7 @@
         @if ($addedProductId !== null)
         {{-- wire:key sayaçla: aynı ürüne tekrar basıldığında Livewire bu düğümü
              yeniden kurar, böylece bildirim her seferinde yeniden işlenir. --}}
-        <div role="status" wire:key="wishlist-cart-alert-{{ $addedCount }}"
+        <div role="status" aria-live="polite" wire:key="wishlist-cart-alert-{{ $addedCount }}"
              class="mb-6 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
