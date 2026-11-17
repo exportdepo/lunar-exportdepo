@@ -8,7 +8,14 @@
       olmadığından popup hiç görünmez; tıklama çekmeceyi açar.
     - Çekmece: düğme tıklaması Alpine `$store.cartDrawer.toggle()` ile açar/kapatır;
       kabuk `components/cart-drawer.blade.php` bileşenidir. Çekmece açıldığında
-      popup kapatılır (`x-effect`) — iki yüzey aynı anda açık kalmaz.
+      popup kapatılır (`x-effect`) — iki yüzey aynı anda açık kalmaz. Çekmece
+      açıkken Alpine paneli odakladığı için `@focusin` guard'ı da devrede:
+      aksi halde masaüstü önizleme kartı modalın arkasında açılırdı.
+    - Escape ile önizleme kartı kapatılır ve odak sepet düğmesine döner
+      (odak kartın içindeyken `<body>`'ye düşmesin diye). Sıra önemlidir:
+      önce odak tetikleyiciye döner, sonra kart kapatılır. Ters sırada
+      `.focus()` gerçek bir focusin üretir, `@focusin` işleyicisi kartı yeniden
+      açar ve Escape işlevini yerine getirmez.
     - Sepet verisi `CartSession` üzerinden gelir; `cart-updated` olayında
       yenilenir (ürün ekleme/çıkarma işlemleri bu olayı tetikler).
 --}}
@@ -27,9 +34,9 @@
      }"
      @mouseenter="showPopup()"
      @mouseleave="scheduleHidePopup()"
-     @focusin="showPopup()"
+     @focusin="if (! $store.cartDrawer.open) showPopup()"
      @focusout="scheduleHidePopup()"
-     @keydown.escape.window="clearTimeout(closeTimer); open = false"
+     @keydown.escape.window="if (open) { clearTimeout(closeTimer); $refs.cartTrigger.focus(); open = false; }"
      @click.outside="open = false"
      x-effect="if ($store.cartDrawer.open) { open = false; }">
     <button type="button"
@@ -50,7 +57,8 @@
         @endif
     </button>
 
-    {{-- Hover popup kartı: yalnızca masaüstünde (lg+) fareyle gelince açılır --}}
+    {{-- Önizleme popup kartı: yalnızca masaüstünde (lg+) görünür; fareyle
+         gelindiğinde ya da düğmeye klavye odağı geldiğinde açılır. --}}
     <div id="header-cart-popup"
          x-show="open"
          x-cloak
