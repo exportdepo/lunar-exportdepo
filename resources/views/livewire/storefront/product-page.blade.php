@@ -186,10 +186,18 @@
                                             @php
                                                 $selected = $this->isValueSelected($group['id'], $value['id']);
                                                 $available = $this->isValueAvailable($group['id'], $value['id']);
-                                                $hexLabel = filled($value['hex'] ?? null) ? $value['hex'] : '#e2e8f0';
                                             @endphp
 
                                             @if ($group['is_colour'])
+                                                @php
+                                                    // Tek kaynak: ekran okuyucuya duyurulan hex ile
+                                                    // çizilen renk aynı olmalı. Geçersiz/boş değerler
+                                                    // #e2e8f0 yedeğine düşer.
+                                                    $hex = $value['hex'] ?? null;
+                                                    $hexLabel = is_string($hex) && preg_match('/^#[0-9a-fA-F]{3,8}$/', trim($hex)) === 1
+                                                        ? trim($hex)
+                                                        : '#e2e8f0';
+                                                @endphp
                                                 <button type="button"
                                                         wire:click="selectOptionValue({{ $group['id'] }}, {{ $value['id'] }})"
                                                         @disabled(! $available)
@@ -199,7 +207,7 @@
                                                         class="flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all
                                                                {{ $selected ? 'border-indigo-600 ring-2 ring-indigo-500/40' : 'border-slate-200 hover:border-indigo-400 dark:border-slate-600' }}
                                                                {{ $available ? '' : 'cursor-not-allowed opacity-40' }}">
-                                                    <span class="h-7 w-7 rounded-full border border-slate-300 dark:border-slate-600" data-hex="{{ $value['hex'] ?: '#e2e8f0' }}" :style="'background-color: ' + $el.dataset.hex" aria-hidden="true"></span>
+                                                    <span class="h-7 w-7 rounded-full border border-slate-300 dark:border-slate-600" data-hex="{{ $hexLabel }}" :style="'background-color: ' + $el.dataset.hex" aria-hidden="true"></span>
                                                 </button>
                                             @else
                                                 <button type="button"
@@ -290,11 +298,16 @@
                             <p class="mt-2 text-sm font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>
                         @enderror
 
-                        @if ($added)
-                            <div role="status" aria-live="polite" class="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
-                                ✅ Ürün sepete eklendi. <a href="{{ url('/sepet') }}" class="font-semibold underline underline-offset-2">Sepete git</a>
-                            </div>
-                        @endif
+                        {{-- Canlı bölge kalıcıdır: mesaj gösterilmeden önce de DOM'da
+                             bulunur. Bölge ve içerik aynı anda eklenirse ekran okuyucu
+                             duyurmayı garanti edemez (WCAG 4.1.3). --}}
+                        <div role="status" aria-live="polite">
+                            @if ($added)
+                                <div class="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
+                                    ✅ Ürün sepete eklendi. <a href="{{ url('/sepet') }}" class="font-semibold underline underline-offset-2">Sepete git</a>
+                                </div>
+                            @endif
+                        </div>
                     @else
                         <p class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300">Bu ürün şu anda stokta yok.</p>
 
@@ -407,11 +420,15 @@
 
                         <div id="yorum-formu" class="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
                             <h3 class="text-lg font-bold text-slate-900 dark:text-white">Değerlendirme Yaz</h3>
-                            @if ($reviewSubmitted)
-                                <div role="status" aria-live="polite" class="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
-                                    Değerlendirmeniz alındı. Onaylandıktan sonra bu sayfada listelenecek.
-                                </div>
-                            @endif
+                            {{-- Canlı bölge kalıcıdır: mesaj gösterilmeden önce de DOM'da
+                                 bulunur (WCAG 4.1.3). --}}
+                            <div role="status" aria-live="polite">
+                                @if ($reviewSubmitted)
+                                    <div class="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
+                                        Değerlendirmeniz alındı. Onaylandıktan sonra bu sayfada listelenecek.
+                                    </div>
+                                @endif
+                            </div>
                             <form wire:submit="submitReview" class="mt-4 space-y-4">
                                 <div>
                                     <label for="review-rating" class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Puanınız</label>

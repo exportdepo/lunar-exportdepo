@@ -33,18 +33,22 @@
         {{-- Sepet bildirisi ızgaranın DIŞINDA: kart içinde gösterilirse o satır
            yükseklik kalkanı ile tüm kartları uzatır ve ızgarada boşluk
            oluşturur (ana sayfa + koleksiyon sayfaları da bu deseni kullanır). --}}
-        @if ($addedProductId !== null)
-        {{-- wire:key sayaçla: aynı ürüne tekrar basıldığında Livewire bu düğümü
-             yeniden kurar, böylece bildirim her seferinde yeniden işlenir. --}}
-        <div role="status" aria-live="polite" wire:key="wishlist-cart-alert-{{ $addedCount }}"
-             class="mb-6 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Ürün sepete eklendi.</span>
-            <a href="{{ url('/sepet') }}" class="font-semibold underline">Sepete git</a>
+        {{-- Canlı bölge kalıcıdır: bildirim gösterilmeden önce de DOM'da bulunur.
+             Bölge ve içerik aynı anda eklenirse ekran okuyucu duyurmaz (WCAG 4.1.3). --}}
+        <div id="wishlist-cart-alert" role="status" aria-live="polite">
+            @if ($addedProductId !== null)
+            {{-- wire:key sayaçla: aynı ürüne tekrar basıldığında Livewire bu düğümü
+                 yeniden kurar, böylece bildirim her seferinde yeniden işlenir. --}}
+            <div wire:key="wishlist-cart-alert-{{ $addedCount }}"
+                 class="mb-6 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Ürün sepete eklendi.</span>
+                <a href="{{ url('/sepet') }}" class="font-semibold underline">Sepete git</a>
+            </div>
+            @endif
         </div>
-        @endif
         <div class="stagger-in grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             @foreach ($items as $item)
             <div wire:key="wishlist-item-{{ $item['id'] }}" class="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-xl dark:border-slate-800 dark:bg-slate-900">
