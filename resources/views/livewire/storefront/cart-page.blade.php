@@ -19,7 +19,7 @@
         </div>
 
         @error('cart')
-            <x-cart-alert :message="$message" />
+            <x-cart-alert id="cart-error" :message="$message" />
         @enderror
 
         @if (empty($lines))
@@ -59,22 +59,35 @@
                                 </p>
 
                                 <div class="mt-3 flex flex-wrap items-center gap-3">
-                                    <div x-data="{ qty: {{ (int) $line['quantity'] }} }"
+                                    {{-- Adet stepper'ı: artırma/azaltma mantığı x-data
+                                         metotlarında toplandı; tıklama ve ok tuşları aynı
+                                         işlemi çağırır (WCAG 2.1.1). `x-model` ile giriş
+                                         değeri Alpine durumuna bağlıdır; böylece yazılan
+                                         değer +/- düğmelerini de doğru etkiler. --}}
+                                    <div x-data="{ qty: {{ (int) $line['quantity'] }}, increase() { this.qty = Math.min(99, (parseInt(this.qty) || 1) + 1); this.$wire.updateQuantity({{ $line['id'] }}, this.qty); }, decrease() { this.qty = Math.max(1, (parseInt(this.qty) || 1) - 1); this.$wire.updateQuantity({{ $line['id'] }}, this.qty); } }"
                                          x-on:cart-quantity-rejected.window="if ($event.detail.lineId === {{ $line['id'] }}) qty = $event.detail.quantity"
                                          class="flex items-stretch overflow-hidden rounded-lg border border-slate-300 transition-colors focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 dark:border-slate-600 dark:focus-within:border-indigo-400 dark:focus-within:ring-indigo-400/30">
                                         <button type="button"
-                                                @click="qty = Math.max(1, (parseInt(qty) || 1) - 1); $wire.updateQuantity({{ $line['id'] }}, qty)"
+                                                @click="decrease()"
+                                                @keydown.down.prevent="decrease()"
                                                 :disabled="(parseInt(qty) || 1) <= 1"
                                                 aria-label="{{ $line['name'] }} adet azalt"
                                                 class="px-2.5 text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40 dark:text-slate-300 dark:hover:bg-slate-800">−</button>
                                         <input type="number"
+                                               x-model.number="qty"
                                                min="1"
-                                               :value="qty"
+                                               max="99"
+                                               role="spinbutton"
+                                               aria-valuemin="1"
+                                               aria-valuemax="99"
+                                               :aria-valuenow="parseInt(qty) || 1"
+                                               @error('cart') aria-describedby="cart-error" aria-invalid="true" @enderror
                                                @change="$wire.updateQuantity({{ $line['id'] }}, $event.target.value)"
                                                aria-label="{{ $line['name'] }} adet"
                                                class="qty-input w-14 py-1.5 text-center text-sm font-semibold text-slate-900 dark:bg-slate-800 dark:text-slate-100" />
                                         <button type="button"
-                                                @click="qty = Math.min(99, (parseInt(qty) || 1) + 1); $wire.updateQuantity({{ $line['id'] }}, qty)"
+                                                @click="increase()"
+                                                @keydown.up.prevent="increase()"
                                                 aria-label="{{ $line['name'] }} adet artır"
                                                 class="px-2.5 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">+</button>
                                     </div>

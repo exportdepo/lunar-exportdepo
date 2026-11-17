@@ -250,9 +250,13 @@
 
                     @if (($product['stock'] ?? 0) > 0)
                         <form wire:submit="addToCart" class="flex flex-wrap items-stretch gap-3">
-                            <div x-data="{ qty: @entangle('quantity') }" class="flex items-stretch overflow-hidden rounded-lg border border-slate-300 transition-colors focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 dark:border-slate-600 dark:focus-within:border-indigo-400 dark:focus-within:ring-indigo-400/30">
+                            {{-- Adet stepper'ı: artırma/azaltma mantığı x-data
+                                 metotlarında toplandı; tıklama ve ok tuşları aynı
+                                 işlemi çağırır (WCAG 2.1.1). --}}
+                            <div x-data="{ qty: @entangle('quantity'), increase() { this.qty = Math.min({{ $product['stock'] ?? 999 }}, (parseInt(this.qty) || 1) + 1); }, decrease() { this.qty = Math.max(1, (parseInt(this.qty) || 1) - 1); } }" class="flex items-stretch overflow-hidden rounded-lg border border-slate-300 transition-colors focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 dark:border-slate-600 dark:focus-within:border-indigo-400 dark:focus-within:ring-indigo-400/30">
                                 <button type="button"
-                                        @click="qty = Math.max(1, (parseInt(qty) || 1) - 1)"
+                                        @click="decrease()"
+                                        @keydown.down.prevent="decrease()"
                                         :disabled="(parseInt(qty) || 1) <= 1"
                                         aria-label="Adedi azalt"
                                         class="px-3 text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40 dark:text-slate-300 dark:hover:bg-slate-800">−</button>
@@ -261,10 +265,16 @@
                                        type="number"
                                        min="1"
                                        @if ($product['stock'] !== null) max="{{ $product['stock'] }}" @endif
+                                       role="spinbutton"
+                                       aria-valuemin="1"
+                                       :aria-valuemax="{{ $product['stock'] ?? 999 }}"
+                                       :aria-valuenow="parseInt(qty) || 1"
+                                       @error('quantity') aria-describedby="quantity-error" aria-invalid="true" @enderror
                                        aria-label="Adet"
                                        class="qty-input w-14 py-3 text-center text-sm font-semibold text-slate-900 dark:bg-slate-800 dark:text-slate-100" />
                                 <button type="button"
-                                        @click="qty = Math.min({{ $product['stock'] ?? 999 }}, (parseInt(qty) || 1) + 1)"
+                                        @click="increase()"
+                                        @keydown.up.prevent="increase()"
                                         aria-label="Adedi artır"
                                         class="px-3 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">+</button>
                             </div>
@@ -295,7 +305,7 @@
                         </form>
 
                         @error('quantity')
-                            <p class="mt-2 text-sm font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                            <p id="quantity-error" class="mt-2 text-sm font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>
                         @enderror
 
                         {{-- Canlı bölge kalıcıdır: mesaj gösterilmeden önce de DOM'da
