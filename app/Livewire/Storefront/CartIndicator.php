@@ -19,14 +19,29 @@ class CartIndicator extends Component
 
     public int $taxTotal = 0;
 
+    /**
+     * Sepet ürün sayısı değiştiğinde ekran okuyucuya duyurulacak metin.
+     *
+     * `null` → henüz duyuru yok. Bölge ilk yüklemede boş başlar; yalnızca
+     * gerçek bir değişiklikte doldurulur (WCAG 4.1.3 — gereksiz bildirim
+     * yapılmaz).
+     */
+    public ?string $cartAnnouncement = null;
+
     public function mount(): void
     {
         $this->refreshCart();
+
+        // İlk yüklemede duyuru yapılmaz: sepetteki ürün sayısı bir
+        // değişiklik değildir, yalnızca mevcut durumu bildirir.
+        $this->cartAnnouncement = null;
     }
 
     #[On('cart-updated')]
     public function refreshCart(): void
     {
+        $previousCount = $this->count;
+
         $cart = CartSession::current();
 
         if (! $cart) {
@@ -35,6 +50,8 @@ class CartIndicator extends Component
             $this->total = 0;
             $this->subTotal = 0;
             $this->taxTotal = 0;
+
+            $this->announceCountChange($previousCount);
 
             return;
         }
@@ -57,6 +74,21 @@ class CartIndicator extends Component
         $this->subTotal = $cart->subTotal?->value ?? 0;
         $this->taxTotal = $cart->taxTotal?->value ?? 0;
         $this->total = $cart->total?->value ?? 0;
+
+        $this->announceCountChange($previousCount);
+    }
+
+    /**
+     * Ürün sayısı değiştiyse canlı bölgedeki metni günceller.
+     *
+     * Sayı değişmediyse metin olduğu gibi bırakılır: aynı metin yeniden
+     * yazılırsa ekran okuyucu gereksiz yere tekrar duyurur.
+     */
+    protected function announceCountChange(int $previousCount): void
+    {
+        if ($this->count !== $previousCount) {
+            $this->cartAnnouncement = "Sepetinizde {$this->count} ürün var.";
+        }
     }
 
     public function removeLine(int $lineId): void

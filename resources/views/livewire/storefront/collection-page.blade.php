@@ -114,7 +114,7 @@
                     @if (!empty($brands))
                         <details class="group mb-4 rounded-lg border border-slate-200 dark:border-slate-700">
                             <summary class="flex cursor-pointer select-none items-center justify-between rounded-lg px-3 py-2.5 text-sm font-bold text-slate-900 transition-colors hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 [&::-webkit-details-marker]:hidden">
-                                Marka
+                                <h3>Marka</h3>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                 </svg>
@@ -153,7 +153,7 @@
                     @if (!empty($tags))
                         <details class="group mb-4 rounded-lg border border-slate-200 dark:border-slate-700">
                             <summary class="flex cursor-pointer select-none items-center justify-between rounded-lg px-3 py-2.5 text-sm font-bold text-slate-900 transition-colors hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 [&::-webkit-details-marker]:hidden">
-                                Etiketler
+                                <h3>Etiketler</h3>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                 </svg>
@@ -178,7 +178,7 @@
                     @foreach ($options as $option)
                         <details class="group mb-4 rounded-lg border border-slate-200 dark:border-slate-700">
                             <summary class="flex cursor-pointer select-none items-center justify-between rounded-lg px-3 py-2.5 text-sm font-bold text-slate-900 transition-colors hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 [&::-webkit-details-marker]:hidden">
-                                {{ $option['name'] }}
+                                <h3>{{ $option['name'] }}</h3>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                 </svg>
@@ -201,7 +201,7 @@
                     {{-- Filterable ürün öznitelikleri --}}
                     @if (!empty($attributeFilterOptions))
                         <div class="mb-5">
-                            <p class="mb-1.5 text-sm font-medium text-slate-700 dark:text-slate-300">Öznitelikler</p>
+                            <h3 class="mb-1.5 text-sm font-medium text-slate-700 dark:text-slate-300">Öznitelikler</h3>
                             @foreach ($attributeFilterOptions as $attributeOption)
                                 <label for="plp-attr-{{ $attributeOption['handle'] }}" class="mb-1 block text-xs font-semibold text-slate-500 dark:text-slate-400">{{ $attributeOption['name'] }}</label>
                                 <select id="plp-attr-{{ $attributeOption['handle'] }}"
