@@ -44,7 +44,7 @@
                         aria-controls="header-search-modal"
                         aria-label="Arama yap"
                         title="Arama yap"
-                        class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-indigo-400">
+                        class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-indigo-400">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                     </svg>
@@ -56,7 +56,7 @@
                         @click="$store.theme.toggle()"
                         :aria-label="$store.theme.dark ? 'Açık temaya geç' : 'Koyu temaya geç'"
                         :title="$store.theme.dark ? 'Açık temaya geç' : 'Koyu temaya geç'"
-                        class="hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-indigo-400 sm:inline-flex">
+                        class="hidden h-11 w-11 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-indigo-400 sm:inline-flex">
                     <svg x-show="!$store.theme.dark" x-cloak xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
                     </svg>
@@ -72,9 +72,14 @@
 
                 {{-- Üyelik: kullanıcı menüsü --}}
                 @auth
+                    {{-- Escape menüyü kapatır ve odağı tetikleyiciye döndürür
+                         (WCAG 2.1.1 / 2.4.3). `if (open)` koruması olmadan menü
+                         kapalıyken Escape odak bağlamadan çalışırdı. --}}
                     <div class="relative hidden shrink-0 sm:block" x-data="{ open: false }">
                         <button type="button"
+                                x-ref="userTrigger"
                                 @click="open = !open"
+                                @keydown.escape.window="if (open) { open = false; $refs.userTrigger.focus(); }"
                                 aria-controls="user-dropdown"
                                 :aria-expanded="open"
                                 class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-indigo-400">
@@ -109,13 +114,14 @@
                          aynı ikon + chevron dilini kullanır. --}}
                     <div class="relative hidden shrink-0 sm:block" x-data="{ open: false }">
                         <button type="button"
+                                x-ref="guestTrigger"
                                 @click="open = !open"
-                                @keydown.escape.window="open = false"
+                                @keydown.escape.window="if (open) { open = false; $refs.guestTrigger.focus(); }"
                                 aria-controls="guest-auth-dropdown"
                                 :aria-expanded="open"
                                 aria-label="Giriş ve üyelik seçenekleri"
                                 title="Giriş ve üyelik seçenekleri"
-                                class="inline-flex h-9 shrink-0 items-center gap-0.5 rounded-lg py-0 pl-2.5 pr-1.5 text-slate-600 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-indigo-400">
+                                class="inline-flex h-11 shrink-0 items-center gap-0.5 rounded-lg py-0 pl-2.5 pr-1.5 text-slate-600 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-indigo-400">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                             </svg>
@@ -147,7 +153,7 @@
                         :aria-expanded="mobileOpen"
                         aria-controls="mobile-menu"
                         aria-label="Menüyü aç/kapat"
-                        class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 lg:hidden">
+                        class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 lg:hidden">
                     <svg x-show="!mobileOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
