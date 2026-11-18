@@ -4,6 +4,34 @@
 
 ## [Unreleased]
 
+WCAG 2.1 AA Erişilebilirlik Denetimi
+
+### Kritik
+
+* **Sepet çekmecesi, arama modalı ve mobil menüde odak tuzağı** — Üç katman da açıldığında artık odağı içeride tutar (`Tab`/`Shift+Tab` ile dışarı çıkılamaz), `Escape` ile kapanır ve kapanırken odak tetikleyici düğmesine geri döner. Uygulama genelinde paylaşılan bir odak tuzağı yardımcısı (`createFocusTrap`) eklendi; odaklanabilir öğeler her `Tab` tuşunda yeniden hesaplandığı için Alpine geçişleri ve Livewire DOM morph işlemlerine dayanıklıdır. `activeTrapOwner` kaydı yalnızca en üst katmanın odağı geri yüklemesini garanti eder (WCAG 2.1.1, 2.4.3).
+* **Atlama bağlantısı ve yapışkan başlık** — Atlama bağlantısına görünür odak halkası eklendi; `main` hedefine `scroll-mt-20` verildi, böylece yapışkan başlığın altında kalan içerik ekranda görünmez olmuyor (WCAG 2.4.1, 2.4.11).
+* **Ghost düğme kontrastı** — `button` bileşeninin ghost varyantı `text-slate-700`'ye yükseltildi (3.2:1 → 7:1) (WCAG 1.4.3).
+
+### Düzeltmeler
+
+* **Form alanları** — Metin ve metin alanı bileşenlerinde placeholder renkleri ile devre dışı alanların kontrastı WCAG AA'ya (4.5:1) yükseltildi; zorunlu alanlar ekran okuyucu için görünür "(zorunlu)" metniyle işaretlendi (WCAG 1.4.3, 3.3.2).
+* **Ödeme ve varyant grupları** — Checkout'ta ödeme yöntemleri `<fieldset>`/`<legend>` ile gruplandı; ürün sayfasındaki varyant seçiciler iç içe `<fieldset>` gruplarına ayrıldı (WCAG 1.3.1, 3.3.2).
+* **Kalıcı canlı bölgeler** — Ödeme sonucu, sepet ve istek listesi bildirimleri artık sayfa boyunca var olan `role="status" aria-live="polite"` bölgeleri içinde duyurulur; önceden eklenip sonradan kaldırılan bildirimlerin duyurulmama riski giderildi (WCAG 4.1.3).
+* **Renk örnekleri** — Ürün sayfasındaki renk varyantları hem `aria-label` hem `data-hex` için tek bir normalleştirilmiş kaynaktan beslenir; görünmeyen örneklerin ekran okuyucu adı boş kalmaz (WCAG 1.1.1, 4.1.2).
+* **İstek listesi düğmeleri** — Ürün kartındaki istek listesi düğmelerinin erişilebilir adı artık ürün adını da içerir; birden fazla ürün listesi ekranında hangi düğmenin hangi ürüne ait olduğu ayırt edilebilir (WCAG 2.4.4, 2.4.6).
+* **Kırıntı navigasyonu** — Koleksiyon sayfasının son kırıntı öğesine `aria-current="page"` eklendi (WCAG 1.3.1).
+* **Sepet önizleme kartı** — Önizleme artık yalnızca fareyle üzerine gelince değil, düğmeye klavye odağı geldiğinde de açılır; `Escape` ile kapanır, odağı tetikleyiciye döndürür ve çekmece açıkken yeniden açılmaz (WCAG 2.1.1, 2.4.3, 2.4.7).
+* **Adet artır/azalt düğmeleri** — Ürün ve sepet sayfalarındaki adet alanları `role="spinbutton"` ile sunulur; `aria-valuemin`/`aria-valuemax`/`aria-valuenow` değerleri gerçek adetle senkron kalır, ok tuşlarıyla adet değiştirilir, hata durumunda `aria-invalid` + `aria-describedby` ile hata mesajına bağlanır (WCAG 4.1.2, 3.3.1).
+* **Dokunma hedefleri** — Header'daki arama, tema, hamburger, sepet ve istek listesi ikon düğmeleri 44×44px'e büyütüldü (WCAG 2.5.5).
+* **Menü Escape davranışı** — Giriş yapmış ve misafir kullanıcı menüleri `Escape` ile kapanır ve odağı tetikleyiciye döndürür; menü kapalıyken `Escape` odak çalmaz (WCAG 2.1.1, 2.4.3).
+* **Filtre başlıkları** — Koleksiyon sayfasındaki akordeon filtre gruplarının etiketleri `<h3>` başlığına sarıldı; "Öznitelikler" başlığı da `<p>` yerine `<h3>` oldu. Başlık hiyerarşisi `<h2> Filtreler` → `<h3>` grup başlıkları şeklinde kesintisiz (WCAG 1.3.1, 2.4.6).
+* **Sepet ürün sayısı duyurusu** — Sepete ürün eklenince ekran okuyucuya "Sepetinizde N ürün var." bildirimi kalıcı canlı bölgede iletilir; ilk yüklemede gereksiz duyuru yapılmaz (WCAG 4.1.3).
+
+### Kalite
+
+* Yeni erişilebilirlik test paketleri: `StorefrontAccessibilityTest`, `StorefrontFormAccessibilityTest`, `StorefrontProductAccessibilityTest`, `StorefrontCartAccessibilityTest`, `StorefrontQuantityAccessibilityTest`, `HeaderAccessibilityTest`, `StorefrontFilterAccessibilityTest`, `StorefrontIndicatorAccessibilityTest`.
+* Tam suite yeşil: **233 test / 1450 assertion**.
+
 ## [v1.5.0](https://github.com/exportdepo/lunar-exportdepo/releases/tag/v1.5.0) — 2026-09-28
 
 Kurumsal Sayfalar, Zengin Footer ve Panel Medya Düzeltmeleri
