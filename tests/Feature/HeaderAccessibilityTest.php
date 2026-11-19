@@ -101,6 +101,43 @@ class HeaderAccessibilityTest extends TestCase
         $this->assertStringContainsString('focus()', $escape);
     }
 
+    public function test_user_dropdown_escape_restores_focus_to_the_user_trigger(): void
+    {
+        $user = User::factory()->create();
+
+        $xpath = $this->parseHtml(
+            $this->actingAs($user)->get('/')->assertOk()->getContent(),
+        );
+
+        $trigger = $this->firstNode($xpath, '//button[@aria-controls="user-dropdown"]');
+
+        $this->assertNotNull($trigger, 'Üyelik menüsü tetikleyicisi bulunamadı.');
+
+        // Odakın tam olarak nereye döndüğü önemlidir: tetikleyici dışındaki
+        // bir hedefe (ör. `document.body`) odaklanmak menüyü kullanılamaz
+        // bırakır (WCAG 2.4.3).
+        $this->assertStringContainsString(
+            '$refs.userTrigger.focus()',
+            (string) $trigger->getAttribute('data-a11y-keydown.escape.window'),
+            'Escape odağı tam olarak kullanıcı menüsü tetikleyicisine döndürmeli.',
+        );
+    }
+
+    public function test_guest_dropdown_escape_restores_focus_to_the_guest_trigger(): void
+    {
+        $xpath = $this->parseHtml($this->get('/')->assertOk()->getContent());
+
+        $trigger = $this->firstNode($xpath, '//button[@aria-controls="guest-auth-dropdown"]');
+
+        $this->assertNotNull($trigger, 'Misafir menüsü tetikleyicisi bulunamadı.');
+
+        $this->assertStringContainsString(
+            '$refs.guestTrigger.focus()',
+            (string) $trigger->getAttribute('data-a11y-keydown.escape.window'),
+            'Escape odağı tam olarak misafir menüsü tetikleyicisine döndürmeli.',
+        );
+    }
+
     public function test_icon_only_header_buttons_have_44px_touch_targets(): void
     {
         $xpath = $this->parseHtml($this->get('/')->assertOk()->getContent());

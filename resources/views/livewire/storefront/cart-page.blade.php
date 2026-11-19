@@ -63,7 +63,10 @@
                                          metotlarında toplandı; tıklama ve ok tuşları aynı
                                          işlemi çağırır (WCAG 2.1.1). `x-model` ile giriş
                                          değeri Alpine durumuna bağlıdır; böylece yazılan
-                                         değer +/- düğmelerini de doğru etkiler. --}}
+                                         değer +/- düğmelerini de doğru etkiler.
+                                         `aria-valuenow` yalnızca gerçek bir sayı
+                                         varken bildirilir; boş alan "1" olarak
+                                         duyurulmamalı (WCAG 4.1.2). --}}
                                     <div x-data="{ qty: {{ (int) $line['quantity'] }}, increase() { this.qty = Math.min(99, (parseInt(this.qty) || 1) + 1); this.$wire.updateQuantity({{ $line['id'] }}, this.qty); }, decrease() { this.qty = Math.max(1, (parseInt(this.qty) || 1) - 1); this.$wire.updateQuantity({{ $line['id'] }}, this.qty); } }"
                                          x-on:cart-quantity-rejected.window="if ($event.detail.lineId === {{ $line['id'] }}) qty = $event.detail.quantity"
                                          class="flex items-stretch overflow-hidden rounded-lg border border-slate-300 transition-colors focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 dark:border-slate-600 dark:focus-within:border-indigo-400 dark:focus-within:ring-indigo-400/30">
@@ -80,8 +83,8 @@
                                                role="spinbutton"
                                                aria-valuemin="1"
                                                aria-valuemax="99"
-                                               :aria-valuenow="parseInt(qty) || 1"
-                                               @error('cart') aria-describedby="cart-error" aria-invalid="true" @enderror
+                                               :aria-valuenow="qty !== null && qty !== '' && Number.isFinite(Number(qty)) ? Number(qty) : false"
+                                               @if ($rejectedLineId === (int) $line['id']) aria-describedby="cart-error" aria-invalid="true" @endif
                                                @change="$wire.updateQuantity({{ $line['id'] }}, $event.target.value)"
                                                aria-label="{{ $line['name'] }} adet"
                                                class="qty-input w-14 py-1.5 text-center text-sm font-semibold text-slate-900 dark:bg-slate-800 dark:text-slate-100" />

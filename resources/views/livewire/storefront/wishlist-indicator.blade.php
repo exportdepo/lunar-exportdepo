@@ -4,7 +4,7 @@
 
 <a href="{{ url('/istek-listesi') }}"
    title="İstek Listem"
-   aria-label="İstek Listem"
+   aria-label="{{ $count > 0 ? 'İstek Listem, '.$count.' ürün' : 'İstek Listem' }}"
    class="relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-colors
           {{ $active ? 'text-rose-600 hover:bg-rose-50' : 'text-slate-600 hover:bg-slate-100 hover:text-rose-600' }}">
     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="{{ $active ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2" aria-hidden="true">

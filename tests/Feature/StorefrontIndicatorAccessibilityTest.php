@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Livewire\Storefront\CartIndicator;
+use App\Support\WishlistManager;
 use DOMDocument;
 use DOMElement;
 use DOMXPath;
@@ -43,7 +44,7 @@ class StorefrontIndicatorAccessibilityTest extends TestCase
     {
         $xpath = $this->parseHtml($this->get('/')->assertOk()->getContent());
 
-        $wishlist = $this->firstNode($xpath, '//a[@aria-label="İstek Listem"]');
+        $wishlist = $this->firstNode($xpath, '//a[starts-with(@aria-label, "İstek Listem")]');
 
         $this->assertNotNull($wishlist, 'İstek listesi göstergesi bulunamadı.');
         $this->assertStringContainsString(
@@ -152,6 +153,62 @@ class StorefrontIndicatorAccessibilityTest extends TestCase
         $component->dispatch('cart-updated')
             ->assertSet('count', 2)
             ->assertSet('cartAnnouncement', 'Sepetinizde 2 ürün var.');
+    }
+
+    public function test_cart_indicator_accessible_name_includes_the_item_count(): void
+    {
+        $product = $this->publishedProductWithVariant(stock: 5);
+        $variant = $product->variants->first();
+
+        CartSession::setChannel($variant->product->channels()->where('handle', 'web')->first());
+        CartSession::manager()->add($variant, 2);
+
+        $xpath = $this->parseHtml($this->get('/')->assertOk()->getContent());
+
+        $cart = $this->firstNode($xpath, '//button[@id="cart-trigger-button"]');
+
+        $this->assertNotNull($cart, 'Sepet göstergesi bulunamadı.');
+
+        // Rozet üzerindeki sayı `aria-label` ile gizlenir; ekran okuyucu
+        // kullanıcısına sayıyı ancak erişilebilir adda iletebiliriz.
+        $label = (string) $cart->getAttribute('aria-label');
+
+        $this->assertStringContainsString(
+            '2',
+            $label,
+            'Sepet düğmesinin erişilebilir adı ürün sayısını içermeli.',
+        );
+        $this->assertStringContainsString(
+            'ürün',
+            $label,
+            'Sepet düğmesinin erişilebilir adı sayının birimini içermeli.',
+        );
+    }
+
+    public function test_wishlist_indicator_accessible_name_includes_the_item_count(): void
+    {
+        $product = $this->publishedProductWithVariant(stock: 5);
+
+        WishlistManager::add($product->id);
+
+        $xpath = $this->parseHtml($this->get('/')->assertOk()->getContent());
+
+        $wishlist = $this->firstNode($xpath, '//a[starts-with(@aria-label, "İstek Listem")]');
+
+        $this->assertNotNull($wishlist, 'İstek listesi göstergesi bulunamadı.');
+
+        $label = (string) $wishlist->getAttribute('aria-label');
+
+        $this->assertStringContainsString(
+            '1',
+            $label,
+            'İstek listesi bağlantısının erişilebilir adı ürün sayısını içermeli.',
+        );
+        $this->assertStringContainsString(
+            'ürün',
+            $label,
+            'İstek listesi bağlantısının erişilebilir adı sayının birimini içermeli.',
+        );
     }
 
     private function parseHtml(string $html): DOMXPath

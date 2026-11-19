@@ -22,6 +22,16 @@ class CartPage extends Component
 
     public int $shippingTotal = 0;
 
+    /**
+     * Adet güncellemesi reddedilen satırın kimliği.
+     *
+     * Hata torbası `cart` anahtarı altında global tutulur. Hata mesajının
+     * hangi adet girişine bağlanacağını bilmek için reddedilen satır burada
+     * ayrıca saklanır; aksi halde tek bir satırdaki hata sepeteki tüm adet
+     * girişlerini hatalı olarak işaretlerdi (WCAG 3.3.1).
+     */
+    public ?int $rejectedLineId = null;
+
     public function mount(): void
     {
         $this->refreshCart();
@@ -55,6 +65,7 @@ class CartPage extends Component
         if (! $line) {
             // Satır başka bir sekmede kaldırılmış olabilir.
             $this->addError('cart', 'Bu ürün artık sepetinizde bulunmuyor.');
+            $this->rejectedLineId = null;
             $this->refreshCart();
             $this->dispatch('cart-updated');
 
@@ -66,13 +77,16 @@ class CartPage extends Component
 
         if ($rejected) {
             $this->addError('cart', $this->stockMessage($stock));
+            $this->rejectedLineId = $lineId;
         } else {
             try {
                 $cart->updateLine($lineId, $quantity);
                 $this->resetErrorBag('cart');
+                $this->rejectedLineId = null;
             } catch (CartException $exception) {
                 $rejected = true;
                 $this->addError('cart', $this->cartErrorMessage($exception));
+                $this->rejectedLineId = $lineId;
             }
         }
 
@@ -97,8 +111,12 @@ class CartPage extends Component
         try {
             $cart->remove($lineId);
             $this->resetErrorBag('cart');
+            $this->rejectedLineId = null;
         } catch (CartException) {
             $this->addError('cart', 'Ürün sepetten kaldırılamadı.');
+            // Hata kaldırma işlemine ait; adet girişini hatalı işaretlemek
+            // yanlış olur (WCAG 3.3.1).
+            $this->rejectedLineId = null;
         }
 
         $this->refreshCart();

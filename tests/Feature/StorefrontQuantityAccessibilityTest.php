@@ -9,6 +9,7 @@ use DOMElement;
 use DOMXPath;
 use Livewire\Livewire;
 use Lunar\Facades\CartSession;
+use Lunar\Models\Currency;
 use Tests\Concerns\CreatesStorefrontProduct;
 use Tests\Concerns\SeedsLunarDefaults;
 use Tests\TestCase;
@@ -52,13 +53,13 @@ class StorefrontQuantityAccessibilityTest extends TestCase
             'Adet girişi spinbutton rolünü taşımalı.',
         );
         $this->assertSame('1', $input->getAttribute('aria-valuemin'));
-        $this->assertStringContainsString(
+        $this->assertSame(
             '7',
-            (string) $input->getAttribute(':aria-valuemax'),
+            $input->getAttribute(':aria-valuemax'),
             'Azami değer stokla (7) eşleşmeli.',
         );
         $this->assertStringContainsString(
-            'qty',
+            'Number(qty)',
             (string) $input->getAttribute(':aria-valuenow'),
             'Anlık değer, girişin gerçek değeriyle senkron olmalı.',
         );
@@ -88,9 +89,58 @@ class StorefrontQuantityAccessibilityTest extends TestCase
             'Yerel max niteliği de aynı sınırı bildirmeli.',
         );
         $this->assertStringContainsString(
-            'qty',
+            'Number(qty)',
             (string) $input->getAttribute(':aria-valuenow'),
             'Anlık değer, girişin gerçek değeriyle senkron olmalı.',
+        );
+    }
+
+    public function test_product_page_quantity_value_is_omitted_while_the_field_is_empty(): void
+    {
+        $xpath = $this->parseHtml($this->productPageHtml(stock: 7));
+
+        $input = $this->firstNode($xpath, '//input[@id="quantity"]');
+
+        $this->assertNotNull($input, 'Adet girişi bulunamadı.');
+
+        $expression = (string) $input->getAttribute(':aria-valuenow');
+
+        // `aria-valuenow` gerçek değeri yansıtmalı (WCAG 4.1.2). Kullanıcı
+        // alanı temizlediğinde Alpine modeli boş değere düşer; "1" değerine
+        // düşmek görünmeyen bir değer bildirir. Değer yoksa nitelik
+        // kaldırılmalı (Alpine `false`/`null`/`undefined` değerinde niteliği
+        // DOM'dan siler).
+        $this->assertDoesNotMatchRegularExpression(
+            '/\|\|\s*1\b/',
+            $expression,
+            'Boş adet alanı "1" olarak bildirilmemeli (aria-valuenow yalanı).',
+        );
+        $this->assertMatchesRegularExpression(
+            '/:\s*(false|null|undefined)\s*$/',
+            trim($expression),
+            'Geçerli sayı olmayan modelde aria-valuenow kaldırılmalı (false/null/undefined).',
+        );
+    }
+
+    public function test_cart_page_quantity_value_is_omitted_while_the_field_is_empty(): void
+    {
+        $xpath = $this->parseHtml($this->cartPageHtml());
+
+        $input = $this->firstNode($xpath, '//main//input[@type="number"]');
+
+        $this->assertNotNull($input, 'Sepet sayfasındaki adet girişi bulunamadı.');
+
+        $expression = (string) $input->getAttribute(':aria-valuenow');
+
+        $this->assertDoesNotMatchRegularExpression(
+            '/\|\|\s*1\b/',
+            $expression,
+            'Boş adet alanı "1" olarak bildirilmemeli (aria-valuenow yalanı).',
+        );
+        $this->assertMatchesRegularExpression(
+            '/:\s*(false|null|undefined)\s*$/',
+            trim($expression),
+            'Geçerli sayı olmayan modelde aria-valuenow kaldırılmalı (false/null/undefined).',
         );
     }
 
@@ -240,6 +290,54 @@ class StorefrontQuantityAccessibilityTest extends TestCase
         );
     }
 
+    public function test_cart_page_marks_only_the_rejected_line_as_invalid(): void
+    {
+        $lineIds = $this->twoLineCart();
+
+        $this->assertCount(2, $lineIds, 'Sepette iki satır bulunmalı.');
+
+        // İkinci satırın adedi stoktan fazla → yalnızca ikinci satır reddedilir.
+        $xpath = $this->parseHtml(
+            Livewire::test(CartPage::class)
+                ->call('updateQuantity', $lineIds[1], 9)
+                ->html(),
+        );
+
+        $inputs = $xpath->query('//input[@type="number"]');
+
+        $this->assertSame(2, $inputs->length, 'Sepette iki adet girişi olmalı.');
+
+        $valid = $inputs->item(0);
+        $rejected = $inputs->item(1);
+
+        $this->assertNotNull($valid);
+        $this->assertNotNull($rejected);
+
+        // Geçerli satır hatalı işaretlenmemeli (WCAG 3.3.1): kullanıcıya
+        // hangi satırı düzeltmesi gerektiği net söylenmelidir.
+        $this->assertSame(
+            '',
+            $valid->getAttribute('aria-invalid'),
+            'Reddedilmeyen satırın adet girişi aria-invalid ile işaretlenmemeli.',
+        );
+        $this->assertSame(
+            '',
+            $valid->getAttribute('aria-describedby'),
+            'Reddedilmeyen satırın adet girişi hata mesajına bağlanmamalı.',
+        );
+
+        $this->assertSame(
+            'true',
+            $rejected->getAttribute('aria-invalid'),
+            'Reddedilen satırın adet girişi aria-invalid ile işaretlenmeli.',
+        );
+        $this->assertSame(
+            'cart-error',
+            $rejected->getAttribute('aria-describedby'),
+            'Reddedilen satırın adet girişi hata mesajına bağlanmalı.',
+        );
+    }
+
     public function test_cart_page_quantity_input_has_no_dangling_description_without_error(): void
     {
         $xpath = $this->parseHtml($this->cartPageHtml());
@@ -276,6 +374,44 @@ class StorefrontQuantityAccessibilityTest extends TestCase
         CartSession::manager()->add($variant, 1);
 
         return $this->get('/sepet')->assertOk()->getContent();
+    }
+
+    /**
+     * Farklı stoklu iki ürünlü sepet kurar ve satır kimliklerini döndürür.
+     *
+     * @return array<int, int>
+     */
+    private function twoLineCart(): array
+    {
+        $first = $this->publishedProductWithVariant(stock: 5);
+        $second = $this->publishedProductWithVariant(stock: 2);
+
+        // Her ürün çağrısı kendi para birimini varsayılan yapar. Sepet tek
+        // para biriminde hesaplandığı için iki varyantın da güncel varsayılan
+        // para biriminde fiyatı bulunmalı.
+        $currency = Currency::query()->where('default', true)->firstOrFail();
+
+        foreach ([$first, $second] as $product) {
+            $variant = $product->variants->first();
+
+            if (! $variant->prices()->where('currency_id', $currency->id)->exists()) {
+                $variant->prices()->create([
+                    'currency_id' => $currency->id,
+                    'price' => 100,
+                    'min_quantity' => 1,
+                ]);
+            }
+        }
+
+        CartSession::setChannel($first->channels()->where('handle', 'web')->first());
+
+        CartSession::manager()->add($first->variants->first(), 1);
+        CartSession::manager()->add($second->variants->first(), 1);
+
+        return CartSession::current()->lines
+            ->map(fn ($line): int => (int) $line->id)
+            ->values()
+            ->all();
     }
 
     private function parseHtml(string $html): DOMXPath

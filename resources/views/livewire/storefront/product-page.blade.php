@@ -254,6 +254,13 @@
                                  metotlarında toplandı; tıklama ve ok tuşları aynı
                                  işlemi çağırır (WCAG 2.1.1). --}}
                             <div x-data="{ qty: @entangle('quantity'), increase() { this.qty = Math.min({{ $product['stock'] ?? 999 }}, (parseInt(this.qty) || 1) + 1); }, decrease() { this.qty = Math.max(1, (parseInt(this.qty) || 1) - 1); } }" class="flex items-stretch overflow-hidden rounded-lg border border-slate-300 transition-colors focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 dark:border-slate-600 dark:focus-within:border-indigo-400 dark:focus-within:ring-indigo-400/30">
+                                {{-- `aria-valuenow` yalnızca gerçek bir sayı varken
+                                     bildirilir: kullanıcı alanı temizlediğinde
+                                     "1" duyurmak yanlış olur (WCAG 4.1.2). Alpine,
+                                     `false`/`null` değerine bağlı niteliği DOM'dan
+                                     kaldırır; `undefined` yerine `false` kullanılır
+                                     çünkü Alpine kapsamında `undefined` identifier'ı
+                                     boş string'e çözülüyor. --}}
                                 <button type="button"
                                         @click="decrease()"
                                         @keydown.down.prevent="decrease()"
@@ -268,7 +275,7 @@
                                        role="spinbutton"
                                        aria-valuemin="1"
                                        :aria-valuemax="{{ $product['stock'] ?? 999 }}"
-                                       :aria-valuenow="parseInt(qty) || 1"
+                                       :aria-valuenow="qty !== null && qty !== '' && Number.isFinite(Number(qty)) ? Number(qty) : false"
                                        @error('quantity') aria-describedby="quantity-error" aria-invalid="true" @enderror
                                        aria-label="Adet"
                                        class="qty-input w-14 py-3 text-center text-sm font-semibold text-slate-900 dark:bg-slate-800 dark:text-slate-100" />
