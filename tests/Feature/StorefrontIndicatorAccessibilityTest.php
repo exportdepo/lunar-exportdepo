@@ -211,6 +211,43 @@ class StorefrontIndicatorAccessibilityTest extends TestCase
         );
     }
 
+    public function test_cart_indicator_clears_its_count_when_the_cart_disappears(): void
+    {
+        $product = $this->publishedProductWithVariant(stock: 5);
+        $variant = $product->variants->first();
+
+        CartSession::setChannel($variant->product->channels()->where('handle', 'web')->first());
+        CartSession::manager()->add($variant, 2);
+
+        $component = Livewire::test(CartIndicator::class);
+
+        $this->assertSame(2, $component->get('count'), 'Sepette iki ürün olmalı.');
+
+        $lineId = (int) CartSession::current()->lines->first()->id;
+
+        // Sepet başka bir sekmede temizlenir → göstergede bayat sayı kalmamalı.
+        CartSession::forget();
+
+        $component->call('removeLine', $lineId);
+
+        $this->assertSame(
+            0,
+            $component->get('count'),
+            'Sepet kaybolduğunda gösterge sayısı sıfırlanmalı; aksi halde erişilebilir '
+                .'adda var olmayan ürünler bildirilir.',
+        );
+        $this->assertSame([], $component->get('lines'), 'Sepet satırları temizlenmeli.');
+
+        $cart = $this->firstNode($this->parseHtml($component->html()), '//button[@id="cart-trigger-button"]');
+
+        $this->assertNotNull($cart, 'Sepet göstergesi bulunamadı.');
+        $this->assertSame(
+            'Sepeti aç',
+            $cart->getAttribute('aria-label'),
+            'Sepet boşken erişilebilir ad ürün sayısı bildirmemeli.',
+        );
+    }
+
     private function parseHtml(string $html): DOMXPath
     {
         $document = new DOMDocument;

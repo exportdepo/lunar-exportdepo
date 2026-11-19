@@ -96,6 +96,11 @@ class CartIndicator extends Component
         $cart = CartSession::current();
 
         if (! $cart) {
+            // Sepet başka bir sekmede temizlenmiş olabilir. Göstergede bayat
+            // sayı kalırsa erişilebilir ad var olmayan ürünleri bildirir
+            // (WCAG 1.1.1 / 4.1.2).
+            $this->refreshCart();
+
             return;
         }
 
