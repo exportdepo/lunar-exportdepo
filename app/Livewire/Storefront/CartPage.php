@@ -57,6 +57,8 @@ class CartPage extends Component
 
         $cart = CartSession::current();
         if (! $cart) {
+            $this->resetCartState();
+
             return;
         }
 
@@ -105,6 +107,8 @@ class CartPage extends Component
     {
         $cart = CartSession::current();
         if (! $cart) {
+            $this->resetCartState();
+
             return;
         }
 
@@ -119,6 +123,22 @@ class CartPage extends Component
             $this->rejectedLineId = null;
         }
 
+        $this->refreshCart();
+        $this->dispatch('cart-updated');
+    }
+
+    /**
+     * Sepet oturumdan kaybolduğunda (ör. başka bir sekmede temizlendiğinde)
+     * satır listesini ve hata durumunu sıfırlar.
+     *
+     * Hata durumu temizlenmezse `rejectedLineId` bir sonraki istekte de
+     * korunur ve görünmeyen bir hata mesajına bağlanan `aria-invalid`
+     * işareti kalır (WCAG 4.1.2).
+     */
+    protected function resetCartState(): void
+    {
+        $this->resetErrorBag('cart');
+        $this->rejectedLineId = null;
         $this->refreshCart();
         $this->dispatch('cart-updated');
     }

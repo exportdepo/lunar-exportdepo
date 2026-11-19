@@ -352,6 +352,31 @@ class StorefrontQuantityAccessibilityTest extends TestCase
         );
     }
 
+    public function test_cart_page_clears_the_rejected_line_state_when_the_cart_disappears(): void
+    {
+        $lineIds = $this->twoLineCart();
+
+        $component = Livewire::test(CartPage::class)
+            ->call('updateQuantity', $lineIds[1], 9);
+
+        $this->assertSame(
+            $lineIds[1],
+            $component->get('rejectedLineId'),
+            'Reddedilen satır kaydedilmiş olmalı.',
+        );
+
+        // Sepet başka bir sekmede temizlenir → sonraki istekte sepet bulunmaz.
+        CartSession::forget();
+
+        $component->call('updateQuantity', $lineIds[0], 2);
+
+        $this->assertNull(
+            $component->get('rejectedLineId'),
+            'Sepet kaybolduğunda reddedilen satır durumu temizlenmeli; aksi halde '
+                .'görünmeyen bir hata mesajına bağlanan aria-invalid kalır.',
+        );
+    }
+
     /**
      * Ürün sayfasının HTML çıktısı.
      */
