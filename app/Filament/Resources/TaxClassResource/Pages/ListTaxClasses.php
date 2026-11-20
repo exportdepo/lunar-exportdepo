@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TaxClassResource\Pages;
 
 use App\Filament\Resources\TaxClassResource;
+use Filament\Actions\CreateAction;
 use Lunar\Admin\Support\Pages\BaseListRecords;
 
 class ListTaxClasses extends BaseListRecords
@@ -12,7 +13,7 @@ class ListTaxClasses extends BaseListRecords
     protected function getDefaultHeaderActions(): array
     {
         return [
-            \Filament\Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

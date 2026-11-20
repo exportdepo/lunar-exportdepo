@@ -16,7 +16,6 @@ use Livewire\Component;
 use Lunar\Models\Attribute;
 use Lunar\Models\Collection;
 use Lunar\Models\Product;
-use Lunar\Models\Tag;
 
 #[Layout('layouts.storefront')]
 class CollectionPage extends Component

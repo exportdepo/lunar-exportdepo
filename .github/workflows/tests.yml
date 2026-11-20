@@ -1,4 +1,4 @@
-name: Tests
+﻿name: Tests
 
 on:
   push:
@@ -64,6 +64,8 @@ jobs:
       - name: Execute tests (Unit & Feature)
         # Seeder için yalnızca test amaçlı yönetici parolası gerekir.
         # Müşteri parolalarını testler belirler; burada tanımlamak override işlemini engeller.
+        # Uygulama Türkçe olduğu için testlerde de TR locale kullanılır.
         env:
           EXPORTDEPO_ADMIN_PASSWORD: ci-demo-admin-password
+          APP_LOCALE: tr
         run: php artisan test

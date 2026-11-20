@@ -18,11 +18,15 @@
 // `intelephense.environment.stubFiles`).
 
 namespace {
+    use App\Models\User;
+    use Illuminate\Contracts\Auth\Guard;
+    use Illuminate\View\View;
+
     /**
      * Auth guard'ı ya da varsayılan guard'ın kendisini döndürür.
      *
      * @param  string|null  $driver
-     * @return \Illuminate\Contracts\Auth\Guard&\App\Models\User
+     * @return Guard&User
      */
     function auth($driver = null) {}
 
@@ -38,10 +42,10 @@ namespace {
      * concrete sınıfa sabitlenir; runtime'da zaten her zaman bu sınıf
      * döner (`ViewFactory::make()`).
      *
-     * @param  string|\Illuminate\Contracts\View\View|null  $view
+     * @param  string|Illuminate\Contracts\View\View|null  $view
      * @param  array  $data
      * @param  array  $mergeData
-     * @return \Illuminate\View\View
+     * @return View
      */
     function view($view = null, $data = [], $mergeData = []) {}
 }

@@ -7,6 +7,8 @@ use App\Services\DeleteCustomers;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\DB;
 use Lunar\Models\Cart;
+use Lunar\Models\Channel;
+use Lunar\Models\Currency;
 use Lunar\Models\Customer;
 use Lunar\Models\CustomerGroup;
 use Lunar\Models\Order;
@@ -50,8 +52,8 @@ class CustomerDeleteTest extends TestCase
 
         $cart = Cart::factory()->create([
             'customer_id' => $customer->id,
-            'currency_id' => \Lunar\Models\Currency::query()->where('default', true)->firstOrFail()->id,
-            'channel_id' => \Lunar\Models\Channel::query()->where('default', true)->firstOrFail()->id,
+            'currency_id' => Currency::query()->where('default', true)->firstOrFail()->id,
+            'channel_id' => Channel::query()->where('default', true)->firstOrFail()->id,
         ]);
 
         app(DeleteCustomers::class)->handle(

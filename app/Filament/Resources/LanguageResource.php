@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Component;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 use Lunar\Admin\Filament\Resources\LanguageResource as LunarLanguageResource;
+use Lunar\Models\Url;
 
 class LanguageResource extends LunarLanguageResource
 {
@@ -42,10 +44,10 @@ class LanguageResource extends LunarLanguageResource
                         ->color('danger')
                         ->requiresConfirmation()
                         ->modalDescription('Seçili diller silinecek. Varsayılan dil ve bu dillere bağlı URL\'ler korunur.')
-                        ->before(function (\Illuminate\Database\Eloquent\Collection $records, \Filament\Actions\DeleteBulkAction $action) {
+                        ->before(function (Collection $records, DeleteBulkAction $action) {
                             $blocked = $records->filter(
                                 fn ($record) => $record->default
-                                    || \Lunar\Models\Url::where('language_id', $record->id)->exists()
+                                    || Url::where('language_id', $record->id)->exists()
                             );
 
                             if ($blocked->isNotEmpty()) {

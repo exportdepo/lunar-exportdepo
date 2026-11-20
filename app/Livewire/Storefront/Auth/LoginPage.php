@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Storefront\Auth;
 
+use App\Support\CustomerEmail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
@@ -12,7 +13,9 @@ use Livewire\Component;
 class LoginPage extends Component
 {
     public string $email = '';
+
     public string $password = '';
+
     public bool $remember = false;
 
     public function mount()
@@ -23,14 +26,14 @@ class LoginPage extends Component
 
     public function login()
     {
-        $this->email = \App\Support\CustomerEmail::normalize($this->email);
+        $this->email = CustomerEmail::normalize($this->email);
 
         $this->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
 
-        $throttleKey = 'login:' . strtolower($this->email) . '|' . request()->ip();
+        $throttleKey = 'login:'.strtolower($this->email).'|'.request()->ip();
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);

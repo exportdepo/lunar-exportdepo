@@ -3,8 +3,6 @@
 namespace Tests\Feature;
 
 use App\Livewire\Storefront\CollectionPage;
-use App\Livewire\Storefront\HomePage;
-use App\Livewire\Storefront\ProductPage;
 use App\Livewire\Storefront\WishlistPage;
 use App\Models\ProductReview;
 use App\Support\WishlistManager;

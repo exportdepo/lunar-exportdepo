@@ -11,6 +11,7 @@ use Lunar\Models\Currency;
 use Lunar\Models\CustomerGroup;
 use Lunar\Models\Language;
 use Lunar\Models\Product;
+use Lunar\Models\TaxClass;
 use Lunar\Models\TaxZone;
 use Tests\TestCase;
 
@@ -158,7 +159,7 @@ class ProductPageTest extends TestCase
 
         foreach ([100, 200] as $index => $price) {
             $variant = $product->variants()->create([
-                'tax_class_id' => \Lunar\Models\TaxClass::factory()->create()->id,
+                'tax_class_id' => TaxClass::factory()->create()->id,
                 'sku' => 'TEST-VARIANT-'.($index + 1).'-'.uniqid(),
                 'stock' => 5 + $index,
                 'unit_quantity' => 1,

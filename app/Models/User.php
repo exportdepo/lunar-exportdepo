@@ -3,7 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Support\CustomerEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -51,10 +53,10 @@ class User extends Authenticatable
         ];
     }
 
-    protected function email(): \Illuminate\Database\Eloquent\Casts\Attribute
+    protected function email(): Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
-            set: fn (string $value) => \App\Support\CustomerEmail::normalize($value),
+        return Attribute::make(
+            set: fn (string $value) => CustomerEmail::normalize($value),
         );
     }
 

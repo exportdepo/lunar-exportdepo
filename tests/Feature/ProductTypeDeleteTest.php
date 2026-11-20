@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Services\DeleteProductTypes;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Lunar\Models\CartLine;
+use Lunar\Models\Channel;
 use Lunar\Models\Language;
 use Lunar\Models\Price;
 use Lunar\Models\Product;
@@ -49,7 +50,7 @@ class ProductTypeDeleteTest extends TestCase
             'purchasable_id' => $variant->id,
         ]);
 
-        $channel = \Lunar\Models\Channel::first();
+        $channel = Channel::first();
         $product->channels()->syncWithoutDetaching([$channel->id]);
 
         $language = Language::first();

@@ -18,6 +18,7 @@ class AccountPageTest extends TestCase
     use SeedsLunarDefaults;
 
     protected ?User $testUser = null;
+
     protected ?Customer $testCustomer = null;
 
     protected function setUp(): void
@@ -45,7 +46,7 @@ class AccountPageTest extends TestCase
     {
         $user = User::factory()->create([
             'name' => 'Test Müşteri',
-            'email' => 'account-' . Str::random(8) . '@example.com',
+            'email' => 'account-'.Str::random(8).'@example.com',
         ]);
 
         $channel = Channel::first();
@@ -55,7 +56,7 @@ class AccountPageTest extends TestCase
             'title' => null,
             'first_name' => 'Test',
             'last_name' => 'Müşteri',
-            'account_ref' => 'ACCT-' . str_pad((string) $user->id, 6, '0', STR_PAD_LEFT),
+            'account_ref' => 'ACCT-'.str_pad((string) $user->id, 6, '0', STR_PAD_LEFT),
             'attribute_data' => collect(['name' => new Text('Test Müşteri')]),
         ]);
         if ($cg) {
@@ -78,7 +79,7 @@ class AccountPageTest extends TestCase
             'customer_id' => $customer->id,
             'new_customer' => false,
             'status' => 'payment-offline',
-            'reference' => 'ACC' . str_pad((string) random_int(1, 999999), 6, '0', STR_PAD_LEFT),
+            'reference' => 'ACC'.str_pad((string) random_int(1, 999999), 6, '0', STR_PAD_LEFT),
             'sub_total' => 10000,
             'discount_total' => 0,
             'shipping_total' => 0,
@@ -118,7 +119,7 @@ class AccountPageTest extends TestCase
         $this->actingAs($user)
             ->get('/hesabim/siparislerim')
             ->assertOk()
-            ->assertSee('#' . $order->reference);
+            ->assertSee('#'.$order->reference);
 
         $this->testOrderCleanup = $order; // for tearDown via different mechanism
     }
@@ -135,20 +136,20 @@ class AccountPageTest extends TestCase
             'title' => null,
             'first_name' => 'Other',
             'last_name' => 'User',
-            'account_ref' => 'ACC2-' . str_pad((string) $user2->id, 6, '0', STR_PAD_LEFT),
+            'account_ref' => 'ACC2-'.str_pad((string) $user2->id, 6, '0', STR_PAD_LEFT),
         ]);
         if ($cg) {
             $customer2->customerGroups()->attach($cg->id);
         }
         $customer2->users()->attach($user2->id);
 
-        $order2 = $this->createOrderForCustomer($customer2, ['reference' => 'OTHER' . random_int(100000, 999999)]);
+        $order2 = $this->createOrderForCustomer($customer2, ['reference' => 'OTHER'.random_int(100000, 999999)]);
 
         $this->actingAs($user1)
             ->get('/hesabim/siparislerim')
             ->assertOk()
-            ->assertSee('#' . $order1->reference)
-            ->assertDontSee('#' . $order2->reference);
+            ->assertSee('#'.$order1->reference)
+            ->assertDontSee('#'.$order2->reference);
 
         // Cleanup
         $order2->delete();

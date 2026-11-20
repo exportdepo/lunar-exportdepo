@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Storefront\Auth;
 
+use App\Support\CustomerEmail;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -13,9 +14,13 @@ use Livewire\Component;
 class ResetPasswordPage extends Component
 {
     public string $token = '';
+
     public string $email = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
+
     public bool $resetSuccess = false;
 
     public function mount(string $token): void
@@ -26,7 +31,7 @@ class ResetPasswordPage extends Component
 
     public function resetPassword()
     {
-        $this->email = \App\Support\CustomerEmail::normalize($this->email);
+        $this->email = CustomerEmail::normalize($this->email);
 
         $this->validate([
             'email' => ['required', 'email'],

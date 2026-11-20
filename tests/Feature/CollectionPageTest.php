@@ -6,6 +6,7 @@ use App\Livewire\Storefront\CollectionPage;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Url;
 use Livewire\Livewire;
+use Lunar\FieldTypes\Text;
 use Lunar\Models\Attribute;
 use Lunar\Models\Brand;
 use Lunar\Models\Collection;
@@ -13,10 +14,10 @@ use Lunar\Models\Currency;
 use Lunar\Models\Language;
 use Lunar\Models\Product;
 use Lunar\Models\ProductOption;
+use Lunar\Models\ProductOptionValue;
 use Lunar\Models\Tag;
 use Lunar\Models\TaxClass;
 use Lunar\Models\TaxZone;
-use Lunar\FieldTypes\Text;
 use ReflectionProperty;
 use Tests\TestCase;
 
@@ -35,7 +36,7 @@ class CollectionPageTest extends TestCase
             'slug' => 'test-collection',
             'default' => true,
         ]);
-        
+
         $product1 = Product::factory()->create(['status' => 'published']);
         $product1->update([
             'attribute_data' => collect([
@@ -169,7 +170,7 @@ class CollectionPageTest extends TestCase
      * `$withSize` true ise Beden seçeneği (S, M) ve üçüncü ürün
      * "Siyah Tişört" (Siyah + S) eklenir: Siyah Gömlek→M, Beyaz Gömlek→M.
      *
-     * @return array{collection: Collection, option: ProductOption, siyah: \Lunar\Models\ProductOptionValue, beyaz: \Lunar\Models\ProductOptionValue, beden: ?ProductOption, small: ?\Lunar\Models\ProductOptionValue, medium: ?\Lunar\Models\ProductOptionValue, products: array<string, Product>, slug: string}
+     * @return array{collection: Collection, option: ProductOption, siyah: ProductOptionValue, beyaz: ProductOptionValue, beden: ?ProductOption, small: ?ProductOptionValue, medium: ?ProductOptionValue, products: array<string, Product>, slug: string}
      */
     private function variantOptionCollection(string $slug, bool $withSize = false): array
     {

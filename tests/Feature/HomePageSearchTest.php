@@ -59,13 +59,13 @@ class HomePageSearchTest extends TestCase
         // Eşleşmeyen arama: hero gizlenir, sonuç alanı en üstte ve boş durum gösterilir
         $this->get('/?q=bulunmayan-terim')
             ->assertOk()
-            ->assertDontSee("Hoş Geldiniz")
+            ->assertDontSee('Hoş Geldiniz')
             ->assertSee('eşleşen ürün bulunamadı');
 
         // Aramasız hâlde hero görünür
         $this->get('/')
             ->assertOk()
-            ->assertSee("Hoş Geldiniz");
+            ->assertSee('Hoş Geldiniz');
     }
 
     private function createProduct(int $languageId, string $name, string $slug): Product

@@ -10,6 +10,7 @@ use Illuminate\Testing\TestResponse;
 use Lunar\Models\Order;
 use Lunar\Models\OrderAddress;
 use Lunar\Models\OrderLine;
+use Lunar\Models\Product;
 use Lunar\Models\ProductVariant;
 use Lunar\Models\TaxClass;
 use Tests\Concerns\SeedsLunarDefaults;
@@ -129,17 +130,18 @@ class StripeIntegrationTest extends TestCase
             'HTTP_STRIPE_SIGNATURE' => "t={$timestamp},v1={$signature}",
         ], $payload);
 
-        $controller = new StripeWebhookController();
+        $controller = new StripeWebhookController;
 
         return TestResponse::fromBaseResponse($controller($request));
     }
 
     private function createStockedVariant(int $stock): ProductVariant
     {
-        $product = \Lunar\Models\Product::factory()->create(['status' => 'published']);
+        $product = Product::factory()->create(['status' => 'published']);
+
         return $product->variants()->create([
             'tax_class_id' => TaxClass::factory()->create()->id,
-            'sku' => 'TEST-STOCK-' . uniqid(),
+            'sku' => 'TEST-STOCK-'.uniqid(),
             'stock' => $stock,
             'unit_quantity' => 1,
             'min_quantity' => 1,
