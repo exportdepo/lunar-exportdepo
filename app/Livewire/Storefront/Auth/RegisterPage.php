@@ -3,6 +3,7 @@
 namespace App\Livewire\Storefront\Auth;
 
 use App\Models\User;
+use App\Support\CustomerEmail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
@@ -15,9 +16,13 @@ use Lunar\Models\CustomerGroup;
 class RegisterPage extends Component
 {
     public string $name = '';
+
     public string $email = '';
+
     public string $phone = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
 
     public function mount()
@@ -28,7 +33,7 @@ class RegisterPage extends Component
 
     public function register()
     {
-        $this->email = \App\Support\CustomerEmail::normalize($this->email);
+        $this->email = CustomerEmail::normalize($this->email);
 
         $this->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -65,7 +70,7 @@ class RegisterPage extends Component
             'title' => null,
             'first_name' => Str::before($user->name, ' ') ?: $user->name,
             'last_name' => Str::after($user->name, ' ') ?: '-',
-            'account_ref' => 'CUST-' . str_pad((string) $user->id, 6, '0', STR_PAD_LEFT),
+            'account_ref' => 'CUST-'.str_pad((string) $user->id, 6, '0', STR_PAD_LEFT),
             'attribute_data' => collect([
                 'name' => new Text($user->name),
             ]),

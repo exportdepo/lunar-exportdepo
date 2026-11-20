@@ -5,6 +5,7 @@ namespace App\Support;
 use Lunar\Exceptions\MissingCurrencyPriceException;
 use Lunar\Facades\Pricing;
 use Lunar\Models\ProductVariant;
+use Lunar\Models\TaxZone;
 
 class StorefrontPricing
 {
@@ -41,7 +42,7 @@ class StorefrontPricing
             }
 
             if ($inclTax) {
-                $taxZone = \Lunar\Models\TaxZone::where('default', true)->first();
+                $taxZone = TaxZone::where('default', true)->first();
 
                 return $taxZone ? $matched->priceIncTax($taxZone)->value : null;
             }

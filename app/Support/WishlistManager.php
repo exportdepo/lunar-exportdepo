@@ -3,7 +3,6 @@
 namespace App\Support;
 
 use App\Models\WishlistItem;
-use App\Support\StorefrontRatings;
 use Illuminate\Support\Facades\Auth;
 use Lunar\Models\Product;
 

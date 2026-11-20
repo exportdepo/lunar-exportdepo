@@ -2,11 +2,11 @@
 
 namespace App\Livewire\Storefront;
 
+use App\Services\OrderConfirmationService;
+use App\Services\OrderStockService;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
-use App\Services\OrderConfirmationService;
-use App\Services\OrderStockService;
 use Lunar\DataTypes\Price;
 use Lunar\DataTypes\ShippingOption;
 use Lunar\Facades\CartSession;
@@ -22,16 +22,27 @@ class CheckoutPage extends Component
     public array $summary = [];
 
     public string $firstName = '';
+
     public string $lastName = '';
+
     public string $email = '';
+
     public string $phone = '';
+
     public string $lineOne = '';
+
     public string $city = '';
+
     public string $state = '';
+
     public string $postcode = '';
+
     public string $paymentMethod = 'offline';
+
     public ?string $orderReference = null;
+
     public ?int $countryId = null;
+
     public bool $stripeEnabled = false;
 
     public function mount(): void
@@ -153,6 +164,7 @@ class CheckoutPage extends Component
 
         if (! $cart || $cart->lines->isEmpty()) {
             $this->summary = [];
+
             return;
         }
 

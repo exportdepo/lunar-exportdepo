@@ -13,4 +13,3 @@ Schedule::command('queue:work --stop-when-empty --sleep=1 --tries=1 --max-time=1
     ->everyFiveMinutes()
     ->withoutOverlapping()
     ->onOneServer();
-

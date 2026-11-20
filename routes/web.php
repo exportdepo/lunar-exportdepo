@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StripeWebhookController;
+use App\Livewire\Storefront\AboutPage;
 use App\Livewire\Storefront\Auth\AccountOrdersPage;
 use App\Livewire\Storefront\Auth\AccountPage;
 use App\Livewire\Storefront\Auth\ForgotPasswordPage;
@@ -10,13 +12,12 @@ use App\Livewire\Storefront\Auth\ResetPasswordPage;
 use App\Livewire\Storefront\CartPage;
 use App\Livewire\Storefront\CheckoutPage;
 use App\Livewire\Storefront\CollectionPage;
-use App\Livewire\Storefront\HomePage;
-use App\Livewire\Storefront\OrderStatusPage;
-use App\Livewire\Storefront\ProductPage;
-use App\Livewire\Storefront\AboutPage;
 use App\Livewire\Storefront\ContactPage;
 use App\Livewire\Storefront\FaqPage;
+use App\Livewire\Storefront\HomePage;
+use App\Livewire\Storefront\OrderStatusPage;
 use App\Livewire\Storefront\PrivacyPage;
+use App\Livewire\Storefront\ProductPage;
 use App\Livewire\Storefront\ReturnsPage;
 use App\Livewire\Storefront\WishlistPage;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
@@ -67,7 +68,7 @@ Route::middleware('auth')->group(function () {
     })->name('logout');
 });
 
-Route::get('/sitemap.xml', \App\Http\Controllers\SitemapController::class)->name('sitemap');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
 Route::post('/stripe/webhook', StripeWebhookController::class)
     ->withoutMiddleware([ValidateCsrfToken::class])

@@ -45,6 +45,7 @@ class AccountPage extends Component
     {
         $user = Auth::user();
         $customer = $user?->customers->first();
+
         return $customer ? Order::where('customer_id', $customer->id)->count() : 0;
     }
 

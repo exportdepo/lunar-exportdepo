@@ -17,7 +17,7 @@ class AuthRegisterTest extends TestCase
 
     public function test_register_with_valid_data_creates_user_and_customer(): void
     {
-        $email = 'newuser-' . uniqid() . '@example.com';
+        $email = 'newuser-'.uniqid().'@example.com';
 
         Livewire::test(RegisterPage::class)
             ->set('name', 'Test Kullanıcı')
@@ -41,7 +41,7 @@ class AuthRegisterTest extends TestCase
 
     public function test_register_with_password_mismatch_fails(): void
     {
-        $email = 'mismatch-' . uniqid() . '@example.com';
+        $email = 'mismatch-'.uniqid().'@example.com';
 
         Livewire::test(RegisterPage::class)
             ->set('name', 'Test Kullanıcı')
@@ -57,7 +57,7 @@ class AuthRegisterTest extends TestCase
 
     public function test_register_with_existing_email_fails(): void
     {
-        $email = 'taken-' . uniqid() . '@example.com';
+        $email = 'taken-'.uniqid().'@example.com';
         User::factory()->create(['email' => $email]);
 
         Livewire::test(RegisterPage::class)

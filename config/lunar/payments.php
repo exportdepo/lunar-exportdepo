@@ -9,12 +9,12 @@ return [
             'driver' => 'offline',
             'authorized' => 'payment-offline',
         ],
-            'stripe' => [
-                'driver' => 'stripe',
-                'secret' => env('STRIPE_SECRET'),
-                'success_url' => env('STRIPE_SUCCESS_URL', env('APP_URL').'/checkout'),
-                'cancel_url' => env('STRIPE_CANCEL_URL', env('APP_URL').'/checkout'),
-            ],
+        'stripe' => [
+            'driver' => 'stripe',
+            'secret' => env('STRIPE_SECRET'),
+            'success_url' => env('STRIPE_SUCCESS_URL', env('APP_URL').'/checkout'),
+            'cancel_url' => env('STRIPE_CANCEL_URL', env('APP_URL').'/checkout'),
+        ],
     ],
 
 ];

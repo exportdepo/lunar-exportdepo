@@ -3,15 +3,16 @@
 namespace Tests\Feature;
 
 use App\Mail\OrderConfirmation;
+use App\Services\OrderConfirmationService;
 use App\Services\OrderStockService;
 use Illuminate\Support\Facades\Mail;
-use Lunar\Models\Order;
-use Lunar\Models\OrderLine;
 use Lunar\Models\Language;
+use Lunar\Models\Order;
+use Lunar\Models\OrderAddress;
+use Lunar\Models\OrderLine;
 use Lunar\Models\Product;
 use Lunar\Models\ProductVariant;
 use Lunar\Models\TaxClass;
-use Lunar\Models\OrderAddress;
 use Tests\Concerns\SeedsLunarDefaults;
 use Tests\TestCase;
 
@@ -28,7 +29,7 @@ class OrderConfirmationMailTest extends TestCase
 
     public function test_mailable_uses_correct_subject_and_view(): void
     {
-        $order = new \Lunar\Models\Order(['reference' => 'ORD-TEST-1234']);
+        $order = new Order(['reference' => 'ORD-TEST-1234']);
         $order->reference = 'ORD-TEST-1234';
 
         $mailable = new OrderConfirmation($order);
@@ -43,7 +44,7 @@ class OrderConfirmationMailTest extends TestCase
 
     public function test_mailable_html_contains_order_reference_and_branding(): void
     {
-        $order = new \Lunar\Models\Order(['reference' => 'ORD-DEMO-9999']);
+        $order = new Order(['reference' => 'ORD-DEMO-9999']);
         $order->reference = 'ORD-DEMO-9999';
 
         $mailable = new OrderConfirmation($order);
@@ -58,7 +59,7 @@ class OrderConfirmationMailTest extends TestCase
 
     public function test_mailable_html_supports_dark_mode_scheme(): void
     {
-        $order = new \Lunar\Models\Order(['reference' => 'ORD-DARK-1']);
+        $order = new Order(['reference' => 'ORD-DARK-1']);
         $order->reference = 'ORD-DARK-1';
 
         $html = (new OrderConfirmation($order))->render();
@@ -75,7 +76,7 @@ class OrderConfirmationMailTest extends TestCase
         Mail::fake();
 
         $fakeMailable = new OrderConfirmation(
-            new \Lunar\Models\Order(['reference' => 'ORD-FAKE-1'])
+            new Order(['reference' => 'ORD-FAKE-1'])
         );
         $fakeMailable->reference = 'ORD-FAKE-1';
 
@@ -99,7 +100,7 @@ class OrderConfirmationMailTest extends TestCase
             'contact_email' => 'customer@example.com',
         ]);
 
-        $service = app(\App\Services\OrderConfirmationService::class);
+        $service = app(OrderConfirmationService::class);
         $service->send($order->fresh());
         $service->send($order->fresh());
 

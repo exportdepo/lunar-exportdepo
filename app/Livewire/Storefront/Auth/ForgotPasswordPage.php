@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Storefront\Auth;
 
+use App\Support\CustomerEmail;
 use Illuminate\Support\Facades\Password;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -10,11 +11,12 @@ use Livewire\Component;
 class ForgotPasswordPage extends Component
 {
     public string $email = '';
+
     public bool $emailSent = false;
 
     public function sendResetLink()
     {
-        $this->email = \App\Support\CustomerEmail::normalize($this->email);
+        $this->email = CustomerEmail::normalize($this->email);
 
         $this->validate([
             'email' => ['required', 'email'],

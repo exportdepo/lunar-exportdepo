@@ -2,12 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\ProductResource\Pages;
+use App\Filament\Resources\ProductResource;
+use App\Providers\CleanLunarPanelManager;
 use Database\Seeders\DemoDataSeeder;
 use Filament\Facades\Filament;
+use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 use Lunar\Admin\Filament\Resources\ProductResource\Pages\ListProducts;
-use Illuminate\Support\Facades\DB;
 use Lunar\Admin\Models\Staff;
 use Lunar\Admin\Support\Forms\Components\Tags as TagsComponent;
 use Lunar\Models\Currency;
@@ -117,15 +118,15 @@ class ProductTagsPanelTest extends TestCase
     {
         $this->assertSame(
             \Lunar\Admin\Filament\Resources\ProductResource::class,
-            get_parent_class(\App\Filament\Resources\ProductResource::class)
+            get_parent_class(ProductResource::class)
         );
 
         $this->assertContains(
-            \App\Filament\Resources\ProductResource::class,
-            \App\Providers\CleanLunarPanelManager::getResources()
+            ProductResource::class,
+            CleanLunarPanelManager::getResources()
         );
 
-        $columns = \App\Filament\Resources\ProductResource::getTableColumns();
+        $columns = ProductResource::getTableColumns();
 
         $this->assertContains(
             'tags.value',
@@ -154,13 +155,13 @@ class ProductTagsPanelTest extends TestCase
 
         $tagId = [$tagged->tags()->first()->id];
 
-        $query = \App\Filament\Resources\ProductResource::getEloquentQuery();
+        $query = ProductResource::getEloquentQuery();
         $query->whereHas('tags', fn ($q) => $q->whereIn('lunar_tags.id', $tagId));
 
         $this->assertTrue($query->get()->contains($tagged));
         $this->assertFalse($query->get()->contains($untagged));
 
-        $columns = \App\Filament\Resources\ProductResource::getTableColumns();
+        $columns = ProductResource::getTableColumns();
         $tagsColumn = collect($columns)->firstWhere(fn ($column) => $column->getName() === 'tags.value');
 
         $this->assertNotNull($tagsColumn);
@@ -168,8 +169,8 @@ class ProductTagsPanelTest extends TestCase
         $this->assertTrue($tagsColumn->isBadge());
 
         $this->assertContains(
-            \App\Filament\Resources\ProductResource::class,
-            \App\Providers\CleanLunarPanelManager::getResources()
+            ProductResource::class,
+            CleanLunarPanelManager::getResources()
         );
     }
 
