@@ -77,14 +77,18 @@
                                                 aria-label="{{ $line['name'] }} adet azalt"
                                                 class="px-2.5 text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40 dark:text-slate-300 dark:hover:bg-slate-800">−</button>
                                         <input type="number"
+                                               wire:key="cart-qty-{{ $line['id'] }}"
+                                               data-line-id="{{ $line['id'] }}"
                                                x-model.number="qty"
+                                               value="{{ (int) $line['quantity'] }}"
                                                min="1"
                                                max="99"
                                                role="spinbutton"
                                                aria-valuemin="1"
                                                aria-valuemax="99"
+                                               aria-valuenow="{{ (int) $line['quantity'] }}"
                                                :aria-valuenow="qty !== null && qty !== '' && Number.isFinite(Number(qty)) ? Number(qty) : false"
-                                               @if ($rejectedLineId === (int) $line['id']) aria-describedby="cart-error" aria-invalid="true" @endif
+                                               @if ($errors->has('cart') && $rejectedLineId === (int) $line['id']) aria-describedby="cart-error" aria-invalid="true" @endif
                                                @change="$wire.updateQuantity({{ $line['id'] }}, $event.target.value)"
                                                aria-label="{{ $line['name'] }} adet"
                                                class="qty-input w-14 py-1.5 text-center text-sm font-semibold text-slate-900 dark:bg-slate-800 dark:text-slate-100" />

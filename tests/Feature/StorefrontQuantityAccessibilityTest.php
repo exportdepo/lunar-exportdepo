@@ -7,6 +7,7 @@ use App\Livewire\Storefront\ProductPage;
 use DOMDocument;
 use DOMElement;
 use DOMXPath;
+use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 use Livewire\Livewire;
 use Lunar\Facades\CartSession;
 use Lunar\Models\Currency;
@@ -95,6 +96,48 @@ class StorefrontQuantityAccessibilityTest extends TestCase
         );
     }
 
+    public function test_product_page_quantity_exposes_its_value_before_alpine_initialises(): void
+    {
+        $xpath = $this->parseHtml($this->productPageHtml(stock: 7));
+
+        $input = $this->firstNode($xpath, '//input[@id="quantity"]');
+
+        $this->assertNotNull($input, 'Adet girişi bulunamadı.');
+
+        // Alpine başlamadan önce de spinbutton bir değer taşımalı; aksi halde
+        // ekran okuyucu "değeri yok" derken görünen alanda `1` yazar
+        // (WCAG 4.1.2).
+        $this->assertSame(
+            '1',
+            $input->getAttribute('aria-valuenow'),
+            'Sunucu tarafında ilk adet değeri aria-valuenow olarak yazılmalı.',
+        );
+        $this->assertSame(
+            '1',
+            $input->getAttribute('value'),
+            'Sunucu tarafında ilk adet değeri görünen alana da yazılmalı.',
+        );
+    }
+
+    public function test_cart_page_quantity_exposes_its_value_before_alpine_initialises(): void
+    {
+        $xpath = $this->parseHtml($this->cartPageHtml());
+
+        $input = $this->firstNode($xpath, '//main//input[@type="number"]');
+
+        $this->assertNotNull($input, 'Sepet sayfasındaki adet girişi bulunamadı.');
+        $this->assertSame(
+            '1',
+            $input->getAttribute('aria-valuenow'),
+            'Sunucu tarafında satır adedi aria-valuenow olarak yazılmalı.',
+        );
+        $this->assertSame(
+            '1',
+            $input->getAttribute('value'),
+            'Sunucu tarafında satır adedi görünen alana da yazılmalı.',
+        );
+    }
+
     public function test_product_page_quantity_value_is_omitted_while_the_field_is_empty(): void
     {
         $xpath = $this->parseHtml($this->productPageHtml(stock: 7));
@@ -108,17 +151,26 @@ class StorefrontQuantityAccessibilityTest extends TestCase
         // `aria-valuenow` gerçek değeri yansıtmalı (WCAG 4.1.2). Kullanıcı
         // alanı temizlediğinde Alpine modeli boş değere düşer; "1" değerine
         // düşmek görünmeyen bir değer bildirir. Değer yoksa nitelik
-        // kaldırılmalı (Alpine `false`/`null`/`undefined` değerinde niteliği
-        // DOM'dan siler).
+        // kaldırılmalı.
+        //
+        // Sentinel olarak `undefined` kullanılamaz: Alpine kapsamında bu
+        // identifier boş string'e çözülüyor ve nitelik `aria-valuenow=""`
+        // olarak kalıyor (kaldırılmıyor). `false`/`null` güvenli seçeneklerdir.
         $this->assertDoesNotMatchRegularExpression(
             '/\|\|\s*1\b/',
             $expression,
             'Boş adet alanı "1" olarak bildirilmemeli (aria-valuenow yalanı).',
         );
         $this->assertMatchesRegularExpression(
-            '/:\s*(false|null|undefined)\s*$/',
+            '/:\s*(false|null)\s*$/',
             trim($expression),
-            'Geçerli sayı olmayan modelde aria-valuenow kaldırılmalı (false/null/undefined).',
+            'Geçerli sayı olmayan modelde aria-valuenow kaldırılmalı (false/null).',
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            '/\bundefined\b/',
+            $expression,
+            '`undefined` sentinel olarak kullanılmamalı; Alpine kapsamında boş '
+                .'string\'e çözülür ve nitelik DOM\'dan kaldırılmaz.',
         );
     }
 
@@ -138,9 +190,15 @@ class StorefrontQuantityAccessibilityTest extends TestCase
             'Boş adet alanı "1" olarak bildirilmemeli (aria-valuenow yalanı).',
         );
         $this->assertMatchesRegularExpression(
-            '/:\s*(false|null|undefined)\s*$/',
+            '/:\s*(false|null)\s*$/',
             trim($expression),
-            'Geçerli sayı olmayan modelde aria-valuenow kaldırılmalı (false/null/undefined).',
+            'Geçerli sayı olmayan modelde aria-valuenow kaldırılmalı (false/null).',
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            '/\bundefined\b/',
+            $expression,
+            '`undefined` sentinel olarak kullanılmamalı; Alpine kapsamında boş '
+                .'string\'e çözülür ve nitelik DOM\'dan kaldırılmaz.',
         );
     }
 
@@ -303,12 +361,9 @@ class StorefrontQuantityAccessibilityTest extends TestCase
                 ->html(),
         );
 
-        $inputs = $xpath->query('//input[@type="number"]');
-
-        $this->assertSame(2, $inputs->length, 'Sepette iki adet girişi olmalı.');
-
-        $valid = $inputs->item(0);
-        $rejected = $inputs->item(1);
+        // Girişler satır kimliğine göre seçilir; render sırasına bağlı değil.
+        $valid = $this->firstNode($xpath, '//input[@data-line-id="'.$lineIds[0].'"]');
+        $rejected = $this->firstNode($xpath, '//input[@data-line-id="'.$lineIds[1].'"]');
 
         $this->assertNotNull($valid);
         $this->assertNotNull($rejected);
@@ -375,6 +430,145 @@ class StorefrontQuantityAccessibilityTest extends TestCase
             'Sepet kaybolduğunda reddedilen satır durumu temizlenmeli; aksi halde '
                 .'görünmeyen bir hata mesajına bağlanan aria-invalid kalır.',
         );
+    }
+
+    public function test_cart_page_accepts_an_empty_quantity_submission(): void
+    {
+        $lineIds = $this->twoLineCart();
+
+        $this->assertCount(2, $lineIds, 'Sepette iki satır bulunmalı.');
+
+        // Kullanıcı adet alanını temizleyip alandan çıktığında `@change`
+        // boş string gönderir. Bu bir TypeError'a yol açmamalı; adet 1'in
+        // altına düştüğü için satır kaldırılır.
+        Livewire::test(CartPage::class)
+            ->call('updateQuantity', $lineIds[0], '')
+            ->assertHasNoErrors()
+            ->assertSet('lines', fn (array $lines): bool => count($lines) === 1);
+    }
+
+    public function test_product_page_accepts_an_empty_quantity_and_reports_it_in_turkish(): void
+    {
+        $product = $this->publishedProductWithVariant(stock: 7);
+
+        $component = new ProductPage;
+        $component->mount($product->urls->first()->slug);
+
+        // Kullanıcı adet alanını temizleyip "Sepete Ekle" düğmesine basar.
+        // Boş değer sunucuya `null` olarak gider ve hata mesajı üretmelidir.
+        // Özellik `int` tipinde kalsaydı Livewire onu `unset()` eder ve 500
+        // hatası oluşurdu (WCAG 3.3.1).
+        $component->quantity = null;
+
+        $component->addToCart();
+
+        $this->assertTrue(
+            $component->getErrorBag()->has('quantity'),
+            'Boş adet için hata mesajı üretilmeli.',
+        );
+        $this->assertSame(
+            ['Lütfen geçerli bir adet girin.'],
+            $component->getErrorBag()->get('quantity'),
+            'Hata mesajı Türkçe olmalı.',
+        );
+        $this->assertFalse(
+            $component->added,
+            'Boş adetle ürün sepete eklenmemeli.',
+        );
+    }
+
+    public function test_cart_page_rejects_a_client_supplied_rejected_line_id(): void
+    {
+        $lineIds = $this->twoLineCart();
+
+        $component = Livewire::test(CartPage::class);
+
+        // `rejectedLineId` yalnızca sunucu tarafından belirlenir; istemci
+        // değiştirmeye çalışırsa istek reddedilir (WCAG 4.1.2).
+        $this->expectException(CannotUpdateLockedPropertyException::class);
+
+        $component->set('rejectedLineId', $lineIds[0]);
+    }
+
+    public function test_cart_page_does_not_mark_a_line_invalid_without_a_visible_error(): void
+    {
+        $lineIds = $this->twoLineCart();
+
+        // Sunucu tarafında bayat bir satır kimliği kalmış ama hata torbası
+        // boşsa hiçbir satır işaretlenmemeli: aksi halde `aria-describedby`
+        // var olmayan bir öğeye (`cart-error`) bağlanırdı (WCAG 4.1.2).
+        $component = Livewire::test(CartPageWithStaleRejectedLine::class, [
+            'rejectedLineId' => $lineIds[0],
+        ]);
+
+        $xpath = $this->parseHtml($component->html());
+
+        $inputs = $xpath->query('//input[@type="number"]');
+
+        $this->assertSame(2, $inputs->length, 'Sepette iki adet girişi olmalı.');
+
+        foreach ($inputs as $input) {
+            $this->assertSame(
+                '',
+                $input->getAttribute('aria-invalid'),
+                'Hata mesajı yokken adet girişi aria-invalid ile işaretlenmemeli.',
+            );
+            $this->assertSame(
+                '',
+                $input->getAttribute('aria-describedby'),
+                'Hata mesajı yokken adet girişi hata mesajına bağlanmamalı.',
+            );
+        }
+    }
+
+    public function test_cart_page_clears_the_invalid_marking_when_the_error_is_resolved(): void
+    {
+        $lineIds = $this->twoLineCart();
+
+        $component = Livewire::test(CartPage::class)
+            ->call('updateQuantity', $lineIds[1], 9);
+
+        $this->assertTrue(
+            $component->errors()->has('cart'),
+            'Stok üstü adet reddedilmeli.',
+        );
+
+        // Diğer bir satır başarıyla güncellenince hata torbası temizlenir ve
+        // daha önce işaretlenen satırın işareti kalkmalı (WCAG 3.3.1).
+        // Not: Livewire yalnızca bileşen özelliğiyle eşleşen hata anahtarlarını
+        // istekler arasında taşır; `cart` bir özellik olmadığı için hata
+        // bir sonraki istekte zaten kaybolur. `rejectedLineId` ise public bir
+        // özellik olduğu için taşınır — bu yüzden sunucu onu da sıfırlamalı.
+        $component->call('updateQuantity', $lineIds[0], 2);
+
+        $this->assertFalse(
+            $component->errors()->has('cart'),
+            'Başarılı güncellemeden sonra hata torbası temizlenmeli.',
+        );
+
+        $xpath = $this->parseHtml($component->html());
+
+        $this->assertNull(
+            $this->firstNode($xpath, '//*[@id="cart-error"]'),
+            'Hata çözüldükten sonra hata mesajı görünmemeli.',
+        );
+
+        $inputs = $xpath->query('//input[@type="number"]');
+
+        $this->assertSame(2, $inputs->length, 'Sepette iki adet girişi olmalı.');
+
+        foreach ($inputs as $input) {
+            $this->assertSame(
+                '',
+                $input->getAttribute('aria-invalid'),
+                'Hata çözüldükten sonra adet girişleri hatalı işaretlenmemeli.',
+            );
+            $this->assertSame(
+                '',
+                $input->getAttribute('aria-describedby'),
+                'Hata çözüldükten sonra adet girişleri hata mesajına bağlanmamalı.',
+            );
+        }
     }
 
     /**
@@ -467,5 +661,22 @@ class StorefrontQuantityAccessibilityTest extends TestCase
         $node = $nodes->item(0);
 
         return $node instanceof DOMElement ? $node : null;
+    }
+}
+
+/**
+ * Test yardımcısı: hata torbası boşken bayat bir satır kimliği taşıyan sepet.
+ *
+ * `rejectedLineId` yalnızca sunucu tarafından atanabildiği için, hata
+ * mesajı olmadan işaretlenebilecek durumu taklit etmek üzere sunucu tarafında
+ * atanır.
+ */
+class CartPageWithStaleRejectedLine extends CartPage
+{
+    public function mount(?int $rejectedLineId = null): void
+    {
+        parent::mount();
+
+        $this->rejectedLineId = $rejectedLineId;
     }
 }

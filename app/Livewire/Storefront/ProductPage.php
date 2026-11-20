@@ -69,7 +69,16 @@ class ProductPage extends Component
 
     public string $slug = '';
 
-    public int $quantity = 1;
+    /**
+     * Sepete eklenecek adet.
+     *
+     * Alan boşaltıldığında Alpine `null` gönderir. Değer nullable tutulur:
+     * `int` tipinde bir özellik `null` ile güncellendiğinde Livewire özelliği
+     * `unset()` eder ve sonraki okuma `PropertyNotFoundException` fırlatır
+     * (500 hatası). Boş değer geçerli bir durumdur ve Türkçe bir hata
+     * mesajıyla karşılanır (WCAG 3.3.1).
+     */
+    public ?int $quantity = 1;
 
     public bool $added = false;
 
@@ -532,6 +541,15 @@ class ProductPage extends Component
 
     public function addToCart(): void
     {
+        // Boş adet (`null`) geçerli bir `int` olmadığı için doğrulama kuralları
+        // önce elle karşılanır; böylece kullanıcı Türkçe bir mesaj görür
+        // (WCAG 3.3.1).
+        if ($this->quantity === null) {
+            $this->addError('quantity', 'Lütfen geçerli bir adet girin.');
+
+            return;
+        }
+
         $this->validate([
             'quantity' => ['required', 'integer', 'min:1'],
         ]);
@@ -581,7 +599,7 @@ class ProductPage extends Component
 
     public function updatedQuantity(): void
     {
-        if (! $this->product['variant_id'] || $this->quantity < 1) {
+        if (! $this->product['variant_id'] || $this->quantity === null || $this->quantity < 1) {
             return;
         }
 
@@ -595,7 +613,9 @@ class ProductPage extends Component
             return;
         }
 
-        $this->product['price'] = StorefrontPricing::forVariantInclTax($variant, $this->quantity);
+        // Adet boşaltıldığında fiyat hesabı için en küçük geçerli adet kullanılır;
+        // alan boş olsa bile sayfa fiyatı göstermeye devam eder.
+        $this->product['price'] = StorefrontPricing::forVariantInclTax($variant, $this->quantity ?? 1);
         $this->product['stock'] = $variant->stock;
         $this->product['variant_id'] = $variant->id;
     }

@@ -270,10 +270,12 @@
                                 <input id="quantity"
                                        x-model.number="qty"
                                        type="number"
+                                       value="{{ $quantity ?? 1 }}"
                                        min="1"
                                        @if ($product['stock'] !== null) max="{{ $product['stock'] }}" @endif
                                        role="spinbutton"
                                        aria-valuemin="1"
+                                       aria-valuenow="{{ $quantity ?? 1 }}"
                                        :aria-valuemax="{{ $product['stock'] ?? 999 }}"
                                        :aria-valuenow="qty !== null && qty !== '' && Number.isFinite(Number(qty)) ? Number(qty) : false"
                                        @error('quantity') aria-describedby="quantity-error" aria-invalid="true" @enderror

@@ -4,6 +4,7 @@ namespace App\Livewire\Storefront;
 
 use App\Support\VariantOptions;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Lunar\Exceptions\Carts\CartException;
 use Lunar\Facades\CartSession;
@@ -29,7 +30,13 @@ class CartPage extends Component
      * hangi adet girişine bağlanacağını bilmek için reddedilen satır burada
      * ayrıca saklanır; aksi halde tek bir satırdaki hata sepeteki tüm adet
      * girişlerini hatalı olarak işaretlerdi (WCAG 3.3.1).
+     *
+     * Değer yalnızca sunucu tarafından belirlenir. `#[Locked]` özniteliği
+     * istemcinin bu değeri değiştirmesini engeller; aksi halde sunucuda olmayan
+     * bir hata mesajına bağlanan `aria-invalid` işareti oluşabilirdi
+     * (WCAG 4.1.2).
      */
+    #[Locked]
     public ?int $rejectedLineId = null;
 
     public function mount(): void
@@ -46,9 +53,14 @@ class CartPage extends Component
      * doğrulayıcılarının ürettiği `CartException` da 500'e çevrilmek yerine
      * kullanıcıya Türkçe uyarı olarak gösterilir; stepper sunucudaki gerçek
      * adete geri döndürülür.
+     *
+     * Adet değeri tarayıcıdan string olarak gelir; boş alan (`''`) geçerli
+     * bir tamsayı olmadığı için normalize edilir (bkz. `normaliseQuantity`).
      */
-    public function updateQuantity(int $lineId, int $quantity): void
+    public function updateQuantity(int $lineId, int|string|null $quantity): void
     {
+        $quantity = $this->normaliseQuantity($quantity);
+
         if ($quantity < 1) {
             $this->removeLine($lineId);
 
@@ -125,6 +137,28 @@ class CartPage extends Component
 
         $this->refreshCart();
         $this->dispatch('cart-updated');
+    }
+
+    /**
+     * Adet değerini tamsayıya normalize eder.
+     *
+     * Tarayıcı, adet alanı boşaltıldığında boş string gönderir; bu değer
+     * geçerli bir tamsayı olmadığı için aksiyona olduğu gibi geçirilirse
+     * `TypeError` oluşur. Boş ya da sayısal olmayan değerler `0` kabul
+     * edilir; `0` da `1`'in altında olduğu için satırın kaldırılmasıyla
+     * sonuçlanır (aynı davranış alana `0` yazılmasıyla).
+     */
+    protected function normaliseQuantity(int|string|null $quantity): int
+    {
+        if (is_int($quantity)) {
+            return $quantity;
+        }
+
+        if ($quantity === null || ! is_numeric(trim($quantity))) {
+            return 0;
+        }
+
+        return (int) trim($quantity);
     }
 
     /**
