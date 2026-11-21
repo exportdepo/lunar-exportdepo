@@ -34,3 +34,31 @@ yarn-error.log
 # SQLite yerel veritabanı
 *.sqlite
 /database/database.sqlite
+
+# AI/Editor tooling
+/.agents
+/.ai
+/.opencode
+/opencode.json
+/skills-lock.json
+/.opencode_rules.md
+
+# Debug & test artifacts
+/debug.log
+/test-run.txt
+/test_output.txt
+/testing
+/toArray()
+
+# Local config/memory
+/memory.md
+/cline_ui_plan.md
+
+# Generated/public assets (if built)
+/public/vendor
+
+# User uploads
+/storage/media-library
+
+# Docker (if local only)
+/docker
