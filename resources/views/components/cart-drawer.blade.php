@@ -39,7 +39,7 @@
     <div x-show="$store.cartDrawer.open"
          x-transition.opacity.duration.300ms
          @click="$store.cartDrawer.hide()"
-         class="absolute inset-0 bg-slate-900/50"
+         class="absolute inset-0 bg-slate-900/60"
          aria-hidden="true"></div>
 
     {{-- Sağdan kayan panel — `tabindex="-1"` odak tuzağının panele

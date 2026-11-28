@@ -22,6 +22,9 @@
             <x-cart-alert id="cart-error" :message="$message" />
         @enderror
 
+        {{-- Quantity rejection announcement (WCAG 2.1 AA 4.1.3) --}}
+        <div id="cart-qty-announcement" role="status" aria-live="polite" aria-atomic="true" class="sr-only" aria-hidden="true"></div>
+
         @if (empty($lines))
             <x-empty-state icon="🛒"
                            title="Sepetiniz boş"
@@ -68,7 +71,7 @@
                                          varken bildirilir; boş alan "1" olarak
                                          duyurulmamalı (WCAG 4.1.2). --}}
                                     <div x-data="{ qty: {{ (int) $line['quantity'] }}, increase() { this.qty = Math.min(99, (parseInt(this.qty) || 1) + 1); this.$wire.updateQuantity({{ $line['id'] }}, this.qty); }, decrease() { this.qty = Math.max(1, (parseInt(this.qty) || 1) - 1); this.$wire.updateQuantity({{ $line['id'] }}, this.qty); } }"
-                                         x-on:cart-quantity-rejected.window="if ($event.detail.lineId === {{ $line['id'] }}) qty = $event.detail.quantity"
+                                         x-on:cart-quantity-rejected.window="if ($event.detail.lineId === {{ $line['id'] }}) { qty = $event.detail.quantity; const ann = document.getElementById('cart-qty-announcement'); if (ann) { ann.textContent = 'Adet ' + $event.detail.quantity + ' olarak düzeltildi'; ann.removeAttribute('aria-hidden'); setTimeout(() => ann.setAttribute('aria-hidden', 'true'), 2000); } }"
                                          class="flex items-stretch overflow-hidden rounded-lg border border-slate-300 transition-colors focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 dark:border-slate-600 dark:focus-within:border-indigo-400 dark:focus-within:ring-indigo-400/30">
                                         <button type="button"
                                                 @click="decrease()"

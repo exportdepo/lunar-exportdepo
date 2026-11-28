@@ -11,6 +11,21 @@
     {{-- Koleksiyon başlık şeridi --}}
     <section class="border-b border-slate-800 bg-slate-900 text-white">
         <div class="anim-fade-up mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+            {{-- Breadcrumb (WCAG 2.4.8) --}}
+            <nav aria-label="Yol Haritası" class="mb-6">
+                <ol class="flex items-center gap-2 text-sm" role="list">
+                    <li>
+                        <a href="{{ url('/') }}" class="text-slate-300 transition-colors hover:text-white">Ana Sayfa</a>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mx-2 h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                    </li>
+                    <li>
+                        <a href="{{ url('/koleksiyonlar') }}" class="text-slate-300 transition-colors hover:text-white">Koleksiyonlar</a>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mx-2 h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                    </li>
+                    <li aria-current="page" class="text-white font-medium">{{ $collection['name'] }}</li>
+                </ol>
+            </nav>
+
             <a href="{{ url('/') }}" class="inline-flex items-center text-sm text-slate-300 transition-colors hover:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -112,9 +127,10 @@
                     {{-- Marka — koleksiyon ürünlerindeki markalar; çoklu seçim (OR),
                          varyant gruplarıyla aynı başlangıçta kapalı accordion --}}
                     @if (!empty($brands))
+                        <h3 class="mb-1.5 text-sm font-medium text-slate-700 dark:text-slate-300">Marka</h3>
                         <details class="group mb-4 rounded-lg border border-slate-200 dark:border-slate-700">
                             <summary class="flex cursor-pointer select-none items-center justify-between rounded-lg px-3 py-2.5 text-sm font-bold text-slate-900 transition-colors hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 [&::-webkit-details-marker]:hidden">
-                                <h3>Marka</h3>
+                                <span>Marka</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                 </svg>
@@ -151,9 +167,10 @@
                     {{-- Etiketler — koleksiyon ürünlerindeki etiketler; çoklu seçim (OR),
                          varyant gruplarıyla aynı başlangıçta kapalı accordion --}}
                     @if (!empty($tags))
+                        <h3 class="mb-1.5 text-sm font-medium text-slate-700 dark:text-slate-300">Etiketler</h3>
                         <details class="group mb-4 rounded-lg border border-slate-200 dark:border-slate-700">
                             <summary class="flex cursor-pointer select-none items-center justify-between rounded-lg px-3 py-2.5 text-sm font-bold text-slate-900 transition-colors hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 [&::-webkit-details-marker]:hidden">
-                                <h3>Etiketler</h3>
+                                <span>Etiketler</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                 </svg>
@@ -176,9 +193,10 @@
                          birleşir; her grup başlangıçta kapalı açılır menüdür (accordion).
                          Koleksiyonda hiç değeri olmayan grup zaten listelenmez. --}}
                     @foreach ($options as $option)
+                        <h3 class="mb-1.5 text-sm font-medium text-slate-700 dark:text-slate-300">{{ $option['name'] }}</h3>
                         <details class="group mb-4 rounded-lg border border-slate-200 dark:border-slate-700">
                             <summary class="flex cursor-pointer select-none items-center justify-between rounded-lg px-3 py-2.5 text-sm font-bold text-slate-900 transition-colors hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 [&::-webkit-details-marker]:hidden">
-                                <h3>{{ $option['name'] }}</h3>
+                                <span>{{ $option['name'] }}</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                 </svg>

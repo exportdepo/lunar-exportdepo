@@ -30,8 +30,8 @@
         'secondary' => 'bg-slate-900 text-white shadow-sm hover:bg-slate-700 active:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white dark:active:bg-slate-300',
         'outline' => 'border border-slate-300 bg-white text-slate-700 shadow-sm hover:border-slate-400 hover:bg-slate-50 active:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-700 dark:active:bg-slate-600',
         'ghost' => 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 active:bg-slate-200 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white',
-        'inverse' => 'bg-white text-indigo-700 shadow-sm hover:bg-slate-100 active:bg-slate-200 dark:bg-white dark:text-indigo-700 dark:hover:bg-slate-100',
-        'glass' => 'border border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 active:bg-white/25',
+        'inverse' => 'bg-white text-indigo-700 shadow-sm hover:bg-slate-100 active:bg-slate-200 dark:bg-white dark:text-indigo-700 dark:hover:bg-slate-100 dark:focus-visible:ring-offset-slate-950',
+        'glass' => 'border border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 active:bg-white/25 dark:focus-visible:ring-offset-slate-950 dark:focus-visible:ring-indigo-400',
         'danger' => 'bg-rose-600 text-white shadow-sm hover:bg-rose-700 active:bg-rose-800 dark:bg-rose-500 dark:hover:bg-rose-400 dark:active:bg-rose-300',
     ];
 

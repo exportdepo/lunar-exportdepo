@@ -7,7 +7,12 @@ export default defineConfig({
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.js'],
             refresh: true,
+            buildDirectory: 'build_2',
         }),
         tailwindcss(),
     ],
+    build: {
+        outDir: 'public/build_2',
+        emptyOutDir: true,
+    },
 });
